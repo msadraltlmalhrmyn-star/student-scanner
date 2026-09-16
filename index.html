@@ -2,7 +2,9 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 
 <title>ماسح الحضور والتقييم</title>
 
@@ -10,148 +12,163 @@
 <script src="https://cdn.jsdelivr.net/gh/damianofalcioni/js-aruco2@master/src/aruco.js"></script>
 
 <style>
-*{box-sizing:border-box}
+
+*{
+  box-sizing:border-box;
+}
 
 body{
- margin:0;
- padding:20px;
- font-family:Arial,sans-serif;
- background:#f4f6f9;
- color:#14233a;
- text-align:center;
+  margin:0;
+  padding:20px;
+  font-family:Arial,sans-serif;
+  background:#f4f6f9;
+  color:#14233a;
+  text-align:center;
 }
 
 h1{
- color:#14558e;
- font-size:34px;
- margin:25px 0 8px;
+  color:#14558e;
+  font-size:34px;
+  margin:25px 0 8px;
 }
 
 .school{
- color:#667085;
- font-size:19px;
- margin-bottom:25px;
+  color:#667085;
+  font-size:19px;
+  margin-bottom:25px;
 }
 
 .tabs{
- display:flex;
- gap:10px;
- margin-bottom:18px;
+  display:flex;
+  gap:10px;
+  margin-bottom:18px;
 }
 
 .tab{
- flex:1;
- padding:17px 5px;
- border:0;
- border-radius:18px;
- background:white;
- color:#1671d9;
- font-size:19px;
- font-weight:bold;
+  flex:1;
+  padding:17px 5px;
+  border:0;
+  border-radius:18px;
+  background:white;
+  color:#1671d9;
+  font-size:19px;
+  font-weight:bold;
 }
 
 .tab.active{
- background:#19558e;
- color:white;
+  background:#19558e;
+  color:white;
 }
 
 #status{
- background:white;
- border-radius:18px;
- padding:17px;
- margin-bottom:18px;
- font-size:19px;
- font-weight:bold;
+  background:white;
+  border-radius:18px;
+  padding:17px;
+  margin-bottom:18px;
+  font-size:19px;
+  font-weight:bold;
 }
 
 .cameraBox{
- position:relative;
- width:100%;
- max-width:650px;
- margin:auto;
- overflow:hidden;
- border-radius:24px;
- background:#111;
+  position:relative;
+  width:100%;
+  max-width:650px;
+  margin:auto;
+  overflow:hidden;
+  border-radius:24px;
+  background:#111;
 }
 
 video{
- display:block;
- width:100%;
- min-height:450px;
- object-fit:cover;
+  display:block;
+  width:100%;
+  min-height:450px;
+  object-fit:cover;
 }
 
 .frame{
- position:absolute;
- width:70%;
- height:65%;
- left:15%;
- top:12%;
- border:5px solid white;
- border-radius:25px;
- pointer-events:none;
+  position:absolute;
+  width:72%;
+  height:65%;
+  left:14%;
+  top:12%;
+  border:5px solid white;
+  border-radius:25px;
+  pointer-events:none;
 }
 
 .guide{
- position:absolute;
- bottom:18px;
- width:100%;
- color:white;
- font-size:20px;
- font-weight:bold;
- text-shadow:0 2px 6px black;
+  position:absolute;
+  bottom:18px;
+  width:100%;
+  color:white;
+  font-size:20px;
+  font-weight:bold;
+  text-shadow:0 2px 6px #000;
 }
 
 canvas{
- display:none;
+  display:none;
 }
 
 .buttons{
- max-width:650px;
- margin:18px auto;
+  max-width:650px;
+  margin:18px auto;
 }
 
 .main{
- width:100%;
- border:0;
- border-radius:20px;
- padding:20px;
- margin-bottom:12px;
- color:white;
- font-size:22px;
- font-weight:bold;
+  width:100%;
+  border:0;
+  border-radius:20px;
+  padding:20px;
+  margin-bottom:12px;
+  color:white;
+  font-size:22px;
+  font-weight:bold;
 }
 
-#startBtn{background:#159447}
-#switchBtn{background:#19558e}
+#startBtn{
+  background:#159447;
+}
+
+#switchBtn{
+  background:#19558e;
+}
 
 #result{
- max-width:650px;
- margin:15px auto;
- padding:20px;
- border-radius:20px;
- background:white;
- font-size:22px;
- min-height:90px;
+  max-width:650px;
+  margin:15px auto;
+  padding:20px;
+  border-radius:20px;
+  background:white;
+  font-size:22px;
+  min-height:100px;
 }
 
 .success{
- background:#ddf7e7 !important;
- border:3px solid #159447;
+  background:#ddf7e7 !important;
+  border:3px solid #159447;
 }
 
 .student{
- font-size:30px;
- font-weight:bold;
- color:#174d82;
+  font-size:30px;
+  font-weight:bold;
+  color:#174d82;
 }
 
 .answer{
- font-size:34px;
- font-weight:bold;
- color:#159447;
- margin-top:8px;
+  font-size:34px;
+  font-weight:bold;
+  color:#159447;
+  margin-top:8px;
 }
+
+.markerid{
+  font-size:16px;
+  color:#667085;
+  margin-top:8px;
+}
+
 </style>
 </head>
 
@@ -163,33 +180,43 @@ canvas{
 مدرسة الحرمين الثانوية
 </div>
 
+
 <div class="tabs">
-<button class="tab active"
- onclick="selectMode('attendance',this)">
+
+<button
+class="tab active"
+onclick="selectMode('attendance',this)">
 الحضور
 </button>
 
-<button class="tab"
- onclick="selectMode('homework',this)">
+<button
+class="tab"
+onclick="selectMode('homework',this)">
 الواجب
 </button>
 
-<button class="tab"
- onclick="selectMode('task',this)">
+<button
+class="tab"
+onclick="selectMode('task',this)">
 مهمة أدائية
 </button>
+
 </div>
 
+
 <div id="status">
-اضغط فتح الكاميرا
+اضغط «فتح الكاميرا»
 </div>
+
 
 <div class="cameraBox">
 
-<video id="video"
- autoplay
- muted
- playsinline></video>
+<video
+id="video"
+autoplay
+muted
+playsinline>
+</video>
 
 <div class="frame"></div>
 
@@ -199,25 +226,33 @@ canvas{
 
 </div>
 
+
 <canvas id="canvas"></canvas>
+
 
 <div class="buttons">
 
 <button
- id="startBtn"
- class="main"
- onclick="startCamera()">
+id="startBtn"
+class="main"
+onclick="startCamera()">
+
 📷 فتح الكاميرا
+
 </button>
 
+
 <button
- id="switchBtn"
- class="main"
- onclick="switchCamera()">
+id="switchBtn"
+class="main"
+onclick="switchCamera()">
+
 🔄 تبديل الكاميرا
+
 </button>
 
 </div>
+
 
 <div id="result">
 لم يتم مسح أي طالب حتى الآن
@@ -226,438 +261,742 @@ canvas{
 
 <script>
 
+/* ================================
+   عناصر الصفحة
+================================ */
+
 const video =
- document.getElementById("video");
+document.getElementById("video");
 
 const canvas =
- document.getElementById("canvas");
+document.getElementById("canvas");
 
 const ctx =
- canvas.getContext(
+canvas.getContext(
   "2d",
   {willReadFrequently:true}
- );
+);
+
+
+/* ================================
+   المتغيرات
+================================ */
 
 let stream = null;
 
 let facingMode =
- "environment";
+"environment";
 
 let currentMode =
- "attendance";
+"attendance";
 
 let scanning =
- false;
+false;
+
+let detector = null;
+
+let lastMarkerID = null;
+
+let lastAnswer = null;
+
+let lastDetectionTime = 0;
 
 
-/* ==============================
-   ARUCO DETECTOR
+/* ================================
+   قارئ ARUCO
+   الافتراضي ARUCO_MIP_36h12
 ================================ */
-
-let detector;
 
 try{
 
- detector =
-  new AR.Detector({
-   dictionaryName:
-   "ARUCO_MIP_36h12"
-  });
+  detector =
+  new AR.Detector();
+
+  console.log(
+    "ARUCO detector ready"
+  );
 
 }catch(error){
 
- console.error(error);
-
- document.getElementById("status")
- .innerHTML =
- "❌ لم يتم تحميل قارئ البطاقات";
+  console.error(error);
 
 }
 
 
-/* ==============================
+/* ================================
    الطلاب
+
+   Marker 0 = S01
+   Marker 1 = S02
+   Marker 2 = S03
+   ...
 ================================ */
 
 const students = {
 
- 0:"الطالب S01",
- 1:"الطالب S02",
- 2:"الطالب S03",
- 3:"الطالب S04",
- 4:"الطالب S05"
+  0:"الطالب S01",
+  1:"الطالب S02",
+  2:"الطالب S03",
+  3:"الطالب S04",
+  4:"الطالب S05",
+  5:"الطالب S06",
+  6:"الطالب S07",
+  7:"الطالب S08",
+  8:"الطالب S09",
+  9:"الطالب S10"
 
 };
 
 
-/* ==============================
-   اختيار الوضع
+/* ================================
+   اختيار نوع التقييم
 ================================ */
 
-function selectMode(mode,button){
+function selectMode(
+  mode,
+  button
+){
 
- currentMode = mode;
+  currentMode =
+  mode;
 
- document
- .querySelectorAll(".tab")
- .forEach(btn =>
-  btn.classList.remove("active")
- );
+  document
+  .querySelectorAll(".tab")
+  .forEach(btn => {
 
- button.classList.add("active");
+    btn.classList.remove(
+      "active"
+    );
+
+  });
+
+  button.classList.add(
+    "active"
+  );
 
 }
 
 
-/* ==============================
-   تشغيل الكاميرا
+/* ================================
+   فتح الكاميرا
 ================================ */
 
 async function startCamera(){
 
- const status =
-  document.getElementById("status");
+  const status =
+  document.getElementById(
+    "status"
+  );
 
- try{
+  try{
 
-  if(stream){
+    if(
+      !navigator.mediaDevices ||
+      !navigator.mediaDevices.getUserMedia
+    ){
 
-   stream
-   .getTracks()
-   .forEach(track =>
-    track.stop()
-   );
+      status.innerHTML =
+      "❌ المتصفح لا يدعم تشغيل الكاميرا";
+
+      return;
+
+    }
+
+
+    if(stream){
+
+      stream
+      .getTracks()
+      .forEach(track => {
+
+        track.stop();
+
+      });
+
+    }
+
+
+    status.innerHTML =
+    "جاري تشغيل الكاميرا...";
+
+
+    stream =
+    await navigator
+    .mediaDevices
+    .getUserMedia({
+
+      video:{
+
+        facingMode:{
+          ideal:facingMode
+        },
+
+        width:{
+          ideal:1280
+        },
+
+        height:{
+          ideal:720
+        }
+
+      },
+
+      audio:false
+
+    });
+
+
+    video.srcObject =
+    stream;
+
+
+    await video.play();
+
+
+    status.innerHTML =
+    "✅ الكاميرا تعمل — وجّهها إلى بطاقة الطالب";
+
+
+    if(!scanning){
+
+      scanning = true;
+
+      requestAnimationFrame(
+        scanFrame
+      );
+
+    }
+
+
+  }catch(error){
+
+    console.error(
+      error
+    );
+
+    status.innerHTML =
+    "❌ تعذر تشغيل الكاميرا: "
+    +
+    error.name;
 
   }
-
-  status.innerHTML =
-   "جاري تشغيل الكاميرا...";
-
-  stream =
-   await navigator
-   .mediaDevices
-   .getUserMedia({
-
-    video:{
-
-     facingMode:{
-      ideal:facingMode
-     },
-
-     width:{
-      ideal:1280
-     },
-
-     height:{
-      ideal:720
-     }
-
-    },
-
-    audio:false
-
-   });
-
-  video.srcObject =
-   stream;
-
-  await video.play();
-
-  status.innerHTML =
-   "✅ الكاميرا تعمل — وجّهها إلى بطاقة الطالب";
-
-  if(!scanning){
-
-   scanning = true;
-
-   requestAnimationFrame(scan);
-
-  }
-
- }catch(error){
-
-  console.error(error);
-
-  status.innerHTML =
-   "❌ تعذر تشغيل الكاميرا: "
-   + error.name;
-
- }
 
 }
 
 
-/* ==============================
+/* ================================
    تبديل الكاميرا
 ================================ */
 
 async function switchCamera(){
 
- facingMode =
-  facingMode === "environment"
-  ? "user"
-  : "environment";
+  if(
+    facingMode ===
+    "environment"
+  ){
 
- await startCamera();
+    facingMode =
+    "user";
 
-}
+  }else{
 
-
-/* ==============================
-   المسح المستمر
-================================ */
-
-function scan(){
-
- if(
-  video.readyState >= 2 &&
-  detector
- ){
-
-  /*
-   تقليل الدقة هنا متعمد
-   حتى يكون المسح سريعاً على الآيفون
-  */
-
-  const scanWidth =
-   640;
-
-  const ratio =
-   video.videoHeight /
-   video.videoWidth;
-
-  const scanHeight =
-   Math.round(
-    scanWidth * ratio
-   );
-
-  canvas.width =
-   scanWidth;
-
-  canvas.height =
-   scanHeight;
-
-  ctx.drawImage(
-   video,
-   0,
-   0,
-   scanWidth,
-   scanHeight
-  );
-
-  try{
-
-   const imageData =
-    ctx.getImageData(
-     0,
-     0,
-     scanWidth,
-     scanHeight
-    );
-
-   const markers =
-    detector.detect(
-     imageData
-    );
-
-   if(markers.length > 0){
-
-    handleMarker(
-     markers[0]
-    );
-
-   }
-
-  }catch(error){
-
-   console.error(
-    "Detection error:",
-    error
-   );
+    facingMode =
+    "environment";
 
   }
 
- }
 
- requestAnimationFrame(scan);
-
-}
-
-
-/* ==============================
-   عند اكتشاف البطاقة
-================================ */
-
-function handleMarker(marker){
-
- const id =
-  Number(marker.id);
-
- const studentNumber =
-  id + 1;
-
- const name =
-  students[id] ||
-  ("الطالب S" +
-   String(studentNumber)
-   .padStart(2,"0"));
-
- const answer =
-  getAnswer(
-   marker.corners
-  );
-
- const result =
-  document.getElementById(
-   "result"
-  );
-
- result.classList.add(
-  "success"
- );
-
- let modeText = "";
-
- if(currentMode ===
-    "attendance"){
-
-  modeText =
-   "✅ حاضر";
-
- }else if(
-  currentMode ===
-  "homework"){
-
-  modeText =
-   "الواجب";
-
- }else{
-
-  modeText =
-   "المهمة الأدائية";
-
- }
-
- result.innerHTML =
-
-  '<div class="student">' +
-  name +
-  '</div>' +
-
-  '<div>' +
-  modeText +
-  '</div>' +
-
-  '<div class="answer">' +
-  'الإجابة: ' +
-  answer +
-  '</div>';
+  await startCamera();
 
 }
 
 
-/* ==============================
-   تحديد اتجاه البطاقة
-   A B C D
+/* ================================
+   قراءة الفيديو باستمرار
 ================================ */
 
-function getAnswer(corners){
+function scanFrame(){
 
- if(
-  !corners ||
-  corners.length < 2
- ){
+  if(
+    video.readyState >= 2 &&
+    detector
+  ){
 
-  return "?";
+    /*
+      دقة مناسبة للآيفون.
+      لا نحتاج معالجة الفيديو
+      بدقته الكاملة.
+    */
 
- }
+    const scanWidth =
+    640;
 
- const p0 =
+
+    const ratio =
+    video.videoHeight /
+    video.videoWidth;
+
+
+    const scanHeight =
+    Math.max(
+      1,
+      Math.round(
+        scanWidth * ratio
+      )
+    );
+
+
+    canvas.width =
+    scanWidth;
+
+    canvas.height =
+    scanHeight;
+
+
+    ctx.drawImage(
+      video,
+      0,
+      0,
+      scanWidth,
+      scanHeight
+    );
+
+
+    try{
+
+      const imageData =
+      ctx.getImageData(
+        0,
+        0,
+        scanWidth,
+        scanHeight
+      );
+
+
+      const markers =
+      detector.detect(
+        imageData
+      );
+
+
+      if(
+        markers &&
+        markers.length > 0
+      ){
+
+        /*
+          حاليًا نختبر أول بطاقة.
+          بعد نجاح الاختبار سنجعل
+          النظام يقرأ عدة طلاب
+          في نفس الصورة.
+        */
+
+        processMarker(
+          markers[0]
+        );
+
+      }
+
+
+    }catch(error){
+
+      console.error(
+        "Detection error:",
+        error
+      );
+
+    }
+
+  }
+
+
+  requestAnimationFrame(
+    scanFrame
+  );
+
+}
+
+
+/* ================================
+   معالجة البطاقة المكتشفة
+================================ */
+
+function processMarker(
+  marker
+){
+
+  const id =
+  Number(
+    marker.id
+  );
+
+
+  const answer =
+  getAnswerFromOrientation(
+    marker.corners
+  );
+
+
+  /*
+    منع اهتزاز النتيجة
+    وتكرار القراءة عشرات المرات
+    في الثانية.
+  */
+
+  const now =
+  Date.now();
+
+
+  if(
+    id === lastMarkerID &&
+    answer === lastAnswer &&
+    now - lastDetectionTime < 700
+  ){
+
+    return;
+
+  }
+
+
+  lastMarkerID =
+  id;
+
+  lastAnswer =
+  answer;
+
+  lastDetectionTime =
+  now;
+
+
+  showResult(
+    id,
+    answer
+  );
+
+}
+
+
+/* ================================
+   تحديد A / B / C / D
+   من اتجاه البطاقة
+================================ */
+
+function getAnswerFromOrientation(
+  corners
+){
+
+  if(
+    !corners ||
+    corners.length < 2
+  ){
+
+    return "?";
+
+  }
+
+
+  /*
+    المكتبة تعيد زوايا العلامة
+    بترتيب معروف بعد التعرف عليها.
+
+    الخط من corner 0 إلى corner 1
+    يعطينا اتجاه أعلى العلامة.
+  */
+
+  const p0 =
   corners[0];
 
- const p1 =
+  const p1 =
   corners[1];
 
- const dx =
+
+  const dx =
   p1.x - p0.x;
 
- const dy =
+  const dy =
   p1.y - p0.y;
 
- let angle =
+
+  let angle =
   Math.atan2(
-   dy,
-   dx
-  ) *
-  180 /
+    dy,
+    dx
+  )
+  *
+  180
+  /
   Math.PI;
 
- if(angle < 0){
 
-  angle += 360;
+  if(angle < 0){
 
- }
+    angle += 360;
 
- /*
-   أعلى البطاقة = A
-   يمين = B
-   أسفل = C
-   يسار = D
- */
+  }
 
- if(
-  angle >= 315 ||
-  angle < 45
- ){
 
-  return "A";
+  /*
+    البطاقة بوضعها الطبيعي:
+    A في الأعلى.
 
- }
+    تدويرها 90°:
+    B
 
- if(
-  angle >= 45 &&
-  angle < 135
- ){
+    تدويرها 180°:
+    C
 
-  return "B";
+    تدويرها 270°:
+    D
+  */
 
- }
 
- if(
-  angle >= 135 &&
-  angle < 225
- ){
+  if(
+    angle >= 315 ||
+    angle < 45
+  ){
 
-  return "C";
+    return "A";
 
- }
+  }
 
- return "D";
+
+  if(
+    angle >= 45 &&
+    angle < 135
+  ){
+
+    return "B";
+
+  }
+
+
+  if(
+    angle >= 135 &&
+    angle < 225
+  ){
+
+    return "C";
+
+  }
+
+
+  return "D";
 
 }
 
 
-/* ==============================
-   فحص تحميل المكتبة
+/* ================================
+   عرض النتيجة
+================================ */
+
+function showResult(
+  id,
+  answer
+){
+
+  const result =
+  document.getElementById(
+    "result"
+  );
+
+
+  const studentNumber =
+  id + 1;
+
+
+  const studentCode =
+  "S" +
+  String(
+    studentNumber
+  ).padStart(
+    2,
+    "0"
+  );
+
+
+  const studentName =
+  students[id] ||
+  (
+    "الطالب " +
+    studentCode
+  );
+
+
+  let modeText =
+  "";
+
+
+  if(
+    currentMode ===
+    "attendance"
+  ){
+
+    modeText =
+    "✅ تم تسجيل الحضور";
+
+  }
+
+
+  else if(
+    currentMode ===
+    "homework"
+  ){
+
+    modeText =
+    "📝 الواجب";
+
+  }
+
+
+  else{
+
+    modeText =
+    "📋 المهمة الأدائية";
+
+  }
+
+
+  result.classList.add(
+    "success"
+  );
+
+
+  /*
+    في الحضور لا نحتاج
+    إظهار الإجابة.
+
+    في الواجب والمهمة
+    نظهر اتجاه البطاقة.
+  */
+
+
+  if(
+    currentMode ===
+    "attendance"
+  ){
+
+    result.innerHTML =
+
+    '<div class="student">'
+    +
+    studentName
+    +
+    '</div>'
+
+    +
+
+    '<div class="answer">'
+    +
+    modeText
+    +
+    '</div>'
+
+    +
+
+    '<div class="markerid">'
+    +
+    'Marker ID: '
+    +
+    id
+    +
+    '</div>';
+
+  }
+
+  else{
+
+    result.innerHTML =
+
+    '<div class="student">'
+    +
+    studentName
+    +
+    '</div>'
+
+    +
+
+    '<div>'
+    +
+    modeText
+    +
+    '</div>'
+
+    +
+
+    '<div class="answer">'
+    +
+    'الإجابة: '
+    +
+    answer
+    +
+    '</div>'
+
+    +
+
+    '<div class="markerid">'
+    +
+    'Marker ID: '
+    +
+    id
+    +
+    '</div>';
+
+  }
+
+
+  document
+  .getElementById(
+    "status"
+  )
+  .innerHTML =
+  "✅ تم التعرف على "
+  +
+  studentCode;
+
+}
+
+
+/* ================================
+   فحص المكتبة عند فتح الصفحة
 ================================ */
 
 window.addEventListener(
- "load",
- function(){
+  "load",
+  function(){
 
-  if(
-   typeof AR ===
-   "undefined"
-  ){
+    const status =
+    document.getElementById(
+      "status"
+    );
 
-   document
-   .getElementById("status")
-   .innerHTML =
-   "❌ مكتبة قراءة البطاقات لم تُحمّل";
+
+    if(
+      typeof AR ===
+      "undefined"
+    ){
+
+      status.innerHTML =
+      "❌ لم يتم تحميل مكتبة قراءة البطاقات";
+
+      return;
+
+    }
+
+
+    if(!detector){
+
+      status.innerHTML =
+      "❌ تعذر تشغيل قارئ البطاقات";
+
+      return;
+
+    }
+
+
+    status.innerHTML =
+    "جاهز — اضغط «فتح الكاميرا»";
 
   }
-
- }
 );
 
 </script>
