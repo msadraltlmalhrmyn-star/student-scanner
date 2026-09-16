@@ -1,192 +1,201 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 
-  <title>ماسح الحضور والتقييم</title>
+<title>ماسح الحضور والتقييم</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/js-aruco2@1.0.0/src/aruco.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/js-aruco2@1.0.0/src/cv.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/damianofalcioni/js-aruco2@master/src/cv.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/damianofalcioni/js-aruco2@master/src/aruco.js"></script>
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<style>
+*{box-sizing:border-box}
 
-    body {
-      margin: 0;
-      padding: 20px;
-      font-family: Arial, sans-serif;
-      background: #f4f6f9;
-      color: #132238;
-      text-align: center;
-    }
+body{
+ margin:0;
+ padding:20px;
+ font-family:Arial,sans-serif;
+ background:#f4f6f9;
+ color:#14233a;
+ text-align:center;
+}
 
-    h1 {
-      color: #174d82;
-      font-size: 34px;
-      margin: 25px 0 8px;
-    }
+h1{
+ color:#14558e;
+ font-size:34px;
+ margin:25px 0 8px;
+}
 
-    .school {
-      color: #667085;
-      font-size: 19px;
-      margin-bottom: 25px;
-    }
+.school{
+ color:#667085;
+ font-size:19px;
+ margin-bottom:25px;
+}
 
-    .tabs {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 18px;
-    }
+.tabs{
+ display:flex;
+ gap:10px;
+ margin-bottom:18px;
+}
 
-    .tab {
-      flex: 1;
-      padding: 17px 5px;
-      border: 0;
-      border-radius: 18px;
-      background: white;
-      color: #1671d9;
-      font-size: 19px;
-      font-weight: bold;
-    }
+.tab{
+ flex:1;
+ padding:17px 5px;
+ border:0;
+ border-radius:18px;
+ background:white;
+ color:#1671d9;
+ font-size:19px;
+ font-weight:bold;
+}
 
-    .tab.active {
-      background: #19558e;
-      color: white;
-    }
+.tab.active{
+ background:#19558e;
+ color:white;
+}
 
-    .status {
-      background: white;
-      border-radius: 18px;
-      padding: 17px;
-      margin-bottom: 18px;
-      font-size: 20px;
-      font-weight: bold;
-    }
+#status{
+ background:white;
+ border-radius:18px;
+ padding:17px;
+ margin-bottom:18px;
+ font-size:19px;
+ font-weight:bold;
+}
 
-    .cameraBox {
-      position: relative;
-      width: 100%;
-      max-width: 650px;
-      margin: auto;
-      overflow: hidden;
-      border-radius: 24px;
-      background: #111;
-    }
+.cameraBox{
+ position:relative;
+ width:100%;
+ max-width:650px;
+ margin:auto;
+ overflow:hidden;
+ border-radius:24px;
+ background:#111;
+}
 
-    video {
-      display: block;
-      width: 100%;
-      min-height: 450px;
-      object-fit: cover;
-    }
+video{
+ display:block;
+ width:100%;
+ min-height:450px;
+ object-fit:cover;
+}
 
-    canvas {
-      display: none;
-    }
+.frame{
+ position:absolute;
+ width:70%;
+ height:65%;
+ left:15%;
+ top:12%;
+ border:5px solid white;
+ border-radius:25px;
+ pointer-events:none;
+}
 
-    .frame {
-      position: absolute;
-      width: 72%;
-      height: 65%;
-      left: 14%;
-      top: 12%;
-      border: 5px solid white;
-      border-radius: 25px;
-      pointer-events: none;
-    }
+.guide{
+ position:absolute;
+ bottom:18px;
+ width:100%;
+ color:white;
+ font-size:20px;
+ font-weight:bold;
+ text-shadow:0 2px 6px black;
+}
 
-    .guide {
-      position: absolute;
-      bottom: 20px;
-      width: 100%;
-      color: white;
-      font-size: 20px;
-      font-weight: bold;
-      text-shadow: 0 2px 6px #000;
-    }
+canvas{
+ display:none;
+}
 
-    .buttons {
-      max-width: 650px;
-      margin: 18px auto 0;
-    }
+.buttons{
+ max-width:650px;
+ margin:18px auto;
+}
 
-    button.main {
-      width: 100%;
-      border: 0;
-      border-radius: 20px;
-      padding: 20px;
-      margin-bottom: 12px;
-      color: white;
-      font-size: 22px;
-      font-weight: bold;
-    }
+.main{
+ width:100%;
+ border:0;
+ border-radius:20px;
+ padding:20px;
+ margin-bottom:12px;
+ color:white;
+ font-size:22px;
+ font-weight:bold;
+}
 
-    #startBtn {
-      background: #159447;
-    }
+#startBtn{background:#159447}
+#switchBtn{background:#19558e}
 
-    #switchBtn {
-      background: #19558e;
-    }
+#result{
+ max-width:650px;
+ margin:15px auto;
+ padding:20px;
+ border-radius:20px;
+ background:white;
+ font-size:22px;
+ min-height:90px;
+}
 
-    #result {
-      max-width: 650px;
-      margin: 15px auto;
-      padding: 20px;
-      border-radius: 20px;
-      background: white;
-      font-size: 22px;
-      min-height: 75px;
-    }
+.success{
+ background:#ddf7e7 !important;
+ border:3px solid #159447;
+}
 
-    .detected {
-      background: #dff7e8 !important;
-      border: 2px solid #159447;
-    }
+.student{
+ font-size:30px;
+ font-weight:bold;
+ color:#174d82;
+}
 
-    .student {
-      font-size: 28px;
-      font-weight: bold;
-      color: #174d82;
-    }
-
-    .answer {
-      font-size: 30px;
-      font-weight: bold;
-      color: #159447;
-      margin-top: 8px;
-    }
-  </style>
+.answer{
+ font-size:34px;
+ font-weight:bold;
+ color:#159447;
+ margin-top:8px;
+}
+</style>
 </head>
 
 <body>
 
 <h1>📷 ماسح الحضور والتقييم</h1>
-<div class="school">مدرسة الحرمين الثانوية</div>
 
-<div class="tabs">
-  <button class="tab active" onclick="setMode('attendance',this)">الحضور</button>
-  <button class="tab" onclick="setMode('homework',this)">الواجب</button>
-  <button class="tab" onclick="setMode('task',this)">مهمة أدائية</button>
+<div class="school">
+مدرسة الحرمين الثانوية
 </div>
 
-<div class="status" id="cameraStatus">
-  اضغط «فتح الكاميرا»
+<div class="tabs">
+<button class="tab active"
+ onclick="selectMode('attendance',this)">
+الحضور
+</button>
+
+<button class="tab"
+ onclick="selectMode('homework',this)">
+الواجب
+</button>
+
+<button class="tab"
+ onclick="selectMode('task',this)">
+مهمة أدائية
+</button>
+</div>
+
+<div id="status">
+اضغط فتح الكاميرا
 </div>
 
 <div class="cameraBox">
 
-  <video id="video" autoplay playsinline muted></video>
+<video id="video"
+ autoplay
+ muted
+ playsinline></video>
 
-  <div class="frame"></div>
+<div class="frame"></div>
 
-  <div class="guide">
-    وجّه الكاميرا نحو بطاقة الطالب
-  </div>
+<div class="guide">
+وجّه الكاميرا نحو بطاقة الطالب
+</div>
 
 </div>
 
@@ -194,215 +203,462 @@
 
 <div class="buttons">
 
-  <button id="startBtn" class="main" onclick="startCamera()">
-    📷 فتح الكاميرا
-  </button>
+<button
+ id="startBtn"
+ class="main"
+ onclick="startCamera()">
+📷 فتح الكاميرا
+</button>
 
-  <button id="switchBtn" class="main" onclick="switchCamera()">
-    🔄 تبديل الكاميرا
-  </button>
+<button
+ id="switchBtn"
+ class="main"
+ onclick="switchCamera()">
+🔄 تبديل الكاميرا
+</button>
 
 </div>
 
 <div id="result">
-  لم يتم مسح أي طالب حتى الآن
+لم يتم مسح أي طالب حتى الآن
 </div>
+
 
 <script>
 
-const video = document.getElementById("video");
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d", {willReadFrequently:true});
+const video =
+ document.getElementById("video");
+
+const canvas =
+ document.getElementById("canvas");
+
+const ctx =
+ canvas.getContext(
+  "2d",
+  {willReadFrequently:true}
+ );
 
 let stream = null;
-let facingMode = "environment";
-let currentMode = "attendance";
 
-let detector = null;
+let facingMode =
+ "environment";
 
-try {
-  detector = new AR.Detector();
-} catch(e) {
-  console.log(e);
+let currentMode =
+ "attendance";
+
+let scanning =
+ false;
+
+
+/* ==============================
+   ARUCO DETECTOR
+================================ */
+
+let detector;
+
+try{
+
+ detector =
+  new AR.Detector({
+   dictionaryName:
+   "ARUCO_MIP_36h12"
+  });
+
+}catch(error){
+
+ console.error(error);
+
+ document.getElementById("status")
+ .innerHTML =
+ "❌ لم يتم تحميل قارئ البطاقات";
+
 }
+
+
+/* ==============================
+   الطلاب
+================================ */
 
 const students = {
-  1: "الوليد",
-  2: "محمد",
-  3: "علي",
-  4: "حسن",
-  5: "حسين",
-  6: "عبدالله",
-  7: "أحمد",
-  8: "مهدي",
-  9: "يوسف",
-  10: "سلمان"
+
+ 0:"الطالب S01",
+ 1:"الطالب S02",
+ 2:"الطالب S03",
+ 3:"الطالب S04",
+ 4:"الطالب S05"
+
 };
 
-function setMode(mode, button) {
 
-  currentMode = mode;
+/* ==============================
+   اختيار الوضع
+================================ */
 
-  document.querySelectorAll(".tab")
-    .forEach(x => x.classList.remove("active"));
+function selectMode(mode,button){
 
-  button.classList.add("active");
+ currentMode = mode;
+
+ document
+ .querySelectorAll(".tab")
+ .forEach(btn =>
+  btn.classList.remove("active")
+ );
+
+ button.classList.add("active");
+
 }
 
-async function startCamera() {
 
-  try {
+/* ==============================
+   تشغيل الكاميرا
+================================ */
 
-    if(stream) {
-      stream.getTracks().forEach(track => track.stop());
-    }
+async function startCamera(){
 
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: {
-          ideal: facingMode
-        },
-        width: {
-          ideal: 1920
-        },
-        height: {
-          ideal: 1080
-        }
-      },
-      audio: false
-    });
+ const status =
+  document.getElementById("status");
 
-    video.srcObject = stream;
+ try{
 
-    await video.play();
+  if(stream){
 
-    document.getElementById("cameraStatus").innerHTML =
-      "✅ الكاميرا تعمل — وجّهها إلى بطاقة الطالب";
-
-    requestAnimationFrame(scan);
-
-  } catch(error) {
-
-    document.getElementById("cameraStatus").innerHTML =
-      "❌ تعذر تشغيل الكاميرا: " + error.message;
+   stream
+   .getTracks()
+   .forEach(track =>
+    track.stop()
+   );
 
   }
+
+  status.innerHTML =
+   "جاري تشغيل الكاميرا...";
+
+  stream =
+   await navigator
+   .mediaDevices
+   .getUserMedia({
+
+    video:{
+
+     facingMode:{
+      ideal:facingMode
+     },
+
+     width:{
+      ideal:1280
+     },
+
+     height:{
+      ideal:720
+     }
+
+    },
+
+    audio:false
+
+   });
+
+  video.srcObject =
+   stream;
+
+  await video.play();
+
+  status.innerHTML =
+   "✅ الكاميرا تعمل — وجّهها إلى بطاقة الطالب";
+
+  if(!scanning){
+
+   scanning = true;
+
+   requestAnimationFrame(scan);
+
+  }
+
+ }catch(error){
+
+  console.error(error);
+
+  status.innerHTML =
+   "❌ تعذر تشغيل الكاميرا: "
+   + error.name;
+
+ }
+
 }
 
-async function switchCamera() {
 
-  facingMode =
-    facingMode === "environment"
-    ? "user"
-    : "environment";
+/* ==============================
+   تبديل الكاميرا
+================================ */
 
-  await startCamera();
+async function switchCamera(){
+
+ facingMode =
+  facingMode === "environment"
+  ? "user"
+  : "environment";
+
+ await startCamera();
+
 }
 
-function scan() {
 
-  if(video.readyState === video.HAVE_ENOUGH_DATA) {
+/* ==============================
+   المسح المستمر
+================================ */
 
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+function scan(){
 
-    ctx.drawImage(
-      video,
-      0,
-      0,
-      canvas.width,
-      canvas.height
+ if(
+  video.readyState >= 2 &&
+  detector
+ ){
+
+  /*
+   تقليل الدقة هنا متعمد
+   حتى يكون المسح سريعاً على الآيفون
+  */
+
+  const scanWidth =
+   640;
+
+  const ratio =
+   video.videoHeight /
+   video.videoWidth;
+
+  const scanHeight =
+   Math.round(
+    scanWidth * ratio
+   );
+
+  canvas.width =
+   scanWidth;
+
+  canvas.height =
+   scanHeight;
+
+  ctx.drawImage(
+   video,
+   0,
+   0,
+   scanWidth,
+   scanHeight
+  );
+
+  try{
+
+   const imageData =
+    ctx.getImageData(
+     0,
+     0,
+     scanWidth,
+     scanHeight
     );
 
-    try {
+   const markers =
+    detector.detect(
+     imageData
+    );
 
-      const imageData =
-        ctx.getImageData(
-          0,
-          0,
-          canvas.width,
-          canvas.height
-        );
+   if(markers.length > 0){
 
-      if(detector) {
+    handleMarker(
+     markers[0]
+    );
 
-        const markers =
-          detector.detect(imageData);
+   }
 
-        if(markers.length > 0) {
+  }catch(error){
 
-          handleMarker(markers[0]);
-
-        }
-
-      }
-
-    } catch(e) {
-
-      console.log("SCAN:", e);
-
-    }
+   console.error(
+    "Detection error:",
+    error
+   );
 
   }
 
-  requestAnimationFrame(scan);
-}
+ }
 
-function handleMarker(marker) {
-
-  const id = marker.id;
-
-  let name =
-    students[id] || ("طالب رقم " + id);
-
-  const answer =
-    getOrientation(marker.corners);
-
-  const result =
-    document.getElementById("result");
-
-  result.classList.add("detected");
-
-  result.innerHTML =
-    '<div class="student">' +
-    name +
-    ' — S' +
-    String(id).padStart(2,"0") +
-    '</div>' +
-    '<div class="answer">الإجابة: ' +
-    answer +
-    '</div>';
+ requestAnimationFrame(scan);
 
 }
 
-function getOrientation(corners) {
 
-  if(!corners || corners.length < 2)
-    return "?";
+/* ==============================
+   عند اكتشاف البطاقة
+================================ */
 
-  const p0 = corners[0];
-  const p1 = corners[1];
+function handleMarker(marker){
 
-  const dx = p1.x - p0.x;
-  const dy = p1.y - p0.y;
+ const id =
+  Number(marker.id);
 
-  let angle =
-    Math.atan2(dy,dx) * 180 / Math.PI;
+ const studentNumber =
+  id + 1;
 
-  if(angle < 0)
-    angle += 360;
+ const name =
+  students[id] ||
+  ("الطالب S" +
+   String(studentNumber)
+   .padStart(2,"0"));
 
-  if(angle >= 315 || angle < 45)
-    return "A";
+ const answer =
+  getAnswer(
+   marker.corners
+  );
 
-  if(angle >= 45 && angle < 135)
-    return "B";
+ const result =
+  document.getElementById(
+   "result"
+  );
 
-  if(angle >= 135 && angle < 225)
-    return "C";
+ result.classList.add(
+  "success"
+ );
 
-  return "D";
+ let modeText = "";
+
+ if(currentMode ===
+    "attendance"){
+
+  modeText =
+   "✅ حاضر";
+
+ }else if(
+  currentMode ===
+  "homework"){
+
+  modeText =
+   "الواجب";
+
+ }else{
+
+  modeText =
+   "المهمة الأدائية";
+
+ }
+
+ result.innerHTML =
+
+  '<div class="student">' +
+  name +
+  '</div>' +
+
+  '<div>' +
+  modeText +
+  '</div>' +
+
+  '<div class="answer">' +
+  'الإجابة: ' +
+  answer +
+  '</div>';
+
 }
+
+
+/* ==============================
+   تحديد اتجاه البطاقة
+   A B C D
+================================ */
+
+function getAnswer(corners){
+
+ if(
+  !corners ||
+  corners.length < 2
+ ){
+
+  return "?";
+
+ }
+
+ const p0 =
+  corners[0];
+
+ const p1 =
+  corners[1];
+
+ const dx =
+  p1.x - p0.x;
+
+ const dy =
+  p1.y - p0.y;
+
+ let angle =
+  Math.atan2(
+   dy,
+   dx
+  ) *
+  180 /
+  Math.PI;
+
+ if(angle < 0){
+
+  angle += 360;
+
+ }
+
+ /*
+   أعلى البطاقة = A
+   يمين = B
+   أسفل = C
+   يسار = D
+ */
+
+ if(
+  angle >= 315 ||
+  angle < 45
+ ){
+
+  return "A";
+
+ }
+
+ if(
+  angle >= 45 &&
+  angle < 135
+ ){
+
+  return "B";
+
+ }
+
+ if(
+  angle >= 135 &&
+  angle < 225
+ ){
+
+  return "C";
+
+ }
+
+ return "D";
+
+}
+
+
+/* ==============================
+   فحص تحميل المكتبة
+================================ */
+
+window.addEventListener(
+ "load",
+ function(){
+
+  if(
+   typeof AR ===
+   "undefined"
+  ){
+
+   document
+   .getElementById("status")
+   .innerHTML =
+   "❌ مكتبة قراءة البطاقات لم تُحمّل";
+
+  }
+
+ }
+);
 
 </script>
 
