@@ -151,10 +151,23 @@ canvas{
  font-weight:bold;
 }
 
-#startBtn{background:#159447}
-#switchBtn{background:#19558e}
-#nextBtn{background:#e58a00;display:none}
-#resetAttendanceBtn{background:#b42318;display:none}
+#startBtn{
+ background:#159447;
+}
+
+#switchBtn{
+ background:#19558e;
+}
+
+#nextBtn{
+ background:#e58a00;
+ display:none;
+}
+
+#resetAttendanceBtn{
+ background:#b42318;
+ display:none;
+}
 
 #summary{
  max-width:700px;
@@ -231,18 +244,31 @@ canvas{
 <label>الشعبة</label>
 
 <select id="classSelect">
-<option value="">اختر الشعبة</option>
-<option value="101">101</option>
-<option value="102">102</option>
-<option value="103">103</option>
-<option value="104">104</option>
-<option value="105">105</option>
+
+<option value="">
+اختر الشعبة
+</option>
+
+<option value="301">
+301
+</option>
+
+<option value="302">
+302
+</option>
+
+<option value="303">
+303
+</option>
+
 </select>
 
 
 <div id="dateArea">
 
-<label>التاريخ</label>
+<label>
+التاريخ
+</label>
 
 <input
 id="attendanceDate"
@@ -251,7 +277,8 @@ type="date">
 </div>
 
 
-<div id="numberArea"
+<div
+id="numberArea"
 style="display:none">
 
 <label id="numberLabel">
@@ -269,39 +296,52 @@ placeholder="مثال: 1">
 </div>
 
 
-<!-- أوضاع النظام -->
+<!-- أنواع التسجيل -->
 
 <div class="tabs">
 
 <button
 class="tab active"
 onclick="selectMode('attendance',this)">
+
 👥 الحضور
+
 </button>
+
 
 <button
 class="tab"
 onclick="selectMode('homework',this)">
+
 📝 الواجب
+
 </button>
+
 
 <button
 class="tab"
 onclick="selectMode('task',this)">
+
 📋 مهمة أدائية
+
 </button>
+
 
 <button
 class="tab"
 onclick="selectMode('participation',this)">
+
 ⭐ المشاركة
+
 </button>
 
 </div>
 
 
 <div id="status">
+
 اختر الشعبة ثم افتح الكاميرا
+
 </div>
 
 
@@ -316,19 +356,27 @@ muted
 playsinline>
 </video>
 
-<div class="frame"></div>
 
-<div class="guide"
+<div class="frame">
+</div>
+
+
+<div
+class="guide"
 id="guide">
 
-الحضور: وجّه الكاميرا إلى بطاقات مجموعة من الطلاب
+الحضور: ارفع عدة بطاقات معًا أمام الكاميرا
 
 </div>
 
 </div>
 
-<canvas id="canvas"></canvas>
 
+<canvas id="canvas">
+</canvas>
+
+
+<!-- الأزرار -->
 
 <div class="buttons">
 
@@ -376,7 +424,8 @@ onclick="resetAttendance()">
 
 <!-- نتيجة المسح الفردي -->
 
-<div id="individualResult"></div>
+<div id="individualResult">
+</div>
 
 
 <!-- الحضور الجماعي -->
@@ -384,20 +433,30 @@ onclick="resetAttendance()">
 <div id="summary">
 
 <div id="summaryTitle">
+
 لم يبدأ المسح بعد
+
 </div>
+
 
 <div
 class="bigNumber"
 id="attendanceCount">
+
 0
+
 </div>
+
 
 <div>
+
 عدد الطلاب المسجل حضورهم
+
 </div>
 
-<div id="attendanceList"></div>
+
+<div id="attendanceList">
+</div>
 
 </div>
 
@@ -422,7 +481,7 @@ canvas.getContext(
 
 
 /* =====================================
-   المتغيرات
+   متغيرات النظام
 ===================================== */
 
 let stream = null;
@@ -438,44 +497,35 @@ let currentMode =
 "attendance";
 
 
-/*
- الحضور المسجل
- key = Marker ID
-*/
+/* الحضور الجماعي */
+
 let attendanceStudents = {};
 
 
-/*
- قراءات الطالب الفردية
-*/
+/* المسح الفردي */
+
 let individualReadings = [];
 
-
-/*
- هل تم تثبيت نتيجة الفردي؟
-*/
 let individualLocked =
 false;
 
 
-/*
- عدد القراءات المطلوبة
-*/
-const REQUIRED_READINGS = 6;
+/* تثبيت القراءة */
 
+const REQUIRED_READINGS =
+6;
 
-/*
- زمن تجميع القراءات
-*/
-const READING_WINDOW = 1000;
+const READING_WINDOW =
+1000;
 
 
 /* =====================================
-   الطلاب
+   بيانات الطلاب
 
- Marker ID 0 = S01
- Marker ID 1 = S02
- ...
+   Marker ID 0 = S01
+   Marker ID 1 = S02
+   Marker ID 2 = S03
+   وهكذا
 ===================================== */
 
 const students = {
@@ -542,7 +592,8 @@ try{
  detector =
  new AR.Detector();
 
-}catch(error){
+}
+catch(error){
 
  console.error(error);
 
@@ -550,7 +601,7 @@ try{
 
 
 /* =====================================
-   تاريخ اليوم
+   وضع تاريخ اليوم تلقائيًا
 ===================================== */
 
 function setToday(){
@@ -558,25 +609,39 @@ function setToday(){
  const today =
  new Date();
 
+
  const year =
  today.getFullYear();
+
 
  const month =
  String(
   today.getMonth()+1
- ).padStart(2,"0");
+ ).padStart(
+  2,
+  "0"
+ );
+
 
  const day =
  String(
   today.getDate()
- ).padStart(2,"0");
+ ).padStart(
+  2,
+  "0"
+ );
+
 
  document
  .getElementById(
   "attendanceDate"
  )
  .value =
- year+"-"+month+"-"+day;
+ year +
+ "-" +
+ month +
+ "-" +
+ day;
 
 }
 
@@ -584,7 +649,7 @@ setToday();
 
 
 /* =====================================
-   اختيار الوضع
+   اختيار نوع التسجيل
 ===================================== */
 
 function selectMode(
@@ -595,15 +660,21 @@ function selectMode(
  currentMode =
  mode;
 
+
  document
- .querySelectorAll(".tab")
- .forEach(btn => {
+ .querySelectorAll(
+  ".tab"
+ )
+ .forEach(
+  btn => {
 
-  btn.classList.remove(
-   "active"
-  );
+   btn.classList.remove(
+    "active"
+   );
 
- });
+  }
+ );
+
 
  button.classList.add(
   "active"
@@ -615,20 +686,24 @@ function selectMode(
   "dateArea"
  );
 
+
  const numberArea =
  document.getElementById(
   "numberArea"
  );
+
 
  const numberLabel =
  document.getElementById(
   "numberLabel"
  );
 
+
  const guide =
  document.getElementById(
   "guide"
  );
+
 
  const summary =
  document.getElementById(
@@ -636,16 +711,24 @@ function selectMode(
  );
 
 
- if(mode === "attendance"){
+ /* الحضور */
+
+ if(
+  mode ===
+  "attendance"
+ ){
 
   dateArea.style.display =
   "block";
 
+
   numberArea.style.display =
   "none";
 
+
   summary.style.display =
   "block";
+
 
   guide.innerHTML =
   "الحضور: ارفع عدة بطاقات معًا أمام الكاميرا";
@@ -653,19 +736,28 @@ function selectMode(
  }
 
 
- else if(mode === "homework"){
+ /* الواجب */
+
+ else if(
+  mode ===
+  "homework"
+ ){
 
   dateArea.style.display =
   "none";
 
+
   numberArea.style.display =
   "block";
+
 
   numberLabel.innerHTML =
   "رقم الواجب";
 
+
   summary.style.display =
   "none";
+
 
   guide.innerHTML =
   "الواجب: امسح بطاقة طالب واحد";
@@ -673,19 +765,28 @@ function selectMode(
  }
 
 
- else if(mode === "task"){
+ /* المهمة الأدائية */
+
+ else if(
+  mode ===
+  "task"
+ ){
 
   dateArea.style.display =
   "none";
 
+
   numberArea.style.display =
   "block";
+
 
   numberLabel.innerHTML =
   "رقم المهمة الأدائية";
 
+
   summary.style.display =
   "none";
+
 
   guide.innerHTML =
   "المهمة الأدائية: امسح بطاقة طالب واحد";
@@ -693,16 +794,21 @@ function selectMode(
  }
 
 
+ /* المشاركة */
+
  else{
 
   dateArea.style.display =
   "block";
 
+
   numberArea.style.display =
   "none";
 
+
   summary.style.display =
   "none";
+
 
   guide.innerHTML =
   "المشاركة: امسح بطاقة طالب واحد";
@@ -716,7 +822,7 @@ function selectMode(
 
 
 /* =====================================
-   التأكد من البيانات
+   التحقق من اختيار البيانات
 ===================================== */
 
 function validateSetup(){
@@ -742,7 +848,8 @@ function validateSetup(){
 
  if(
   currentMode ===
-  "homework" ||
+  "homework"
+  ||
   currentMode ===
   "task"
  ){
@@ -766,13 +873,16 @@ function validateSetup(){
      "أدخل رقم الواجب"
     );
 
-   }else{
+   }
+
+   else{
 
     alert(
      "أدخل رقم المهمة الأدائية"
     );
 
    }
+
 
    return false;
 
@@ -787,12 +897,14 @@ function validateSetup(){
 
 
 /* =====================================
-   فتح الكاميرا
+   تشغيل الكاميرا
 ===================================== */
 
 async function startCamera(){
 
- if(!validateSetup()){
+ if(
+  !validateSetup()
+ ){
 
   return;
 
@@ -807,15 +919,32 @@ async function startCamera(){
 
  try{
 
+
+  if(
+   !navigator.mediaDevices
+   ||
+   !navigator.mediaDevices.getUserMedia
+  ){
+
+   status.innerHTML =
+   "❌ المتصفح لا يدعم الكاميرا";
+
+   return;
+
+  }
+
+
   if(stream){
 
    stream
    .getTracks()
-   .forEach(track => {
+   .forEach(
+    track => {
 
-    track.stop();
+     track.stop();
 
-   });
+    }
+   );
 
   }
 
@@ -878,7 +1007,9 @@ async function startCamera(){
 
   if(!scanning){
 
-   scanning = true;
+   scanning =
+   true;
+
 
    requestAnimationFrame(
     scanFrame
@@ -889,7 +1020,10 @@ async function startCamera(){
  }
  catch(error){
 
-  console.error(error);
+  console.error(
+   error
+  );
+
 
   status.innerHTML =
   "❌ تعذر تشغيل الكاميرا: "
@@ -928,7 +1062,8 @@ async function switchCamera(){
 function scanFrame(){
 
  if(
-  video.readyState >= 2 &&
+  video.readyState >= 2
+  &&
   detector
  ){
 
@@ -945,13 +1080,15 @@ function scanFrame(){
   Math.max(
    1,
    Math.round(
-    scanWidth * ratio
+    scanWidth *
+    ratio
    )
   );
 
 
   canvas.width =
   scanWidth;
+
 
   canvas.height =
   scanHeight;
@@ -984,15 +1121,14 @@ function scanFrame(){
 
 
    if(
-    markers &&
+    markers
+    &&
     markers.length > 0
    ){
 
-    /*
-      الحضور:
-      نعالج جميع البطاقات
-      الموجودة في الصورة.
-    */
+    /* =============================
+       الحضور = مسح جماعي
+    ============================== */
 
     if(
      currentMode ===
@@ -1012,10 +1148,10 @@ function scanFrame(){
     }
 
 
-    /*
-      البقية:
-      طالب واحد فقط.
-    */
+    /* =============================
+       الواجب / المهمة / المشاركة
+       = مسح فردي
+    ============================== */
 
     else if(
      !individualLocked
@@ -1033,6 +1169,7 @@ function scanFrame(){
   catch(error){
 
    console.error(
+    "Detection error:",
     error
    );
 
@@ -1049,7 +1186,7 @@ function scanFrame(){
 
 
 /* =====================================
-   الحضور الجماعي
+   تسجيل الحضور الجماعي
 ===================================== */
 
 function registerAttendance(
@@ -1063,8 +1200,7 @@ function registerAttendance(
 
 
  /*
-  إذا سبق تسجيل الطالب
-  لا نكرره
+   منع تكرار الطالب
  */
 
  if(
@@ -1077,7 +1213,9 @@ function registerAttendance(
 
 
  const student =
- getStudent(id);
+ getStudent(
+  id
+ );
 
 
  const className =
@@ -1121,6 +1259,7 @@ function registerAttendance(
   "status"
  )
  .innerHTML =
+
  "✅ تم تسجيل "
  +
  student.code;
@@ -1129,7 +1268,7 @@ function registerAttendance(
 
 
 /* =====================================
-   تحديث قائمة الحضور
+   عرض قائمة الحضور
 ===================================== */
 
 function updateAttendanceScreen(){
@@ -1174,7 +1313,9 @@ function updateAttendanceScreen(){
  +
  className
  +
- "<br>التاريخ: "
+ "<br>"
+ +
+ "التاريخ: "
  +
  date;
 
@@ -1185,71 +1326,76 @@ function updateAttendanceScreen(){
  );
 
 
- list.innerHTML = "";
+ list.innerHTML =
+ "";
 
 
  ids
  .sort(
   (a,b) =>
-  Number(a)-Number(b)
+  Number(a) -
+  Number(b)
  )
- .forEach(id => {
+ .forEach(
+  id => {
 
-  const s =
-  attendanceStudents[id];
-
-
-  const card =
-  document.createElement(
-   "div"
-  );
+   const student =
+   attendanceStudents[id];
 
 
-  card.className =
-  "resultCard";
+   const card =
+   document.createElement(
+    "div"
+   );
 
 
-  card.innerHTML =
-
-  '<div class="studentName">'
-  +
-  s.name
-  +
-  '</div>'
-
-  +
-
-  '<div class="studentCode">'
-  +
-  s.code
-  +
-  ' — حاضر ✅'
-  +
-  '</div>';
+   card.className =
+   "resultCard";
 
 
-  list.appendChild(
-   card
-  );
+   card.innerHTML =
 
- });
+   '<div class="studentName">'
+   +
+   student.name
+   +
+   '</div>'
+
+   +
+
+   '<div class="studentCode">'
+   +
+   student.code
+   +
+   ' — حاضر ✅'
+   +
+   '</div>';
+
+
+   list.appendChild(
+    card
+   );
+
+  }
+ );
 
 }
 
 
 /* =====================================
-   مسح حضور جديد
+   بدء حضور جديد
 ===================================== */
 
 function resetAttendance(){
 
  if(
   confirm(
-   "هل تريد مسح قائمة الحضور الحالية وبدء قائمة جديدة؟"
+   "هل تريد مسح قائمة الحضور الحالية وبدء حضور جديد؟"
   )
  ){
 
-  attendanceStudents = {};
+  attendanceStudents =
+  {};
 
 
   updateAttendanceScreen();
@@ -1268,7 +1414,7 @@ function resetAttendance(){
 
 
 /* =====================================
-   المسح الفردي
+   جمع قراءات الطالب الفردية
 ===================================== */
 
 function collectIndividual(
@@ -1304,22 +1450,23 @@ function collectIndividual(
 
  individualReadings =
  individualReadings.filter(
-  r =>
-  now-r.time
+  reading =>
+  now -
+  reading.time
   <=
   READING_WINDOW
  );
 
 
  /*
-  نأخذ فقط قراءات
-  نفس البطاقة الحالية.
+   نأخذ قراءات
+   البطاقة نفسها فقط
  */
 
  const same =
  individualReadings.filter(
-  r =>
-  r.id === id
+  reading =>
+  reading.id === id
  );
 
 
@@ -1335,13 +1482,15 @@ function collectIndividual(
   .innerHTML =
   "🔍 جاري تثبيت قراءة الطالب...";
 
+
   return;
 
  }
 
 
  /*
-  أكثر إجابة تكراراً
+   نحدد أكثر اتجاه
+   تكرر
  */
 
  const counts = {
@@ -1355,16 +1504,18 @@ function collectIndividual(
 
 
  same.forEach(
-  r => {
+  reading => {
 
    if(
-    counts[r.answer]
+    counts[
+     reading.answer
+    ]
     !==
     undefined
    ){
 
     counts[
-     r.answer
+     reading.answer
     ]++;
 
    }
@@ -1376,6 +1527,7 @@ function collectIndividual(
  let bestAnswer =
  "A";
 
+
  let max =
  -1;
 
@@ -1383,22 +1535,26 @@ function collectIndividual(
  Object.keys(
   counts
  )
- .forEach(answer => {
+ .forEach(
+  answer => {
 
-  if(
-   counts[answer] >
-   max
-  ){
+   if(
+    counts[answer]
+    >
+    max
+   ){
 
-   max =
-   counts[answer];
+    max =
+    counts[answer];
 
-   bestAnswer =
-   answer;
+
+    bestAnswer =
+    answer;
+
+   }
 
   }
-
- });
+ );
 
 
  showIndividualResult(
@@ -1410,7 +1566,7 @@ function collectIndividual(
 
 
 /* =====================================
-   نتيجة الطالب الفردية
+   عرض نتيجة الفردي
 ===================================== */
 
 function showIndividualResult(
@@ -1423,7 +1579,9 @@ function showIndividualResult(
 
 
  const student =
- getStudent(id);
+ getStudent(
+  id
+ );
 
 
  const className =
@@ -1443,7 +1601,8 @@ function showIndividualResult(
 
 
  const box =
- document.getElementById(
+ document
+ .getElementById(
   "individualResult"
  );
 
@@ -1452,7 +1611,8 @@ function showIndividualResult(
  "block";
 
 
- let title = "";
+ let title =
+ "";
 
 
  if(
@@ -1539,6 +1699,7 @@ function showIndividualResult(
   "status"
  )
  .innerHTML =
+
  "✅ تم تثبيت قراءة "
  +
  student.code;
@@ -1555,7 +1716,7 @@ function showIndividualResult(
 
 
 /* =====================================
-   الطالب التالي
+   مسح الطالب التالي
 ===================================== */
 
 function nextStudent(){
@@ -1563,7 +1724,9 @@ function nextStudent(){
  individualLocked =
  false;
 
- individualReadings = [];
+
+ individualReadings =
+ [];
 
 
  const box =
@@ -1574,6 +1737,7 @@ function nextStudent(){
 
  box.style.display =
  "none";
+
 
  box.innerHTML =
  "";
@@ -1608,7 +1772,9 @@ function nextStudent(){
    بيانات الطالب
 ===================================== */
 
-function getStudent(id){
+function getStudent(
+ id
+){
 
  if(
   students[id]
@@ -1626,7 +1792,8 @@ function getStudent(id){
   +
   String(
    id+1
-  ).padStart(
+  )
+  .padStart(
    2,
    "0"
   ),
@@ -1640,7 +1807,8 @@ function getStudent(id){
 
 
 /* =====================================
-   اتجاه البطاقة
+   تحديد اتجاه البطاقة
+   A B C D
 ===================================== */
 
 function getAnswer(
@@ -1648,7 +1816,8 @@ function getAnswer(
 ){
 
  if(
-  !corners ||
+  !corners
+  ||
   corners.length < 2
  ){
 
@@ -1660,15 +1829,19 @@ function getAnswer(
  const p0 =
  corners[0];
 
+
  const p1 =
  corners[1];
 
 
  const dx =
- p1.x-p0.x;
+ p1.x -
+ p0.x;
+
 
  const dy =
- p1.y-p0.y;
+ p1.y -
+ p0.y;
 
 
  let angle =
@@ -1682,15 +1855,27 @@ function getAnswer(
  Math.PI;
 
 
- if(angle < 0){
+ if(
+  angle < 0
+ ){
 
-  angle += 360;
+  angle +=
+  360;
 
  }
 
 
+ /*
+   أعلى = A
+   يمين = B
+   أسفل = C
+   يسار = D
+ */
+
+
  if(
-  angle >= 315 ||
+  angle >= 315
+  ||
   angle < 45
  ){
 
@@ -1700,7 +1885,8 @@ function getAnswer(
 
 
  if(
-  angle >= 45 &&
+  angle >= 45
+  &&
   angle < 135
  ){
 
@@ -1710,7 +1896,8 @@ function getAnswer(
 
 
  if(
-  angle >= 135 &&
+  angle >= 135
+  &&
   angle < 225
  ){
 
@@ -1751,7 +1938,9 @@ window.addEventListener(
   }
 
 
-  if(!detector){
+  if(
+   !detector
+  ){
 
    status.innerHTML =
    "❌ تعذر تشغيل قارئ البطاقات";
