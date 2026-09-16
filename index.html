@@ -1,19 +1,16 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-
 <head>
   <meta charset="UTF-8">
-
   <meta name="viewport"
-        content="width=device-width,
-        initial-scale=1,
-        maximum-scale=1,
-        viewport-fit=cover">
+        content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 
   <title>ماسح الحضور والتقييم</title>
 
-  <style>
+  <script src="https://cdn.jsdelivr.net/npm/js-aruco2@1.0.0/src/aruco.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-aruco2@1.0.0/src/cv.js"></script>
 
+  <style>
     * {
       box-sizing: border-box;
     }
@@ -23,370 +20,391 @@
       padding: 20px;
       font-family: Arial, sans-serif;
       background: #f4f6f9;
-      color: #14213d;
+      color: #132238;
       text-align: center;
     }
 
     h1 {
-      color: #16477f;
-      margin-top: 25px;
-      margin-bottom: 10px;
+      color: #174d82;
+      font-size: 34px;
+      margin: 25px 0 8px;
     }
 
-    .subtitle {
-      color: #64748b;
-      margin-bottom: 20px;
+    .school {
+      color: #667085;
+      font-size: 19px;
+      margin-bottom: 25px;
     }
 
     .tabs {
       display: flex;
-      gap: 8px;
-      margin-bottom: 15px;
+      gap: 10px;
+      margin-bottom: 18px;
     }
 
     .tab {
       flex: 1;
-      padding: 14px 5px;
-      border: none;
-      border-radius: 14px;
+      padding: 17px 5px;
+      border: 0;
+      border-radius: 18px;
       background: white;
-      color: #1670df;
-      font-size: 17px;
+      color: #1671d9;
+      font-size: 19px;
       font-weight: bold;
     }
 
     .tab.active {
-      background: #16477f;
+      background: #19558e;
       color: white;
     }
 
-    #status {
+    .status {
       background: white;
-      padding: 14px;
-      border-radius: 14px;
-      margin-bottom: 14px;
+      border-radius: 18px;
+      padding: 17px;
+      margin-bottom: 18px;
+      font-size: 20px;
       font-weight: bold;
     }
 
-    #cameraBox {
+    .cameraBox {
       position: relative;
       width: 100%;
-      background: #000;
-      border-radius: 20px;
+      max-width: 650px;
+      margin: auto;
       overflow: hidden;
-      min-height: 280px;
+      border-radius: 24px;
+      background: #111;
     }
 
     video {
-      width: 100%;
       display: block;
-      min-height: 280px;
+      width: 100%;
+      min-height: 450px;
       object-fit: cover;
     }
 
-    .scanFrame {
+    canvas {
+      display: none;
+    }
+
+    .frame {
       position: absolute;
-      left: 12%;
-      right: 12%;
-      top: 20%;
-      bottom: 20%;
-      border: 4px solid #ffffff;
-      border-radius: 20px;
+      width: 72%;
+      height: 65%;
+      left: 14%;
+      top: 12%;
+      border: 5px solid white;
+      border-radius: 25px;
       pointer-events: none;
     }
 
-    .scanText {
+    .guide {
       position: absolute;
-      bottom: 15px;
-      left: 0;
-      right: 0;
-      color: white;
-      font-weight: bold;
-      text-shadow: 0 2px 5px black;
-    }
-
-    .button {
+      bottom: 20px;
       width: 100%;
-      border: none;
-      border-radius: 16px;
-      padding: 17px;
-      margin-top: 15px;
-      font-size: 19px;
+      color: white;
+      font-size: 20px;
       font-weight: bold;
-      cursor: pointer;
+      text-shadow: 0 2px 6px #000;
     }
 
-    #startCamera {
-      background: #168f4d;
-      color: white;
+    .buttons {
+      max-width: 650px;
+      margin: 18px auto 0;
     }
 
-    #switchCamera {
-      background: #16477f;
-      color: white;
-    }
-
-    .studentBox {
-      background: white;
-      margin-top: 18px;
+    button.main {
+      width: 100%;
+      border: 0;
       border-radius: 20px;
       padding: 20px;
-      display: none;
-      box-shadow: 0 4px 15px rgba(0,0,0,.08);
-    }
-
-    #studentName {
-      font-size: 30px;
+      margin-bottom: 12px;
+      color: white;
+      font-size: 22px;
       font-weight: bold;
-      margin-bottom: 5px;
     }
 
-    #studentId {
-      color: #7b8798;
-      margin-bottom: 20px;
+    #startBtn {
+      background: #159447;
     }
 
-    .answers {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
+    #switchBtn {
+      background: #19558e;
+    }
+
+    #result {
+      max-width: 650px;
+      margin: 15px auto;
+      padding: 20px;
+      border-radius: 20px;
+      background: white;
+      font-size: 22px;
+      min-height: 75px;
+    }
+
+    .detected {
+      background: #dff7e8 !important;
+      border: 2px solid #159447;
+    }
+
+    .student {
+      font-size: 28px;
+      font-weight: bold;
+      color: #174d82;
     }
 
     .answer {
-      padding: 18px;
-      border-radius: 15px;
-      font-size: 25px;
+      font-size: 30px;
       font-weight: bold;
-      background: #eef4ff;
+      color: #159447;
+      margin-top: 8px;
     }
-
-    #lastRead {
-      margin-top: 15px;
-      background: white;
-      padding: 14px;
-      border-radius: 14px;
-      color: #475569;
-    }
-
   </style>
 </head>
 
 <body>
 
 <h1>📷 ماسح الحضور والتقييم</h1>
-
-<div class="subtitle">
-  مدرسة الحرمين الثانوية
-</div>
+<div class="school">مدرسة الحرمين الثانوية</div>
 
 <div class="tabs">
-
-  <button class="tab active"
-          onclick="selectMode('attendance',this)">
-    الحضور
-  </button>
-
-  <button class="tab"
-          onclick="selectMode('homework',this)">
-    الواجب
-  </button>
-
-  <button class="tab"
-          onclick="selectMode('task',this)">
-    مهمة أدائية
-  </button>
-
+  <button class="tab active" onclick="setMode('attendance',this)">الحضور</button>
+  <button class="tab" onclick="setMode('homework',this)">الواجب</button>
+  <button class="tab" onclick="setMode('task',this)">مهمة أدائية</button>
 </div>
 
-<div id="status">
-  جاهز — اضغط فتح الكاميرا
+<div class="status" id="cameraStatus">
+  اضغط «فتح الكاميرا»
 </div>
 
-<div id="cameraBox">
+<div class="cameraBox">
 
-  <video
-    id="video"
-    autoplay
-    playsinline
-    muted>
-  </video>
+  <video id="video" autoplay playsinline muted></video>
 
-  <div class="scanFrame"></div>
+  <div class="frame"></div>
 
-  <div class="scanText">
+  <div class="guide">
     وجّه الكاميرا نحو بطاقة الطالب
   </div>
 
 </div>
 
-<button
-  id="startCamera"
-  class="button"
-  onclick="startCamera()">
-  📷 فتح الكاميرا
-</button>
+<canvas id="canvas"></canvas>
 
-<button
-  id="switchCamera"
-  class="button"
-  onclick="switchCamera()">
-  🔄 تبديل الكاميرا
-</button>
+<div class="buttons">
 
-<div id="studentBox" class="studentBox">
+  <button id="startBtn" class="main" onclick="startCamera()">
+    📷 فتح الكاميرا
+  </button>
 
-  <div id="studentName">
-    اسم الطالب
-  </div>
-
-  <div id="studentId">
-    رقم الطالب
-  </div>
-
-  <div class="answers">
-
-    <div class="answer">A</div>
-
-    <div class="answer">B</div>
-
-    <div class="answer">C</div>
-
-    <div class="answer">D</div>
-
-  </div>
+  <button id="switchBtn" class="main" onclick="switchCamera()">
+    🔄 تبديل الكاميرا
+  </button>
 
 </div>
 
-<div id="lastRead">
+<div id="result">
   لم يتم مسح أي طالب حتى الآن
 </div>
 
-
 <script>
 
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d", {willReadFrequently:true});
+
 let stream = null;
-
 let facingMode = "environment";
-
 let currentMode = "attendance";
 
+let detector = null;
 
-function selectMode(mode, button) {
+try {
+  detector = new AR.Detector();
+} catch(e) {
+  console.log(e);
+}
+
+const students = {
+  1: "الوليد",
+  2: "محمد",
+  3: "علي",
+  4: "حسن",
+  5: "حسين",
+  6: "عبدالله",
+  7: "أحمد",
+  8: "مهدي",
+  9: "يوسف",
+  10: "سلمان"
+};
+
+function setMode(mode, button) {
 
   currentMode = mode;
 
-  document
-    .querySelectorAll(".tab")
-    .forEach(btn => btn.classList.remove("active"));
+  document.querySelectorAll(".tab")
+    .forEach(x => x.classList.remove("active"));
 
   button.classList.add("active");
-
 }
-
 
 async function startCamera() {
 
-  const status =
-    document.getElementById("status");
-
-  const video =
-    document.getElementById("video");
-
   try {
 
-    status.innerHTML =
-      "جاري تشغيل الكاميرا...";
-
-    if (stream) {
-
-      stream
-        .getTracks()
-        .forEach(track => track.stop());
-
+    if(stream) {
+      stream.getTracks().forEach(track => track.stop());
     }
 
-    stream =
-      await navigator.mediaDevices.getUserMedia({
-
-        video: {
-
-          facingMode: {
-            ideal: facingMode
-          },
-
-          width: {
-            ideal: 1920
-          },
-
-          height: {
-            ideal: 1080
-          }
-
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: {
+          ideal: facingMode
         },
-
-        audio: false
-
-      });
-
+        width: {
+          ideal: 1920
+        },
+        height: {
+          ideal: 1080
+        }
+      },
+      audio: false
+    });
 
     video.srcObject = stream;
 
     await video.play();
 
-    status.innerHTML =
+    document.getElementById("cameraStatus").innerHTML =
       "✅ الكاميرا تعمل — وجّهها إلى بطاقة الطالب";
 
-  }
+    requestAnimationFrame(scan);
 
-  catch (error) {
+  } catch(error) {
 
-    console.error(error);
-
-    status.innerHTML =
-      "❌ تعذر تشغيل الكاميرا: " +
-      error.name;
+    document.getElementById("cameraStatus").innerHTML =
+      "❌ تعذر تشغيل الكاميرا: " + error.message;
 
   }
-
 }
-
 
 async function switchCamera() {
 
-  if (facingMode === "environment") {
-
-    facingMode = "user";
-
-  } else {
-
-    facingMode = "environment";
-
-  }
+  facingMode =
+    facingMode === "environment"
+    ? "user"
+    : "environment";
 
   await startCamera();
-
 }
 
+function scan() {
 
-window.addEventListener(
-  "load",
-  () => {
+  if(video.readyState === video.HAVE_ENOUGH_DATA) {
 
-    if (
-      !navigator.mediaDevices ||
-      !navigator.mediaDevices.getUserMedia
-    ) {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
 
-      document.getElementById("status").innerHTML =
-        "❌ هذا المتصفح لا يدعم تشغيل الكاميرا";
+    ctx.drawImage(
+      video,
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+    try {
+
+      const imageData =
+        ctx.getImageData(
+          0,
+          0,
+          canvas.width,
+          canvas.height
+        );
+
+      if(detector) {
+
+        const markers =
+          detector.detect(imageData);
+
+        if(markers.length > 0) {
+
+          handleMarker(markers[0]);
+
+        }
+
+      }
+
+    } catch(e) {
+
+      console.log("SCAN:", e);
 
     }
 
   }
-);
+
+  requestAnimationFrame(scan);
+}
+
+function handleMarker(marker) {
+
+  const id = marker.id;
+
+  let name =
+    students[id] || ("طالب رقم " + id);
+
+  const answer =
+    getOrientation(marker.corners);
+
+  const result =
+    document.getElementById("result");
+
+  result.classList.add("detected");
+
+  result.innerHTML =
+    '<div class="student">' +
+    name +
+    ' — S' +
+    String(id).padStart(2,"0") +
+    '</div>' +
+    '<div class="answer">الإجابة: ' +
+    answer +
+    '</div>';
+
+}
+
+function getOrientation(corners) {
+
+  if(!corners || corners.length < 2)
+    return "?";
+
+  const p0 = corners[0];
+  const p1 = corners[1];
+
+  const dx = p1.x - p0.x;
+  const dy = p1.y - p0.y;
+
+  let angle =
+    Math.atan2(dy,dx) * 180 / Math.PI;
+
+  if(angle < 0)
+    angle += 360;
+
+  if(angle >= 315 || angle < 45)
+    return "A";
+
+  if(angle >= 45 && angle < 135)
+    return "B";
+
+  if(angle >= 135 && angle < 225)
+    return "C";
+
+  return "D";
+}
 
 </script>
 
 </body>
-
 </html>
