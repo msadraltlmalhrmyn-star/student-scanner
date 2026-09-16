@@ -1,108 +1,392 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width,initial-scale=1,viewport-fit=cover">
 
-  <title>اختبار الكاميرا</title>
+  <meta name="viewport"
+        content="width=device-width,
+        initial-scale=1,
+        maximum-scale=1,
+        viewport-fit=cover">
+
+  <title>ماسح الحضور والتقييم</title>
 
   <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      padding: 25px;
+      padding: 20px;
       font-family: Arial, sans-serif;
       background: #f4f6f9;
+      color: #14213d;
       text-align: center;
     }
 
     h1 {
-      color: #123f73;
+      color: #16477f;
+      margin-top: 25px;
+      margin-bottom: 10px;
     }
 
-    button {
-      width: 100%;
-      max-width: 500px;
-      padding: 18px;
-      border: 0;
-      border-radius: 15px;
-      background: #16884b;
-      color: white;
-      font-size: 22px;
+    .subtitle {
+      color: #64748b;
+      margin-bottom: 20px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 14px 5px;
+      border: none;
+      border-radius: 14px;
+      background: white;
+      color: #1670df;
+      font-size: 17px;
       font-weight: bold;
+    }
+
+    .tab.active {
+      background: #16477f;
+      color: white;
+    }
+
+    #status {
+      background: white;
+      padding: 14px;
+      border-radius: 14px;
+      margin-bottom: 14px;
+      font-weight: bold;
+    }
+
+    #cameraBox {
+      position: relative;
+      width: 100%;
+      background: #000;
+      border-radius: 20px;
+      overflow: hidden;
+      min-height: 280px;
     }
 
     video {
       width: 100%;
-      max-width: 600px;
-      margin-top: 20px;
-      border-radius: 18px;
-      background: black;
+      display: block;
+      min-height: 280px;
+      object-fit: cover;
     }
 
-    #status {
-      margin: 18px;
-      font-size: 18px;
-      font-weight: bold;
+    .scanFrame {
+      position: absolute;
+      left: 12%;
+      right: 12%;
+      top: 20%;
+      bottom: 20%;
+      border: 4px solid #ffffff;
+      border-radius: 20px;
+      pointer-events: none;
     }
+
+    .scanText {
+      position: absolute;
+      bottom: 15px;
+      left: 0;
+      right: 0;
+      color: white;
+      font-weight: bold;
+      text-shadow: 0 2px 5px black;
+    }
+
+    .button {
+      width: 100%;
+      border: none;
+      border-radius: 16px;
+      padding: 17px;
+      margin-top: 15px;
+      font-size: 19px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #startCamera {
+      background: #168f4d;
+      color: white;
+    }
+
+    #switchCamera {
+      background: #16477f;
+      color: white;
+    }
+
+    .studentBox {
+      background: white;
+      margin-top: 18px;
+      border-radius: 20px;
+      padding: 20px;
+      display: none;
+      box-shadow: 0 4px 15px rgba(0,0,0,.08);
+    }
+
+    #studentName {
+      font-size: 30px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    #studentId {
+      color: #7b8798;
+      margin-bottom: 20px;
+    }
+
+    .answers {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .answer {
+      padding: 18px;
+      border-radius: 15px;
+      font-size: 25px;
+      font-weight: bold;
+      background: #eef4ff;
+    }
+
+    #lastRead {
+      margin-top: 15px;
+      background: white;
+      padding: 14px;
+      border-radius: 14px;
+      color: #475569;
+    }
+
   </style>
 </head>
 
 <body>
 
-<h1>📷 اختبار كاميرا الطلاب</h1>
+<h1>📷 ماسح الحضور والتقييم</h1>
 
-<div id="status">
-اضغط الزر لتشغيل الكاميرا
+<div class="subtitle">
+  مدرسة الحرمين الثانوية
 </div>
 
-<button onclick="startCamera()">
-فتح الكاميرا
+<div class="tabs">
+
+  <button class="tab active"
+          onclick="selectMode('attendance',this)">
+    الحضور
+  </button>
+
+  <button class="tab"
+          onclick="selectMode('homework',this)">
+    الواجب
+  </button>
+
+  <button class="tab"
+          onclick="selectMode('task',this)">
+    مهمة أدائية
+  </button>
+
+</div>
+
+<div id="status">
+  جاهز — اضغط فتح الكاميرا
+</div>
+
+<div id="cameraBox">
+
+  <video
+    id="video"
+    autoplay
+    playsinline
+    muted>
+  </video>
+
+  <div class="scanFrame"></div>
+
+  <div class="scanText">
+    وجّه الكاميرا نحو بطاقة الطالب
+  </div>
+
+</div>
+
+<button
+  id="startCamera"
+  class="button"
+  onclick="startCamera()">
+  📷 فتح الكاميرا
 </button>
 
-<br>
+<button
+  id="switchCamera"
+  class="button"
+  onclick="switchCamera()">
+  🔄 تبديل الكاميرا
+</button>
 
-<video id="camera"
-       autoplay
-       playsinline
-       muted>
-</video>
+<div id="studentBox" class="studentBox">
+
+  <div id="studentName">
+    اسم الطالب
+  </div>
+
+  <div id="studentId">
+    رقم الطالب
+  </div>
+
+  <div class="answers">
+
+    <div class="answer">A</div>
+
+    <div class="answer">B</div>
+
+    <div class="answer">C</div>
+
+    <div class="answer">D</div>
+
+  </div>
+
+</div>
+
+<div id="lastRead">
+  لم يتم مسح أي طالب حتى الآن
+</div>
+
 
 <script>
 
+let stream = null;
+
+let facingMode = "environment";
+
+let currentMode = "attendance";
+
+
+function selectMode(mode, button) {
+
+  currentMode = mode;
+
+  document
+    .querySelectorAll(".tab")
+    .forEach(btn => btn.classList.remove("active"));
+
+  button.classList.add("active");
+
+}
+
+
 async function startCamera() {
 
-  const status = document.getElementById("status");
-  const video = document.getElementById("camera");
+  const status =
+    document.getElementById("status");
+
+  const video =
+    document.getElementById("video");
 
   try {
 
-    status.innerText = "جاري طلب إذن الكاميرا...";
+    status.innerHTML =
+      "جاري تشغيل الكاميرا...";
 
-    const stream =
+    if (stream) {
+
+      stream
+        .getTracks()
+        .forEach(track => track.stop());
+
+    }
+
+    stream =
       await navigator.mediaDevices.getUserMedia({
+
         video: {
+
           facingMode: {
-            ideal: "environment"
+            ideal: facingMode
+          },
+
+          width: {
+            ideal: 1920
+          },
+
+          height: {
+            ideal: 1080
           }
+
         },
+
         audio: false
+
       });
+
 
     video.srcObject = stream;
 
-    status.innerText = "✅ الكاميرا تعمل";
+    await video.play();
 
-  } catch (err) {
+    status.innerHTML =
+      "✅ الكاميرا تعمل — وجّهها إلى بطاقة الطالب";
 
-    status.innerText =
-      "❌ " + err.name + " : " + err.message;
+  }
+
+  catch (error) {
+
+    console.error(error);
+
+    status.innerHTML =
+      "❌ تعذر تشغيل الكاميرا: " +
+      error.name;
 
   }
 
 }
 
+
+async function switchCamera() {
+
+  if (facingMode === "environment") {
+
+    facingMode = "user";
+
+  } else {
+
+    facingMode = "environment";
+
+  }
+
+  await startCamera();
+
+}
+
+
+window.addEventListener(
+  "load",
+  () => {
+
+    if (
+      !navigator.mediaDevices ||
+      !navigator.mediaDevices.getUserMedia
+    ) {
+
+      document.getElementById("status").innerHTML =
+        "❌ هذا المتصفح لا يدعم تشغيل الكاميرا";
+
+    }
+
+  }
+);
+
 </script>
 
 </body>
+
 </html>
