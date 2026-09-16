@@ -28,14 +28,14 @@ body{
 
 h1{
   color:#14558e;
-  font-size:34px;
-  margin:25px 0 8px;
+  font-size:32px;
+  margin:20px 0 8px;
 }
 
 .school{
   color:#667085;
   font-size:19px;
-  margin-bottom:25px;
+  margin-bottom:22px;
 }
 
 .tabs{
@@ -46,12 +46,12 @@ h1{
 
 .tab{
   flex:1;
-  padding:17px 5px;
+  padding:17px 4px;
   border:0;
   border-radius:18px;
   background:white;
   color:#1671d9;
-  font-size:19px;
+  font-size:18px;
   font-weight:bold;
 }
 
@@ -63,7 +63,7 @@ h1{
 #status{
   background:white;
   border-radius:18px;
-  padding:17px;
+  padding:16px;
   margin-bottom:18px;
   font-size:19px;
   font-weight:bold;
@@ -82,7 +82,7 @@ h1{
 video{
   display:block;
   width:100%;
-  min-height:450px;
+  min-height:430px;
   object-fit:cover;
 }
 
@@ -102,7 +102,7 @@ video{
   bottom:18px;
   width:100%;
   color:white;
-  font-size:20px;
+  font-size:19px;
   font-weight:bold;
   text-shadow:0 2px 6px #000;
 }
@@ -120,10 +120,10 @@ canvas{
   width:100%;
   border:0;
   border-radius:20px;
-  padding:20px;
+  padding:19px;
   margin-bottom:12px;
   color:white;
-  font-size:22px;
+  font-size:21px;
   font-weight:bold;
 }
 
@@ -135,14 +135,18 @@ canvas{
   background:#19558e;
 }
 
+#unlockBtn{
+  background:#e58a00;
+  display:none;
+}
+
 #result{
   max-width:650px;
   margin:15px auto;
   padding:20px;
   border-radius:20px;
   background:white;
-  font-size:22px;
-  min-height:100px;
+  min-height:110px;
 }
 
 .success{
@@ -150,22 +154,28 @@ canvas{
   border:3px solid #159447;
 }
 
-.student{
-  font-size:30px;
+.studentName{
+  font-size:29px;
   font-weight:bold;
   color:#174d82;
+}
+
+.studentCode{
+  font-size:22px;
+  font-weight:bold;
+  margin-top:5px;
 }
 
 .answer{
   font-size:34px;
   font-weight:bold;
   color:#159447;
-  margin-top:8px;
+  margin-top:10px;
 }
 
-.markerid{
-  font-size:16px;
+.hint{
   color:#667085;
+  font-size:16px;
   margin-top:8px;
 }
 
@@ -183,20 +193,17 @@ canvas{
 
 <div class="tabs">
 
-<button
-class="tab active"
+<button class="tab active"
 onclick="selectMode('attendance',this)">
 الحضور
 </button>
 
-<button
-class="tab"
+<button class="tab"
 onclick="selectMode('homework',this)">
 الواجب
 </button>
 
-<button
-class="tab"
+<button class="tab"
 onclick="selectMode('task',this)">
 مهمة أدائية
 </button>
@@ -205,7 +212,7 @@ onclick="selectMode('task',this)">
 
 
 <div id="status">
-اضغط «فتح الكاميرا»
+جاهز — اضغط «فتح الكاميرا»
 </div>
 
 
@@ -236,19 +243,21 @@ playsinline>
 id="startBtn"
 class="main"
 onclick="startCamera()">
-
 📷 فتح الكاميرا
-
 </button>
-
 
 <button
 id="switchBtn"
 class="main"
 onclick="switchCamera()">
-
 🔄 تبديل الكاميرا
+</button>
 
+<button
+id="unlockBtn"
+class="main"
+onclick="unlockResult()">
+🔓 مسح بطاقة أخرى
 </button>
 
 </div>
@@ -261,9 +270,9 @@ onclick="switchCamera()">
 
 <script>
 
-/* ================================
-   عناصر الصفحة
-================================ */
+/* =====================================
+   العناصر
+===================================== */
 
 const video =
 document.getElementById("video");
@@ -278,9 +287,9 @@ canvas.getContext(
 );
 
 
-/* ================================
+/* =====================================
    المتغيرات
-================================ */
+===================================== */
 
 let stream = null;
 
@@ -295,26 +304,47 @@ false;
 
 let detector = null;
 
-let lastMarkerID = null;
 
-let lastAnswer = null;
+/*
+  عندما يتم تثبيت طالب
+  تصبح هذه true
+*/
+let resultLocked =
+false;
 
-let lastDetectionTime = 0;
+
+/*
+  نجمع عدة قراءات قبل الاعتماد
+*/
+let readings = [];
 
 
-/* ================================
-   قارئ ARUCO
-   الافتراضي ARUCO_MIP_36h12
-================================ */
+/*
+  آخر وقت ظهرت فيه علامة
+*/
+let lastSeenTime = 0;
+
+
+/*
+  عدد القراءات المطلوبة للتثبيت
+*/
+const REQUIRED_READINGS = 7;
+
+
+/*
+  المدة التي نجمع خلالها القراءات
+*/
+const READING_WINDOW = 1200;
+
+
+/* =====================================
+   قارئ ArUco
+===================================== */
 
 try{
 
   detector =
   new AR.Detector();
-
-  console.log(
-    "ARUCO detector ready"
-  );
 
 }catch(error){
 
@@ -323,34 +353,51 @@ try{
 }
 
 
-/* ================================
-   الطلاب
+/* =====================================
+   أسماء الطلاب
 
-   Marker 0 = S01
-   Marker 1 = S02
-   Marker 2 = S03
-   ...
-================================ */
+   مهم:
+   ID 0 = S01
+   ID 1 = S02
+   وهكذا
+
+   غيّر "اسم الطالب الأول"
+   لاحقاً إلى الاسم الحقيقي.
+===================================== */
 
 const students = {
 
-  0:"الطالب S01",
-  1:"الطالب S02",
-  2:"الطالب S03",
-  3:"الطالب S04",
-  4:"الطالب S05",
-  5:"الطالب S06",
-  6:"الطالب S07",
-  7:"الطالب S08",
-  8:"الطالب S09",
-  9:"الطالب S10"
+  0:{
+    code:"S01",
+    name:"اسم الطالب الأول"
+  },
+
+  1:{
+    code:"S02",
+    name:"اسم الطالب الثاني"
+  },
+
+  2:{
+    code:"S03",
+    name:"اسم الطالب الثالث"
+  },
+
+  3:{
+    code:"S04",
+    name:"اسم الطالب الرابع"
+  },
+
+  4:{
+    code:"S05",
+    name:"اسم الطالب الخامس"
+  }
 
 };
 
 
-/* ================================
-   اختيار نوع التقييم
-================================ */
+/* =====================================
+   اختيار الوضع
+===================================== */
 
 function selectMode(
   mode,
@@ -374,12 +421,20 @@ function selectMode(
     "active"
   );
 
+
+  /*
+    عند تغيير نوع التقييم
+    نسمح بقراءة جديدة
+  */
+
+  unlockResult();
+
 }
 
 
-/* ================================
-   فتح الكاميرا
-================================ */
+/* =====================================
+   تشغيل الكاميرا
+===================================== */
 
 async function startCamera(){
 
@@ -396,7 +451,7 @@ async function startCamera(){
     ){
 
       status.innerHTML =
-      "❌ المتصفح لا يدعم تشغيل الكاميرا";
+      "❌ المتصفح لا يدعم الكاميرا";
 
       return;
 
@@ -467,12 +522,10 @@ async function startCamera(){
 
     }
 
+  }
+  catch(error){
 
-  }catch(error){
-
-    console.error(
-      error
-    );
+    console.error(error);
 
     status.innerHTML =
     "❌ تعذر تشغيل الكاميرا: "
@@ -484,26 +537,18 @@ async function startCamera(){
 }
 
 
-/* ================================
+/* =====================================
    تبديل الكاميرا
-================================ */
+===================================== */
 
 async function switchCamera(){
 
-  if(
-    facingMode ===
-    "environment"
-  ){
-
-    facingMode =
-    "user";
-
-  }else{
-
-    facingMode =
-    "environment";
-
-  }
+  facingMode =
+  facingMode === "environment"
+  ?
+  "user"
+  :
+  "environment";
 
 
   await startCamera();
@@ -511,22 +556,32 @@ async function switchCamera(){
 }
 
 
-/* ================================
-   قراءة الفيديو باستمرار
-================================ */
+/* =====================================
+   المسح المستمر
+===================================== */
 
 function scanFrame(){
+
+  /*
+    إذا ثبتنا النتيجة
+    لا نغيرها.
+  */
+
+  if(resultLocked){
+
+    requestAnimationFrame(
+      scanFrame
+    );
+
+    return;
+
+  }
+
 
   if(
     video.readyState >= 2 &&
     detector
   ){
-
-    /*
-      دقة مناسبة للآيفون.
-      لا نحتاج معالجة الفيديو
-      بدقته الكاملة.
-    */
 
     const scanWidth =
     640;
@@ -584,24 +639,21 @@ function scanFrame(){
         markers.length > 0
       ){
 
-        /*
-          حاليًا نختبر أول بطاقة.
-          بعد نجاح الاختبار سنجعل
-          النظام يقرأ عدة طلاب
-          في نفس الصورة.
-        */
+        lastSeenTime =
+        Date.now();
 
-        processMarker(
+
+        collectReading(
           markers[0]
         );
 
       }
 
-
-    }catch(error){
+    }
+    catch(error){
 
       console.error(
-        "Detection error:",
+        "Detection:",
         error
       );
 
@@ -617,11 +669,11 @@ function scanFrame(){
 }
 
 
-/* ================================
-   معالجة البطاقة المكتشفة
-================================ */
+/* =====================================
+   جمع القراءات
+===================================== */
 
-function processMarker(
+function collectReading(
   marker
 ){
 
@@ -637,49 +689,196 @@ function processMarker(
   );
 
 
-  /*
-    منع اهتزاز النتيجة
-    وتكرار القراءة عشرات المرات
-    في الثانية.
-  */
-
   const now =
   Date.now();
 
 
+  readings.push({
+
+    id:id,
+
+    answer:answer,
+
+    time:now
+
+  });
+
+
+  /*
+    نحذف القراءات القديمة
+  */
+
+  readings =
+  readings.filter(
+    item =>
+    now - item.time
+    <=
+    READING_WINDOW
+  );
+
+
+  /*
+    نحسب أكثر ID ظهوراً
+  */
+
+  const idCounts = {};
+
+
+  readings.forEach(
+    item => {
+
+      if(
+        idCounts[item.id] ===
+        undefined
+      ){
+
+        idCounts[item.id] = 0;
+
+      }
+
+      idCounts[item.id]++;
+
+    }
+  );
+
+
+  let bestID = null;
+
+  let bestIDCount = 0;
+
+
+  Object.keys(
+    idCounts
+  )
+  .forEach(key => {
+
+    if(
+      idCounts[key] >
+      bestIDCount
+    ){
+
+      bestID =
+      Number(key);
+
+      bestIDCount =
+      idCounts[key];
+
+    }
+
+  });
+
+
+  /*
+    لا نعتمد الطالب إلا بعد
+    عدة قراءات متوافقة
+  */
+
   if(
-    id === lastMarkerID &&
-    answer === lastAnswer &&
-    now - lastDetectionTime < 700
+    bestIDCount <
+    REQUIRED_READINGS
   ){
+
+    document
+    .getElementById(
+      "status"
+    )
+    .innerHTML =
+    "🔍 جاري تثبيت قراءة البطاقة...";
 
     return;
 
   }
 
 
-  lastMarkerID =
-  id;
+  /*
+    الآن نأخذ قراءات
+    نفس الطالب فقط
+  */
 
-  lastAnswer =
-  answer;
+  const studentReadings =
+  readings.filter(
+    item =>
+    item.id === bestID
+  );
 
-  lastDetectionTime =
-  now;
+
+  /*
+    نحدد أكثر اتجاه
+    تكرر لهذا الطالب
+  */
+
+  const answerCounts = {
+
+    A:0,
+    B:0,
+    C:0,
+    D:0
+
+  };
 
 
-  showResult(
-    id,
-    answer
+  studentReadings.forEach(
+    item => {
+
+      if(
+        answerCounts[item.answer]
+        !==
+        undefined
+      ){
+
+        answerCounts[
+          item.answer
+        ]++;
+
+      }
+
+    }
+  );
+
+
+  let stableAnswer =
+  "A";
+
+  let highestCount =
+  -1;
+
+
+  Object.keys(
+    answerCounts
+  )
+  .forEach(answer => {
+
+    if(
+      answerCounts[answer] >
+      highestCount
+    ){
+
+      stableAnswer =
+      answer;
+
+      highestCount =
+      answerCounts[answer];
+
+    }
+
+  });
+
+
+  /*
+    نثبت النتيجة
+  */
+
+  lockResult(
+    bestID,
+    stableAnswer
   );
 
 }
 
 
-/* ================================
-   تحديد A / B / C / D
-   من اتجاه البطاقة
-================================ */
+/* =====================================
+   تحديد اتجاه البطاقة
+===================================== */
 
 function getAnswerFromOrientation(
   corners
@@ -694,14 +893,6 @@ function getAnswerFromOrientation(
 
   }
 
-
-  /*
-    المكتبة تعيد زوايا العلامة
-    بترتيب معروف بعد التعرف عليها.
-
-    الخط من corner 0 إلى corner 1
-    يعطينا اتجاه أعلى العلامة.
-  */
 
   const p0 =
   corners[0];
@@ -733,21 +924,6 @@ function getAnswerFromOrientation(
     angle += 360;
 
   }
-
-
-  /*
-    البطاقة بوضعها الطبيعي:
-    A في الأعلى.
-
-    تدويرها 90°:
-    B
-
-    تدويرها 180°:
-    C
-
-    تدويرها 270°:
-    D
-  */
 
 
   if(
@@ -785,14 +961,40 @@ function getAnswerFromOrientation(
 }
 
 
-/* ================================
-   عرض النتيجة
-================================ */
+/* =====================================
+   تثبيت النتيجة
+===================================== */
 
-function showResult(
+function lockResult(
   id,
   answer
 ){
+
+  resultLocked =
+  true;
+
+
+  readings = [];
+
+
+  const student =
+  students[id] ||
+  {
+
+    code:
+    "S" +
+    String(
+      id + 1
+    ).padStart(
+      2,
+      "0"
+    ),
+
+    name:
+    "طالب غير مسجل"
+
+  };
+
 
   const result =
   document.getElementById(
@@ -800,128 +1002,41 @@ function showResult(
   );
 
 
-  const studentNumber =
-  id + 1;
-
-
-  const studentCode =
-  "S" +
-  String(
-    studentNumber
-  ).padStart(
-    2,
-    "0"
-  );
-
-
-  const studentName =
-  students[id] ||
-  (
-    "الطالب " +
-    studentCode
-  );
-
-
-  let modeText =
-  "";
-
-
-  if(
-    currentMode ===
-    "attendance"
-  ){
-
-    modeText =
-    "✅ تم تسجيل الحضور";
-
-  }
-
-
-  else if(
-    currentMode ===
-    "homework"
-  ){
-
-    modeText =
-    "📝 الواجب";
-
-  }
-
-
-  else{
-
-    modeText =
-    "📋 المهمة الأدائية";
-
-  }
-
-
   result.classList.add(
     "success"
   );
 
 
+  let details = "";
+
+
   /*
-    في الحضور لا نحتاج
-    إظهار الإجابة.
-
-    في الواجب والمهمة
-    نظهر اتجاه البطاقة.
+    الحضور
   */
-
 
   if(
     currentMode ===
     "attendance"
   ){
 
-    result.innerHTML =
-
-    '<div class="student">'
-    +
-    studentName
-    +
-    '</div>'
-
-    +
+    details =
 
     '<div class="answer">'
     +
-    modeText
-    +
-    '</div>'
-
-    +
-
-    '<div class="markerid">'
-    +
-    'Marker ID: '
-    +
-    id
+    '✅ تم تسجيل الحضور'
     +
     '</div>';
 
   }
 
+
+  /*
+    الواجب أو المهمة
+  */
+
   else{
 
-    result.innerHTML =
-
-    '<div class="student">'
-    +
-    studentName
-    +
-    '</div>'
-
-    +
-
-    '<div>'
-    +
-    modeText
-    +
-    '</div>'
-
-    +
+    details =
 
     '<div class="answer">'
     +
@@ -929,19 +1044,38 @@ function showResult(
     +
     answer
     +
-    '</div>'
-
-    +
-
-    '<div class="markerid">'
-    +
-    'Marker ID: '
-    +
-    id
-    +
     '</div>';
 
   }
+
+
+  result.innerHTML =
+
+  '<div class="studentName">'
+  +
+  student.name
+  +
+  '</div>'
+
+  +
+
+  '<div class="studentCode">'
+  +
+  student.code
+  +
+  '</div>'
+
+  +
+
+  details
+
+  +
+
+  '<div class="hint">'
+  +
+  'تم تثبيت القراءة'
+  +
+  '</div>';
 
 
   document
@@ -949,16 +1083,76 @@ function showResult(
     "status"
   )
   .innerHTML =
+
   "✅ تم التعرف على "
   +
-  studentCode;
+  student.code;
+
+
+  /*
+    نظهر زر قراءة طالب آخر
+  */
+
+  document
+  .getElementById(
+    "unlockBtn"
+  )
+  .style.display =
+  "block";
 
 }
 
 
-/* ================================
-   فحص المكتبة عند فتح الصفحة
-================================ */
+/* =====================================
+   السماح بقراءة طالب آخر
+===================================== */
+
+function unlockResult(){
+
+  resultLocked =
+  false;
+
+  readings = [];
+
+  lastSeenTime = 0;
+
+
+  const result =
+  document.getElementById(
+    "result"
+  );
+
+
+  result.classList.remove(
+    "success"
+  );
+
+
+  result.innerHTML =
+  "جاهز لمسح بطاقة الطالب";
+
+
+  document
+  .getElementById(
+    "status"
+  )
+  .innerHTML =
+  "وجّه الكاميرا إلى البطاقة";
+
+
+  document
+  .getElementById(
+    "unlockBtn"
+  )
+  .style.display =
+  "none";
+
+}
+
+
+/* =====================================
+   فحص المكتبة
+===================================== */
 
 window.addEventListener(
   "load",
@@ -976,7 +1170,7 @@ window.addEventListener(
     ){
 
       status.innerHTML =
-      "❌ لم يتم تحميل مكتبة قراءة البطاقات";
+      "❌ لم يتم تحميل قارئ البطاقات";
 
       return;
 
