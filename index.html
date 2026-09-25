@@ -19,7 +19,7 @@ content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 
 body{
   margin:0;
-  padding:16px;
+  padding:10px;
   font-family:Arial,sans-serif;
   background:#f4f6f9;
   color:#14233a;
@@ -28,56 +28,71 @@ body{
 
 h1{
   color:#14558e;
-  margin:18px 0 5px;
-  font-size:30px;
+  margin:8px 0 2px;
+  font-size:26px;
 }
 
 .school{
   color:#667085;
-  font-size:18px;
-  margin-bottom:18px;
+  font-size:16px;
+  margin-bottom:8px;
 }
+
+/* ================================
+   الإعدادات
+================================ */
 
 .setup{
   max-width:700px;
-  margin:auto;
+  margin:0 auto 7px;
   background:white;
-  padding:15px;
-  border-radius:20px;
-  margin-bottom:15px;
+  padding:8px;
+  border-radius:14px;
+}
+
+.setupGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
 }
 
 label{
   display:block;
   text-align:right;
   font-weight:bold;
-  margin:10px 4px 6px;
+  margin:3px 2px;
+  font-size:13px;
 }
 
-select,input{
+select,
+input{
   width:100%;
-  padding:14px;
-  border:2px solid #d0d5dd;
-  border-radius:14px;
-  font-size:18px;
+  padding:9px;
+  border:1px solid #d0d5dd;
+  border-radius:9px;
+  font-size:16px;
   background:white;
 }
 
+/* ================================
+   الأوضاع
+================================ */
+
 .tabs{
   display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:9px;
+  grid-template-columns:repeat(4,1fr);
+  gap:5px;
   max-width:700px;
-  margin:0 auto 15px;
+  margin:0 auto 7px;
 }
 
 .tab{
   border:0;
-  padding:15px 5px;
-  border-radius:16px;
+  padding:10px 2px;
+  border-radius:11px;
   background:white;
   color:#1671d9;
-  font-size:17px;
+  font-size:14px;
   font-weight:bold;
 }
 
@@ -86,15 +101,23 @@ select,input{
   color:white;
 }
 
+/* ================================
+   الحالة
+================================ */
+
 #status{
   max-width:700px;
-  margin:0 auto 15px;
+  margin:0 auto 6px;
   background:white;
-  border-radius:17px;
-  padding:14px;
-  font-size:18px;
+  border-radius:10px;
+  padding:8px;
+  font-size:15px;
   font-weight:bold;
 }
+
+/* ================================
+   الكاميرا
+================================ */
 
 .cameraBox{
   position:relative;
@@ -102,35 +125,36 @@ select,input{
   margin:auto;
   background:#111;
   overflow:hidden;
-  border-radius:22px;
+  border-radius:14px;
 }
 
 video{
   width:100%;
   display:block;
-  min-height:400px;
+  height:58vh;
+  min-height:360px;
   object-fit:cover;
 }
 
 .frame{
   position:absolute;
-  width:90%;
-  height:76%;
-  left:5%;
-  top:7%;
-  border:4px solid white;
-  border-radius:22px;
+  width:96%;
+  height:92%;
+  left:2%;
+  top:2%;
+  border:2px solid white;
+  border-radius:14px;
   pointer-events:none;
 }
 
 .guide{
   position:absolute;
-  bottom:15px;
+  bottom:8px;
   width:100%;
-  padding:0 10px;
+  padding:0 8px;
   color:white;
   font-weight:bold;
-  font-size:18px;
+  font-size:14px;
   text-shadow:0 2px 6px black;
 }
 
@@ -138,19 +162,25 @@ canvas{
   display:none;
 }
 
+/* ================================
+   الأزرار
+================================ */
+
 .buttons{
   max-width:700px;
-  margin:15px auto;
+  margin:6px auto;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:5px;
 }
 
 .main{
   width:100%;
-  padding:18px;
-  margin-bottom:10px;
+  padding:11px 5px;
   border:0;
-  border-radius:18px;
+  border-radius:11px;
   color:white;
-  font-size:20px;
+  font-size:14px;
   font-weight:bold;
 }
 
@@ -172,61 +202,171 @@ canvas{
   display:none;
 }
 
+/* ================================
+   الحضور
+================================ */
+
 #summary{
   max-width:700px;
-  margin:15px auto;
+  margin:7px auto;
   background:white;
-  border-radius:20px;
-  padding:18px;
+  border-radius:14px;
+  padding:10px;
 }
 
-.bigNumber{
-  font-size:48px;
-  color:#159447;
+.stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:6px;
+  margin:8px 0;
+}
+
+.statBox{
+  background:#f4f6f9;
+  border-radius:10px;
+  padding:7px 2px;
+}
+
+.statNumber{
+  font-size:25px;
   font-weight:bold;
 }
 
+.presentNumber{
+  color:#159447;
+}
+
+.absentNumber{
+  color:#b42318;
+}
+
+.totalNumber{
+  color:#19558e;
+}
+
+.statLabel{
+  font-size:12px;
+  color:#667085;
+}
+
 .resultCard{
-  border:2px solid #159447;
+  border:1px solid #159447;
   background:#e4f7eb;
-  border-radius:17px;
-  padding:14px;
-  margin:9px 0;
+  border-radius:11px;
+  padding:8px;
+  margin:5px 0;
 }
 
 .studentName{
-  font-size:23px;
+  font-size:18px;
   font-weight:bold;
   color:#174d82;
 }
 
 .studentCode{
   font-weight:bold;
-  font-size:19px;
-  margin:5px;
+  font-size:15px;
+  margin:3px;
 }
 
 .answer{
-  font-size:28px;
+  font-size:26px;
   font-weight:bold;
   color:#159447;
-  margin-top:10px;
+  margin-top:7px;
 }
 
 .small{
   color:#667085;
-  font-size:15px;
-  margin-top:6px;
+  font-size:14px;
+  margin-top:4px;
 }
 
 #individualResult{
   display:none;
   max-width:700px;
-  margin:15px auto;
+  margin:7px auto;
   background:#e4f7eb;
-  border:3px solid #159447;
-  border-radius:20px;
-  padding:20px;
+  border:2px solid #159447;
+  border-radius:14px;
+  padding:12px;
+}
+
+/* ================================
+   الجوال
+================================ */
+
+@media(max-width:700px){
+
+  body{
+    padding:5px;
+  }
+
+  h1{
+    font-size:19px;
+    margin:2px 0;
+  }
+
+  .school{
+    font-size:12px;
+    margin-bottom:4px;
+  }
+
+  .setup{
+    padding:5px;
+    margin-bottom:4px;
+  }
+
+  label{
+    display:none;
+  }
+
+  select,
+  input{
+    padding:7px 5px;
+    font-size:14px;
+  }
+
+  .tabs{
+    gap:3px;
+    margin-bottom:4px;
+  }
+
+  .tab{
+    padding:7px 1px;
+    font-size:11px;
+  }
+
+  #status{
+    margin-bottom:4px;
+    padding:5px;
+    font-size:12px;
+  }
+
+  video{
+    height:62vh;
+    min-height:330px;
+  }
+
+  .guide{
+    font-size:12px;
+    bottom:5px;
+  }
+
+  .buttons{
+    margin:4px auto;
+  }
+
+  .main{
+    padding:8px 3px;
+    font-size:12px;
+  }
+
+  #summary{
+    margin:4px auto;
+    padding:7px;
+  }
+
 }
 
 </style>
@@ -243,14 +383,20 @@ canvas{
 
 <div class="setup">
 
+<div class="setupGrid">
+
+<div>
+
 <label>الشعبة</label>
 
-<select id="classSelect">
-  <option value="">اختر الشعبة</option>
-  <option value="301">301</option>
-  <option value="302">302</option>
-  <option value="303">303</option>
+<select id="classSelect" onchange="classChanged()">
+<option value="">اختر الشعبة</option>
+<option value="301">301</option>
+<option value="302">302</option>
+<option value="303">303</option>
 </select>
+
+</div>
 
 
 <div id="dateArea">
@@ -274,7 +420,9 @@ type="date">
 id="activityNumber"
 type="number"
 min="1"
-placeholder="مثال: 1">
+placeholder="رقم النشاط">
+
+</div>
 
 </div>
 
@@ -298,13 +446,13 @@ onclick="selectMode('homework',this)">
 <button
 class="tab"
 onclick="selectMode('task',this)">
-📋 مهمة أدائية
+📋 مهمة
 </button>
 
 <button
 class="tab"
 onclick="selectMode('participation',this)">
-⭐ المشاركة
+⭐ مشاركة
 </button>
 
 </div>
@@ -327,7 +475,7 @@ playsinline>
 <div class="frame"></div>
 
 <div class="guide" id="guide">
-الحضور: ضع S01 و S02 داخل الإطار
+الحضور: وجّه الكاميرا إلى بطاقات الطلاب
 </div>
 
 </div>
@@ -363,7 +511,7 @@ onclick="nextStudent()">
 id="resetAttendanceBtn"
 class="main"
 onclick="resetAttendance()">
-🗑 بدء مسح حضور جديد
+🗑 حضور جديد
 </button>
 
 </div>
@@ -375,15 +523,44 @@ onclick="resetAttendance()">
 <div id="summary">
 
 <div id="summaryTitle">
-لم يبدأ المسح بعد
+اختر الشعبة
 </div>
 
-<div class="bigNumber" id="attendanceCount">
+<div class="stats">
+
+<div class="statBox">
+<div
+class="statNumber presentNumber"
+id="attendanceCount">
 0
 </div>
+<div class="statLabel">
+حاضر
+</div>
+</div>
 
-<div>
-عدد الطلاب المسجل حضورهم
+<div class="statBox">
+<div
+class="statNumber absentNumber"
+id="absentCount">
+45
+</div>
+<div class="statLabel">
+غائب
+</div>
+</div>
+
+<div class="statBox">
+<div
+class="statNumber totalNumber"
+id="totalCount">
+45
+</div>
+<div class="statLabel">
+الإجمالي
+</div>
+</div>
+
 </div>
 
 <div id="attendanceList"></div>
@@ -393,9 +570,9 @@ onclick="resetAttendance()">
 
 <script>
 
-/* ==================================
-   عناصر الكاميرا
-================================== */
+/* =========================================================
+   الكاميرا
+========================================================= */
 
 const video =
 document.getElementById("video");
@@ -412,58 +589,303 @@ canvas.getContext(
 let stream = null;
 let detector = null;
 let scanning = false;
-let facingMode = "environment";
-let currentMode = "attendance";
+
+let facingMode =
+"environment";
+
+let currentMode =
+"attendance";
 
 
-/* ==================================
-   بطاقات الاختبار المسموحة فقط
-   S01 = ID 0
-   S02 = ID 1
-================================== */
+/* =========================================================
+   البطاقات
+
+   ID 0  = S01
+   ID 44 = S45
+========================================================= */
+
+const STUDENT_COUNT = 45;
 
 const ALLOWED_MARKER_IDS =
-new Set([0,1]);
+new Set(
+  Array.from(
+    {length:STUDENT_COUNT},
+    (_,i)=>i
+  )
+);
 
 
-/* ==================================
-   الطلاب
-================================== */
+/* =========================================================
+   أسماء الطلاب
 
-const students = {
+   مهم:
+   تعديل أي اسم مستقبلاً يتم من هنا فقط.
 
-  0:{
-    code:"S01",
-    name:"اسم الطالب الأول"
-  },
+   ترتيب الأسماء مهم:
+   الاسم الأول  = S01
+   الاسم الثاني = S02
+   ...
+   الاسم 45     = S45
+========================================================= */
 
-  1:{
-    code:"S02",
-    name:"اسم الطالب الثاني"
-  }
+const classStudents = {
+
+
+/* =========================================================
+   301
+========================================================= */
+
+"301":[
+
+"أحمد عبدالفتاح عبدالله البعداني",
+"الوليد بن عبدالرحمن بن صالح التيسان",
+"إياد علي محمد العبداللطيف",
+"تركي منصور عوض المالكي",
+"حزام فهد بن عبدالله العتيبي",
+"حسين محمد عوض سعيد",
+"حيدر محمد بن علي الحمود",
+"خالد بن محمد بن حمود الشمري",
+"خالد جابر بن حنين الحربي",
+"راشد سعيد بن راشد المري",
+"راكان مفلح بن جويهر العنبر",
+"ريان محمد بن جمعان المالكي",
+"سالم بن نافل بن دعيرم العرجاني العجمي",
+"سامي سعيد محمد الزبيدي",
+"سعود عيسى رجاء العنزي",
+"سعيد محمد بن سعيد الدوسري",
+"سند عوضه سعد القحطاني",
+"صنهات محمد صنهات الدوسري",
+"عبدالاله بن سعد بن شايع القحطاني",
+"عبدالله بن محمد بن عبدالله القحطاني",
+"عبدالله حمد بن صالح المري",
+"عبدالله ضيف الله عبدالرزاق المالكي",
+"عبدالله غانم ظافر القحطاني",
+"عثمان محمد بن عبدالله العيسى",
+"عزالدين علي محمد إبراهيم السيد",
+"علي الدين أحمد محمود السيد أحمد",
+"عوض صالح بن عوض الصيعري",
+"فارس حمد بن محمد المري",
+"فارس عبدالله بن علي الرويشد",
+"فهاد نواف بن عجي الدوسري",
+"فيصل جمال هندي الرجاء",
+"مبارك عادل بن مبارك الأحمد",
+"محمد براك بن مشلح العرجاني",
+"محمد بن بدر بن محمد آل روق القحطاني",
+"محمد حمد بن محمد المري",
+"محمد قطبي عمر أحمد",
+"مشعل عبدالسلام محمد القحطاني",
+"مصلح محسن بن سعيد الدوسري",
+"معتز وسيم جمعة أبو عمشة",
+"ميثم عبدالله بن عيسى العويض",
+"ناصر بن فهد بن بداح الدوسري",
+"ناصر عبدالله بن محمد الدوسري",
+"نواف محمد بن غانم الدوسري",
+"ياسر محمد آدم حمزة",
+"سلطان سعد القحطاني"
+
+],
+
+
+/* =========================================================
+   302
+========================================================= */
+
+"302":[
+
+"إبراهيم حسن أسكر",
+"إبراهيم خالد بوسعد",
+"أسامة حروبي العبدالله",
+"بدر إبراهيم القحطاني",
+"تركي ضحوي الحربي",
+"حسين علي مري",
+"حمد علي العجمي",
+"ريان عبدالسلام القحطاني",
+"زياد عبدالله الحربي",
+"سعيد محمد مري",
+"سلطان سعد فهيد القحطاني",
+"سلطان عبدالله القحطاني",
+"صبيح محمد المري",
+"عبدالرحمن جلوي المطيري",
+"عبدالعزيز خلف المطيري",
+"عبدالله حسن أسكر",
+"عبدالله سالم اليامي",
+"عبدالله صالح حسين",
+"عبدالله عبدالمحسن الدوسري",
+"عبدالله مبارك المري",
+"عبدالله متعب الدوسري",
+"عبدالله منصر الصيعري",
+"عبودي عبدي عثمان",
+"علي ماجد العبدالله",
+"علي سالم المري",
+"فارس فايز بالقحوم",
+"فهد عبدالله الدوسري",
+"فهد علي العجمي",
+"ماجد سعد البقومي",
+"مشتبى مجاهد عبدالرحمن",
+"محمد بندر العمران",
+"محمد فيصل برجس",
+"محمد حميد المالكي",
+"محمد مبخوت الدوسري",
+"محمد مشعان الدوسري",
+"مشاري جابر المري",
+"مهراز زيد المري",
+"ناجي علي المري",
+"ناهض راشد الدوسري",
+"نايف راشد السبيعي",
+"نواف عبدالهادي المري",
+"وسيم حروبي العبدالله",
+"وليد عبدالرحمن الدوسري",
+"يوسف فارس الرداعي",
+"يوسف محمود الرفاعي"
+
+],
+
+
+/* =========================================================
+   303
+========================================================= */
+
+"303":[
+
+"إبراهيم عبدالحافظ راشد",
+"أحمد جلوي المطيري",
+"أحمد عبدالله باوحال",
+"جابر محمد مري",
+"حمد جار الله العجمي",
+"حمد سالم مري",
+"حمزة حسن حداد",
+"خالد محمد سالم أحمد",
+"ريان علي مدشل",
+"سالم علي مري",
+"سالم صلاح بالخدر",
+"سالم فهد المري",
+"سامي محمد العنزي",
+"سعد عبدالهدي قحطاني",
+"سعيد عبيد قحطاني",
+"سلطان جمال امليفي",
+"سيف عبدالله القحطاني",
+"عبدالرحمن عوض بشير",
+"عبدالله بخيت المري",
+"عبدالله عيد الدوسري",
+"عبدالله ظافر قحطاني",
+"عبدالله مناور قحطاني",
+"عرفات أحمد الضبياني",
+"علي متعب المري",
+"علي محمد المري",
+"علي محمد مهري",
+"عماش حزمي السبيعي",
+"عمر حسن شيخ",
+"فايز محمد عبده",
+"محمد حمد المري",
+"محمد رائد الرحال",
+"محمد عبدالرحمن أبو دماغ",
+"محمد محمد العولقي",
+"محمد ناجي المري",
+"مروان عادل محمود",
+"مروان عارف عبدالله",
+"مسفر عوض قحطاني",
+"مصطفى عوض الكريم",
+"منصور عبدالرحمن أبو دماغ",
+"مهند ناصر الديهبلي",
+"نبيل نادر أحمد",
+"نواف أمين أحمد",
+"وهيب نادر أحمد",
+"يوسف محسن المشجري",
+"يونس محمد ضربوش"
+
+]
 
 };
 
 
-/* ==================================
-   الحضور الجماعي
-================================== */
+/* =========================================================
+   جلب الطالب حسب الشعبة
+
+   نفس S01-S45 تستخدم في كل الشعب
+========================================================= */
+
+function getStudent(id){
+
+  const className =
+  document
+  .getElementById(
+    "classSelect"
+  )
+  .value;
+
+  const list =
+  classStudents[className];
+
+  if(
+    !list
+    ||
+    !Number.isInteger(id)
+    ||
+    id < 0
+    ||
+    id >= list.length
+  ){
+
+    return null;
+
+  }
+
+  return {
+
+    id:id,
+
+    code:
+    "S"
+    +
+    String(id+1)
+    .padStart(2,"0"),
+
+    name:list[id],
+
+    section:className
+
+  };
+
+}
+
+
+/* =========================================================
+   الحضور
+========================================================= */
 
 let attendanceStudents = {};
 
-let attendanceHits = {
-  0:[],
-  1:[]
-};
+let attendanceHits = {};
 
-const ATTENDANCE_REQUIRED_HITS = 3;
+function createAttendanceHits(){
 
-const ATTENDANCE_HIT_WINDOW = 3000;
+  attendanceHits = {};
+
+  for(
+    let i=0;
+    i<STUDENT_COUNT;
+    i++
+  ){
+
+    attendanceHits[i] = [];
+
+  }
+
+}
+
+createAttendanceHits();
 
 
-/* ==================================
+const ATTENDANCE_REQUIRED_HITS =
+3;
+
+const ATTENDANCE_HIT_WINDOW =
+3000;
+
+
+/* =========================================================
    القراءة الفردية
-================================== */
+========================================================= */
 
 let individualReadings = [];
 
@@ -474,9 +896,9 @@ const REQUIRED_READINGS = 5;
 const READING_WINDOW = 1500;
 
 
-/* ==================================
-   تشغيل قارئ ARUCO
-================================== */
+/* =========================================================
+   قارئ ARUCO
+========================================================= */
 
 try{
 
@@ -491,9 +913,9 @@ catch(error){
 }
 
 
-/* ==================================
-   تاريخ اليوم
-================================== */
+/* =========================================================
+   التاريخ
+========================================================= */
 
 function setToday(){
 
@@ -518,46 +940,138 @@ function setToday(){
     "attendanceDate"
   )
   .value =
-  year + "-" + month + "-" + day;
+  year
+  +
+  "-"
+  +
+  month
+  +
+  "-"
+  +
+  day;
 
 }
 
 setToday();
 
 
-/* ==================================
+/* =========================================================
+   تغيير الشعبة
+
+   يمنع اختلاط حضور شعبتين
+========================================================= */
+
+function classChanged(){
+
+  attendanceStudents = {};
+
+  createAttendanceHits();
+
+  individualReadings = [];
+
+  individualLocked = false;
+
+  document
+  .getElementById(
+    "individualResult"
+  )
+  .style.display =
+  "none";
+
+  document
+  .getElementById(
+    "nextBtn"
+  )
+  .style.display =
+  "none";
+
+  updateAttendanceScreen();
+
+  const className =
+  document
+  .getElementById(
+    "classSelect"
+  )
+  .value;
+
+  if(className){
+
+    document
+    .getElementById(
+      "status"
+    )
+    .innerHTML =
+    "الشعبة "
+    +
+    className
+    +
+    " — جاهز للمسح";
+
+  }
+
+  else{
+
+    document
+    .getElementById(
+      "status"
+    )
+    .innerHTML =
+    "اختر الشعبة ثم افتح الكاميرا";
+
+  }
+
+}
+
+
+/* =========================================================
    اختيار الوضع
-================================== */
+========================================================= */
 
 function selectMode(mode,button){
 
   currentMode = mode;
 
   document
-  .querySelectorAll(".tab")
-  .forEach(btn => {
+  .querySelectorAll(
+    ".tab"
+  )
+  .forEach(btn=>{
 
-    btn.classList.remove("active");
+    btn.classList.remove(
+      "active"
+    );
 
   });
 
-  button.classList.add("active");
+  button.classList.add(
+    "active"
+  );
 
 
   const dateArea =
-  document.getElementById("dateArea");
+  document.getElementById(
+    "dateArea"
+  );
 
   const numberArea =
-  document.getElementById("numberArea");
+  document.getElementById(
+    "numberArea"
+  );
 
   const numberLabel =
-  document.getElementById("numberLabel");
+  document.getElementById(
+    "numberLabel"
+  );
 
   const guide =
-  document.getElementById("guide");
+  document.getElementById(
+    "guide"
+  );
 
   const summary =
-  document.getElementById("summary");
+  document.getElementById(
+    "summary"
+  );
 
   const resetButton =
   document.getElementById(
@@ -565,7 +1079,10 @@ function selectMode(mode,button){
   );
 
 
-  if(mode === "attendance"){
+  if(
+    mode ===
+    "attendance"
+  ){
 
     dateArea.style.display =
     "block";
@@ -577,15 +1094,22 @@ function selectMode(mode,button){
     "block";
 
     guide.innerHTML =
-    "الحضور: ضع S01 و S02 داخل الإطار";
+    "الحضور: وجّه الكاميرا إلى بطاقات الطلاب";
 
     resetButton.style.display =
-    stream ? "block" : "none";
+    stream
+    ?
+    "block"
+    :
+    "none";
 
   }
 
 
-  else if(mode === "homework"){
+  else if(
+    mode ===
+    "homework"
+  ){
 
     dateArea.style.display =
     "none";
@@ -608,7 +1132,10 @@ function selectMode(mode,button){
   }
 
 
-  else if(mode === "task"){
+  else if(
+    mode ===
+    "task"
+  ){
 
     dateArea.style.display =
     "none";
@@ -623,7 +1150,7 @@ function selectMode(mode,button){
     "none";
 
     guide.innerHTML =
-    "المهمة الأدائية: امسح بطاقة طالب واحد";
+    "المهمة: امسح بطاقة طالب واحد";
 
     resetButton.style.display =
     "none";
@@ -655,9 +1182,9 @@ function selectMode(mode,button){
 }
 
 
-/* ==================================
+/* =========================================================
    التحقق
-================================== */
+========================================================= */
 
 function validateSetup(){
 
@@ -668,10 +1195,11 @@ function validateSetup(){
   )
   .value;
 
-
   if(!className){
 
-    alert("اختر الشعبة أولاً");
+    alert(
+      "اختر الشعبة أولاً"
+    );
 
     return false;
 
@@ -679,9 +1207,11 @@ function validateSetup(){
 
 
   if(
-    currentMode === "homework"
+    currentMode ===
+    "homework"
     ||
-    currentMode === "task"
+    currentMode ===
+    "task"
   ){
 
     const number =
@@ -691,14 +1221,16 @@ function validateSetup(){
     )
     .value;
 
-
     if(!number){
 
       if(
-        currentMode === "homework"
+        currentMode ===
+        "homework"
       ){
 
-        alert("أدخل رقم الواجب");
+        alert(
+          "أدخل رقم الواجب"
+        );
 
       }
 
@@ -721,19 +1253,23 @@ function validateSetup(){
 }
 
 
-/* ==================================
+/* =========================================================
    فتح الكاميرا
-================================== */
+========================================================= */
 
 async function startCamera(){
 
   if(!validateSetup()){
+
     return;
+
   }
 
 
   const status =
-  document.getElementById("status");
+  document.getElementById(
+    "status"
+  );
 
 
   try{
@@ -741,7 +1277,8 @@ async function startCamera(){
     if(
       !navigator.mediaDevices
       ||
-      !navigator.mediaDevices.getUserMedia
+      !navigator.mediaDevices
+      .getUserMedia
     ){
 
       status.innerHTML =
@@ -756,7 +1293,7 @@ async function startCamera(){
 
       stream
       .getTracks()
-      .forEach(track => {
+      .forEach(track=>{
 
         track.stop();
 
@@ -846,14 +1383,15 @@ async function startCamera(){
 }
 
 
-/* ==================================
+/* =========================================================
    تبديل الكاميرا
-================================== */
+========================================================= */
 
 async function switchCamera(){
 
   facingMode =
-  facingMode === "environment"
+  facingMode ===
+  "environment"
   ?
   "user"
   :
@@ -864,9 +1402,9 @@ async function switchCamera(){
 }
 
 
-/* ==================================
-   المسح المستمر
-================================== */
+/* =========================================================
+   المسح
+========================================================= */
 
 function scanFrame(){
 
@@ -876,10 +1414,12 @@ function scanFrame(){
     detector
   ){
 
-    const scanWidth = 960;
+    const scanWidth =
+    960;
 
     const ratio =
-    video.videoHeight /
+    video.videoHeight
+    /
     video.videoWidth;
 
     const scanHeight =
@@ -925,20 +1465,23 @@ function scanFrame(){
 
 
       /*
-        منع أي ID غير S01 و S02
+        يسمح فقط بـ ID 0 إلى 44
       */
 
       const validMarkers =
       detectedMarkers.filter(
-        marker => {
+        marker=>{
 
           const id =
           Number(marker.id);
 
-          return (
+          return(
             Number.isInteger(id)
             &&
-            ALLOWED_MARKER_IDS.has(id)
+            ALLOWED_MARKER_IDS
+            .has(id)
+            &&
+            getStudent(id)
           );
 
         }
@@ -946,8 +1489,7 @@ function scanFrame(){
 
 
       /*
-        الحضور:
-        قراءة جماعية لكل البطاقات
+        الحضور الجماعي
       */
 
       if(
@@ -955,16 +1497,14 @@ function scanFrame(){
         "attendance"
       ){
 
-        validMarkers.forEach(
-          marker => {
+        validMarkers
+        .forEach(marker=>{
 
-            collectAttendanceHit(
-              marker
-            );
+          collectAttendanceHit(
+            marker
+          );
 
-          }
-        );
-
+        });
 
         cleanupAttendanceHits();
 
@@ -972,8 +1512,7 @@ function scanFrame(){
 
 
       /*
-        الواجب والمهمة والمشاركة:
-        طالب واحد
+        قراءة فردية
       */
 
       else if(
@@ -1009,19 +1548,33 @@ function scanFrame(){
 }
 
 
-/* ==================================
-   تجميع قراءة الحضور
-================================== */
+/* =========================================================
+   تجميع الحضور
+========================================================= */
 
-function collectAttendanceHit(marker){
+function collectAttendanceHit(
+  marker
+){
 
   const id =
   Number(marker.id);
 
 
   if(
-    !ALLOWED_MARKER_IDS.has(id)
+    !ALLOWED_MARKER_IDS
+    .has(id)
   ){
+
+    return;
+
+  }
+
+
+  const student =
+  getStudent(id);
+
+
+  if(!student){
 
     return;
 
@@ -1050,20 +1603,18 @@ function collectAttendanceHit(marker){
   Date.now();
 
 
-  attendanceHits[id].push(now);
+  attendanceHits[id]
+  .push(now);
 
 
   attendanceHits[id] =
-  attendanceHits[id].filter(
-    time =>
-    now - time
+  attendanceHits[id]
+  .filter(
+    time=>
+    now-time
     <=
     ATTENDANCE_HIT_WINDOW
   );
-
-
-  const student =
-  students[id];
 
 
   document
@@ -1075,10 +1626,15 @@ function collectAttendanceHit(marker){
   +
   student.code
   +
-  " — تثبيت القراءة "
+  " "
+  +
+  student.name
+  +
+  " — "
   +
   Math.min(
-    attendanceHits[id].length,
+    attendanceHits[id]
+    .length,
     ATTENDANCE_REQUIRED_HITS
   )
   +
@@ -1088,7 +1644,8 @@ function collectAttendanceHit(marker){
 
 
   if(
-    attendanceHits[id].length
+    attendanceHits[id]
+    .length
     >=
     ATTENDANCE_REQUIRED_HITS
   ){
@@ -1100,9 +1657,9 @@ function collectAttendanceHit(marker){
 }
 
 
-/* ==================================
-   اعتماد حضور الطالب
-================================== */
+/* =========================================================
+   اعتماد الحضور
+========================================================= */
 
 function confirmAttendance(id){
 
@@ -1115,17 +1672,8 @@ function confirmAttendance(id){
   }
 
 
-  if(
-    !ALLOWED_MARKER_IDS.has(id)
-  ){
-
-    return;
-
-  }
-
-
   const student =
-  students[id];
+  getStudent(id);
 
 
   if(!student){
@@ -1179,16 +1727,18 @@ function confirmAttendance(id){
     "status"
   )
   .innerHTML =
-  "✅ تم تسجيل "
+  "✅ "
   +
-  student.code;
+  student.name
+  +
+  " — حاضر";
 
 }
 
 
-/* ==================================
-   تنظيف القراءات القديمة
-================================== */
+/* =========================================================
+   تنظيف القراءات
+========================================================= */
 
 function cleanupAttendanceHits(){
 
@@ -1197,7 +1747,7 @@ function cleanupAttendanceHits(){
 
 
   ALLOWED_MARKER_IDS
-  .forEach(id => {
+  .forEach(id=>{
 
     if(
       attendanceStudents[id]
@@ -1220,9 +1770,10 @@ function cleanupAttendanceHits(){
 
 
     attendanceHits[id] =
-    attendanceHits[id].filter(
-      time =>
-      now - time
+    attendanceHits[id]
+    .filter(
+      time=>
+      now-time
       <=
       ATTENDANCE_HIT_WINDOW
     );
@@ -1232,9 +1783,9 @@ function cleanupAttendanceHits(){
 }
 
 
-/* ==================================
-   تحديث شاشة الحضور
-================================== */
+/* =========================================================
+   تحديث ملخص الحضور
+========================================================= */
 
 function updateAttendanceScreen(){
 
@@ -1242,14 +1793,6 @@ function updateAttendanceScreen(){
   Object.keys(
     attendanceStudents
   );
-
-
-  document
-  .getElementById(
-    "attendanceCount"
-  )
-  .textContent =
-  ids.length;
 
 
   const className =
@@ -1260,6 +1803,53 @@ function updateAttendanceScreen(){
   .value;
 
 
+  const listForClass =
+  classStudents[className];
+
+
+  const total =
+  listForClass
+  ?
+  listForClass.length
+  :
+  STUDENT_COUNT;
+
+
+  const present =
+  ids.length;
+
+
+  const absent =
+  Math.max(
+    0,
+    total-present
+  );
+
+
+  document
+  .getElementById(
+    "attendanceCount"
+  )
+  .textContent =
+  present;
+
+
+  document
+  .getElementById(
+    "absentCount"
+  )
+  .textContent =
+  absent;
+
+
+  document
+  .getElementById(
+    "totalCount"
+  )
+  .textContent =
+  total;
+
+
   const date =
   document
   .getElementById(
@@ -1268,20 +1858,35 @@ function updateAttendanceScreen(){
   .value;
 
 
-  document
-  .getElementById(
-    "summaryTitle"
-  )
-  .innerHTML =
-  "الشعبة: "
-  +
-  className
-  +
-  "<br>"
-  +
-  "التاريخ: "
-  +
-  date;
+  if(className){
+
+    document
+    .getElementById(
+      "summaryTitle"
+    )
+    .innerHTML =
+    "<b>الشعبة "
+    +
+    className
+    +
+    "</b>"
+    +
+    "<br>"
+    +
+    date;
+
+  }
+
+  else{
+
+    document
+    .getElementById(
+      "summaryTitle"
+    )
+    .innerHTML =
+    "اختر الشعبة";
+
+  }
 
 
   const list =
@@ -1295,10 +1900,10 @@ function updateAttendanceScreen(){
 
   ids
   .sort(
-    (a,b) =>
-    Number(a) - Number(b)
+    (a,b)=>
+    Number(a)-Number(b)
   )
-  .forEach(id => {
+  .forEach(id=>{
 
     const student =
     attendanceStudents[id];
@@ -1337,25 +1942,21 @@ function updateAttendanceScreen(){
 }
 
 
-/* ==================================
-   بدء حضور جديد
-================================== */
+/* =========================================================
+   حضور جديد
+========================================================= */
 
 function resetAttendance(){
 
   if(
     confirm(
-      "هل تريد مسح قائمة الحضور الحالية وبدء حضور جديد؟"
+      "هل تريد مسح الحضور الحالي وبدء مسح جديد؟"
     )
   ){
 
     attendanceStudents = {};
 
-    attendanceHits = {
-      0:[],
-      1:[]
-    };
-
+    createAttendanceHits();
 
     updateAttendanceScreen();
 
@@ -1365,25 +1966,28 @@ function resetAttendance(){
       "status"
     )
     .innerHTML =
-    "جاهز لمسح S01 و S02";
+    "جاهز لمسح بطاقات S01 إلى S45";
 
   }
 
 }
 
 
-/* ==================================
+/* =========================================================
    القراءة الفردية
-================================== */
+========================================================= */
 
-function collectIndividual(marker){
+function collectIndividual(
+  marker
+){
 
   const id =
   Number(marker.id);
 
 
   if(
-    !ALLOWED_MARKER_IDS.has(id)
+    !ALLOWED_MARKER_IDS
+    .has(id)
   ){
 
     return;
@@ -1391,7 +1995,11 @@ function collectIndividual(marker){
   }
 
 
-  if(!students[id]){
+  const student =
+  getStudent(id);
+
+
+  if(!student){
 
     return;
 
@@ -1420,23 +2028,26 @@ function collectIndividual(marker){
 
 
   individualReadings =
-  individualReadings.filter(
-    reading =>
-    now - reading.time
+  individualReadings
+  .filter(
+    reading=>
+    now-reading.time
     <=
     READING_WINDOW
   );
 
 
   const same =
-  individualReadings.filter(
-    reading =>
+  individualReadings
+  .filter(
+    reading=>
     reading.id === id
   );
 
 
   if(
-    same.length <
+    same.length
+    <
     REQUIRED_READINGS
   ){
 
@@ -1447,7 +2058,7 @@ function collectIndividual(marker){
     .innerHTML =
     "🔍 جاري تثبيت "
     +
-    students[id].code
+    student.name
     +
     "...";
 
@@ -1466,32 +2077,43 @@ function collectIndividual(marker){
   };
 
 
-  same.forEach(reading => {
+  same.forEach(
+    reading=>{
 
-    if(
-      counts[reading.answer]
-      !== undefined
-    ){
+      if(
+        counts[
+          reading.answer
+        ]
+        !==
+        undefined
+      ){
 
-      counts[
-        reading.answer
-      ]++;
+        counts[
+          reading.answer
+        ]++;
+
+      }
 
     }
-
-  });
-
-
-  let bestAnswer = "A";
-
-  let max = -1;
+  );
 
 
-  Object.keys(counts)
-  .forEach(answer => {
+  let bestAnswer =
+  "A";
+
+  let max =
+  -1;
+
+
+  Object.keys(
+    counts
+  )
+  .forEach(answer=>{
 
     if(
-      counts[answer] > max
+      counts[answer]
+      >
+      max
     ){
 
       max =
@@ -1513,20 +2135,28 @@ function collectIndividual(marker){
 }
 
 
-/* ==================================
+/* =========================================================
    نتيجة القراءة الفردية
-================================== */
+========================================================= */
 
 function showIndividualResult(
   id,
   answer
 ){
 
-  individualLocked = true;
+  individualLocked =
+  true;
 
 
   const student =
-  students[id];
+  getStudent(id);
+
+
+  if(!student){
+
+    return;
+
+  }
 
 
   const className =
@@ -1541,6 +2171,14 @@ function showIndividualResult(
   document
   .getElementById(
     "activityNumber"
+  )
+  .value;
+
+
+  const date =
+  document
+  .getElementById(
+    "attendanceDate"
   )
   .value;
 
@@ -1588,7 +2226,9 @@ function showIndividualResult(
   else{
 
     title =
-    "⭐ المشاركة";
+    "⭐ المشاركة — "
+    +
+    date;
 
   }
 
@@ -1614,7 +2254,7 @@ function showIndividualResult(
   +
   '</div>'
   +
-  '<div style="margin-top:8px;font-weight:bold">'
+  '<div style="margin-top:6px;font-weight:bold">'
   +
   title
   +
@@ -1636,7 +2276,7 @@ function showIndividualResult(
   .innerHTML =
   "✅ تم تثبيت "
   +
-  student.code;
+  student.name;
 
 
   document
@@ -1649,19 +2289,22 @@ function showIndividualResult(
 }
 
 
-/* ==================================
-   مسح طالب آخر
-================================== */
+/* =========================================================
+   طالب آخر
+========================================================= */
 
 function nextStudent(){
 
-  individualLocked = false;
+  individualLocked =
+  false;
 
-  individualReadings = [];
+  individualReadings =
+  [];
 
 
   const box =
-  document.getElementById(
+  document
+  .getElementById(
     "individualResult"
   );
 
@@ -1669,7 +2312,8 @@ function nextStudent(){
   box.style.display =
   "none";
 
-  box.innerHTML = "";
+  box.innerHTML =
+  "";
 
 
   document
@@ -1681,7 +2325,8 @@ function nextStudent(){
 
 
   if(
-    currentMode !==
+    currentMode
+    !==
     "attendance"
   ){
 
@@ -1697,14 +2342,17 @@ function nextStudent(){
 }
 
 
-/* ==================================
+/* =========================================================
    اتجاه البطاقة
 
-   التصحيح النهائي:
-   A صحيح
-   C صحيح
-   B و D تم عكسهما
-================================== */
+   لا نغيره
+   هذا هو التصحيح الذي اختبرناه:
+
+   A = A
+   B = B
+   C = C
+   D = D
+========================================================= */
 
 function getAnswer(corners){
 
@@ -1727,10 +2375,10 @@ function getAnswer(corners){
 
 
   const dx =
-  p1.x - p0.x;
+  p1.x-p0.x;
 
   const dy =
-  p1.y - p0.y;
+  p1.y-p0.y;
 
 
   let angle =
@@ -1751,9 +2399,7 @@ function getAnswer(corners){
   }
 
 
-  /*
-    A
-  */
+  /* A */
 
   if(
     angle >= 315
@@ -1766,10 +2412,7 @@ function getAnswer(corners){
   }
 
 
-  /*
-    هذه كانت B سابقًا
-    وتم تصحيحها إلى D
-  */
+  /* D */
 
   if(
     angle >= 45
@@ -1782,9 +2425,7 @@ function getAnswer(corners){
   }
 
 
-  /*
-    C
-  */
+  /* C */
 
   if(
     angle >= 135
@@ -1797,19 +2438,16 @@ function getAnswer(corners){
   }
 
 
-  /*
-    هذه كانت D سابقًا
-    وتم تصحيحها إلى B
-  */
+  /* B */
 
   return "B";
 
 }
 
 
-/* ==================================
-   عند تحميل الصفحة
-================================== */
+/* =========================================================
+   تحميل الصفحة
+========================================================= */
 
 window.addEventListener(
   "load",
@@ -1843,6 +2481,9 @@ window.addEventListener(
       return;
 
     }
+
+
+    updateAttendanceScreen();
 
 
     status.innerHTML =
