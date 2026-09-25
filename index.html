@@ -13,7 +13,9 @@ content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 
 <style>
 
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
 
 body{
   margin:0;
@@ -152,8 +154,13 @@ canvas{
   font-weight:bold;
 }
 
-#startBtn{background:#159447}
-#switchBtn{background:#19558e}
+#startBtn{
+  background:#159447;
+}
+
+#switchBtn{
+  background:#19558e;
+}
 
 #nextBtn{
   background:#e58a00;
@@ -411,6 +418,8 @@ let currentMode = "attendance";
 
 /* ==================================
    بطاقات الاختبار المسموحة فقط
+   S01 = ID 0
+   S02 = ID 1
 ================================== */
 
 const ALLOWED_MARKER_IDS =
@@ -438,10 +447,6 @@ const students = {
 
 /* ==================================
    الحضور الجماعي
-
-   لكل بطاقة عداد مستقل.
-   لا يشترط اكتشاف البطاقتين
-   في نفس إطار الفيديو.
 ================================== */
 
 let attendanceStudents = {};
@@ -451,33 +456,26 @@ let attendanceHits = {
   1:[]
 };
 
-/*
-  ثلاث قراءات تكفي للاختبار.
-  هذا يجعل S02 أسهل في الالتقاط
-  مع بقاء فلتر ID 0 و1.
-*/
 const ATTENDANCE_REQUIRED_HITS = 3;
 
-/*
-  نعطي البطاقة 3 ثوانٍ
-  لتجميع قراءاتها.
-*/
 const ATTENDANCE_HIT_WINDOW = 3000;
 
 
 /* ==================================
-   الفردي
+   القراءة الفردية
 ================================== */
 
 let individualReadings = [];
+
 let individualLocked = false;
 
 const REQUIRED_READINGS = 5;
+
 const READING_WINDOW = 1500;
 
 
 /* ==================================
-   قارئ ARUCO
+   تشغيل قارئ ARUCO
 ================================== */
 
 try{
@@ -724,7 +722,7 @@ function validateSetup(){
 
 
 /* ==================================
-   تشغيل الكاميرا
+   فتح الكاميرا
 ================================== */
 
 async function startCamera(){
@@ -758,7 +756,11 @@ async function startCamera(){
 
       stream
       .getTracks()
-      .forEach(track => track.stop());
+      .forEach(track => {
+
+        track.stop();
+
+      });
 
     }
 
@@ -793,7 +795,8 @@ async function startCamera(){
     });
 
 
-    video.srcObject = stream;
+    video.srcObject =
+    stream;
 
     await video.play();
 
@@ -803,7 +806,8 @@ async function startCamera(){
 
 
     if(
-      currentMode === "attendance"
+      currentMode ===
+      "attendance"
     ){
 
       document
@@ -861,10 +865,7 @@ async function switchCamera(){
 
 
 /* ==================================
-   المسح
-
-   نستخدم دقة داخلية أعلى من السابق
-   للمساعدة في قراءة أكثر من بطاقة.
+   المسح المستمر
 ================================== */
 
 function scanFrame(){
@@ -924,8 +925,7 @@ function scanFrame(){
 
 
       /*
-        لا نسمح بأي ID
-        غير 0 و1.
+        منع أي ID غير S01 و S02
       */
 
       const validMarkers =
@@ -945,18 +945,15 @@ function scanFrame(){
       );
 
 
+      /*
+        الحضور:
+        قراءة جماعية لكل البطاقات
+      */
+
       if(
         currentMode ===
         "attendance"
       ){
-
-        /*
-          نعالج كل بطاقة مستقلة.
-
-          إذا ظهر S01 في هذا الإطار
-          وS02 في إطار لاحق،
-          كلاهما يجمع قراءاته.
-        */
 
         validMarkers.forEach(
           marker => {
@@ -969,16 +966,15 @@ function scanFrame(){
         );
 
 
-        /*
-          ننظف القراءات القديمة
-          حتى لو لم تظهر البطاقة
-          في هذا الإطار.
-        */
-
         cleanupAttendanceHits();
 
       }
 
+
+      /*
+        الواجب والمهمة والمشاركة:
+        طالب واحد
+      */
 
       else if(
         validMarkers.length > 0
@@ -1014,7 +1010,7 @@ function scanFrame(){
 
 
 /* ==================================
-   تجميع قراءة حضور
+   تجميع قراءة الحضور
 ================================== */
 
 function collectAttendanceHit(marker){
@@ -1066,12 +1062,6 @@ function collectAttendanceHit(marker){
   );
 
 
-  /*
-    عرض تقدم القراءة
-    حتى نعرف أن الكاميرا
-    ترى البطاقة.
-  */
-
   const student =
   students[id];
 
@@ -1111,7 +1101,7 @@ function collectAttendanceHit(marker){
 
 
 /* ==================================
-   اعتماد الحضور
+   اعتماد حضور الطالب
 ================================== */
 
 function confirmAttendance(id){
@@ -1243,7 +1233,7 @@ function cleanupAttendanceHits(){
 
 
 /* ==================================
-   تحديث قائمة الحضور
+   تحديث شاشة الحضور
 ================================== */
 
 function updateAttendanceScreen(){
@@ -1383,7 +1373,7 @@ function resetAttendance(){
 
 
 /* ==================================
-   المسح الفردي
+   القراءة الفردية
 ================================== */
 
 function collectIndividual(marker){
@@ -1395,6 +1385,13 @@ function collectIndividual(marker){
   if(
     !ALLOWED_MARKER_IDS.has(id)
   ){
+
+    return;
+
+  }
+
+
+  if(!students[id]){
 
     return;
 
@@ -1460,10 +1457,12 @@ function collectIndividual(marker){
 
 
   const counts = {
+
     A:0,
     B:0,
     C:0,
     D:0
+
   };
 
 
@@ -1484,6 +1483,7 @@ function collectIndividual(marker){
 
 
   let bestAnswer = "A";
+
   let max = -1;
 
 
@@ -1514,7 +1514,7 @@ function collectIndividual(marker){
 
 
 /* ==================================
-   عرض نتيجة الفردي
+   نتيجة القراءة الفردية
 ================================== */
 
 function showIndividualResult(
@@ -1650,7 +1650,7 @@ function showIndividualResult(
 
 
 /* ==================================
-   طالب آخر
+   مسح طالب آخر
 ================================== */
 
 function nextStudent(){
@@ -1699,6 +1699,11 @@ function nextStudent(){
 
 /* ==================================
    اتجاه البطاقة
+
+   التصحيح النهائي:
+   A صحيح
+   C صحيح
+   B و D تم عكسهما
 ================================== */
 
 function getAnswer(corners){
@@ -1746,6 +1751,10 @@ function getAnswer(corners){
   }
 
 
+  /*
+    A
+  */
+
   if(
     angle >= 315
     ||
@@ -1757,16 +1766,25 @@ function getAnswer(corners){
   }
 
 
+  /*
+    هذه كانت B سابقًا
+    وتم تصحيحها إلى D
+  */
+
   if(
     angle >= 45
     &&
     angle < 135
   ){
 
-    return "B";
+    return "D";
 
   }
 
+
+  /*
+    C
+  */
 
   if(
     angle >= 135
@@ -1779,13 +1797,18 @@ function getAnswer(corners){
   }
 
 
-  return "D";
+  /*
+    هذه كانت D سابقًا
+    وتم تصحيحها إلى B
+  */
+
+  return "B";
 
 }
 
 
 /* ==================================
-   عند فتح الصفحة
+   عند تحميل الصفحة
 ================================== */
 
 window.addEventListener(
