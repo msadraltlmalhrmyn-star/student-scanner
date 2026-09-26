@@ -38,10 +38,6 @@ h1{
   margin-bottom:8px;
 }
 
-/* ================================
-   الإعدادات
-================================ */
-
 .setup{
   max-width:700px;
   margin:0 auto 7px;
@@ -74,10 +70,6 @@ input{
   background:white;
 }
 
-/* ================================
-   الأوضاع
-================================ */
-
 .tabs{
   display:grid;
   grid-template-columns:repeat(4,1fr);
@@ -101,10 +93,6 @@ input{
   color:white;
 }
 
-/* ================================
-   الحالة
-================================ */
-
 #status{
   max-width:700px;
   margin:0 auto 6px;
@@ -114,10 +102,6 @@ input{
   font-size:15px;
   font-weight:bold;
 }
-
-/* ================================
-   الكاميرا
-================================ */
 
 .cameraBox{
   position:relative;
@@ -162,10 +146,6 @@ canvas{
   display:none;
 }
 
-/* ================================
-   الأزرار
-================================ */
-
 .buttons{
   max-width:700px;
   margin:6px auto;
@@ -201,10 +181,6 @@ canvas{
   background:#b42318;
   display:none;
 }
-
-/* ================================
-   الحضور
-================================ */
 
 #summary{
   max-width:700px;
@@ -292,10 +268,6 @@ canvas{
   padding:12px;
 }
 
-/* ================================
-   الجوال
-================================ */
-
 @media(max-width:700px){
 
   body{
@@ -380,13 +352,11 @@ canvas{
 مدرسة الحرمين الثانوية
 </div>
 
-
 <div class="setup">
 
 <div class="setupGrid">
 
 <div>
-
 <label>الشعبة</label>
 
 <select id="classSelect" onchange="classChanged()">
@@ -395,9 +365,7 @@ canvas{
 <option value="302">302</option>
 <option value="303">303</option>
 </select>
-
 </div>
-
 
 <div id="dateArea">
 
@@ -408,7 +376,6 @@ id="attendanceDate"
 type="date">
 
 </div>
-
 
 <div id="numberArea" style="display:none">
 
@@ -425,9 +392,7 @@ placeholder="رقم النشاط">
 </div>
 
 </div>
-
 </div>
-
 
 <div class="tabs">
 
@@ -457,11 +422,9 @@ onclick="selectMode('participation',this)">
 
 </div>
 
-
 <div id="status">
 اختر الشعبة ثم افتح الكاميرا
 </div>
-
 
 <div class="cameraBox">
 
@@ -480,9 +443,7 @@ playsinline>
 
 </div>
 
-
 <canvas id="canvas"></canvas>
-
 
 <div class="buttons">
 
@@ -516,9 +477,7 @@ onclick="resetAttendance()">
 
 </div>
 
-
 <div id="individualResult"></div>
-
 
 <div id="summary">
 
@@ -534,9 +493,7 @@ class="statNumber presentNumber"
 id="attendanceCount">
 0
 </div>
-<div class="statLabel">
-حاضر
-</div>
+<div class="statLabel">حاضر</div>
 </div>
 
 <div class="statBox">
@@ -545,9 +502,7 @@ class="statNumber absentNumber"
 id="absentCount">
 45
 </div>
-<div class="statLabel">
-غائب
-</div>
+<div class="statLabel">غائب</div>
 </div>
 
 <div class="statBox">
@@ -556,9 +511,7 @@ class="statNumber totalNumber"
 id="totalCount">
 45
 </div>
-<div class="statLabel">
-الإجمالي
-</div>
+<div class="statLabel">الإجمالي</div>
 </div>
 
 </div>
@@ -566,7 +519,6 @@ id="totalCount">
 <div id="attendanceList"></div>
 
 </div>
-
 
 <script>
 
@@ -599,9 +551,6 @@ let currentMode =
 
 /* =========================================================
    البطاقات
-
-   ID 0  = S01
-   ID 44 = S45
 ========================================================= */
 
 const STUDENT_COUNT = 45;
@@ -616,24 +565,10 @@ new Set(
 
 
 /* =========================================================
-   أسماء الطلاب
-
-   مهم:
-   تعديل أي اسم مستقبلاً يتم من هنا فقط.
-
-   ترتيب الأسماء مهم:
-   الاسم الأول  = S01
-   الاسم الثاني = S02
-   ...
-   الاسم 45     = S45
+   الطلاب
 ========================================================= */
 
 const classStudents = {
-
-
-/* =========================================================
-   301
-========================================================= */
 
 "301":[
 
@@ -685,11 +620,6 @@ const classStudents = {
 
 ],
 
-
-/* =========================================================
-   302
-========================================================= */
-
 "302":[
 
 "إبراهيم حسن أسكر",
@@ -739,11 +669,6 @@ const classStudents = {
 "يوسف محمود الرفاعي"
 
 ],
-
-
-/* =========================================================
-   303
-========================================================= */
 
 "303":[
 
@@ -799,44 +724,34 @@ const classStudents = {
 
 
 /* =========================================================
-   جلب الطالب حسب الشعبة
-
-   نفس S01-S45 تستخدم في كل الشعب
+   جلب الطالب
 ========================================================= */
 
 function getStudent(id){
 
   const className =
-  document
-  .getElementById(
+  document.getElementById(
     "classSelect"
-  )
-  .value;
+  ).value;
 
   const list =
   classStudents[className];
 
   if(
-    !list
-    ||
-    !Number.isInteger(id)
-    ||
-    id < 0
-    ||
+    !list ||
+    !Number.isInteger(id) ||
+    id < 0 ||
     id >= list.length
   ){
-
     return null;
-
   }
 
-  return {
+  return{
 
     id:id,
 
     code:
-    "S"
-    +
+    "S" +
     String(id+1)
     .padStart(2,"0"),
 
@@ -854,7 +769,6 @@ function getStudent(id){
 ========================================================= */
 
 let attendanceStudents = {};
-
 let attendanceHits = {};
 
 function createAttendanceHits(){
@@ -866,9 +780,7 @@ function createAttendanceHits(){
     i<STUDENT_COUNT;
     i++
   ){
-
     attendanceHits[i] = [];
-
   }
 
 }
@@ -876,11 +788,159 @@ function createAttendanceHits(){
 createAttendanceHits();
 
 
-const ATTENDANCE_REQUIRED_HITS =
-3;
+/*
+   التعديل الجديد:
 
-const ATTENDANCE_HIT_WINDOW =
-3000;
+   يجب أن تظهر البطاقة 6 مرات صحيحة
+   خلال نافذة زمنية قصيرة.
+
+   هذا يقلل القراءات الوهمية.
+*/
+
+const ATTENDANCE_REQUIRED_HITS = 6;
+
+const ATTENDANCE_HIT_WINDOW = 1800;
+
+
+/*
+   فلتر حجم وشكل البطاقة
+*/
+
+const MIN_MARKER_AREA = 1800;
+
+const MAX_SIDE_RATIO = 2.2;
+
+
+/* =========================================================
+   فلتر هندسي للبطاقة
+========================================================= */
+
+function distanceBetween(a,b){
+
+  const dx =
+  a.x-b.x;
+
+  const dy =
+  a.y-b.y;
+
+  return Math.sqrt(
+    dx*dx +
+    dy*dy
+  );
+
+}
+
+
+function markerIsGood(marker){
+
+  if(
+    !marker ||
+    !marker.corners ||
+    marker.corners.length !== 4
+  ){
+    return false;
+  }
+
+
+  const c =
+  marker.corners;
+
+
+  const sides = [
+
+    distanceBetween(
+      c[0],
+      c[1]
+    ),
+
+    distanceBetween(
+      c[1],
+      c[2]
+    ),
+
+    distanceBetween(
+      c[2],
+      c[3]
+    ),
+
+    distanceBetween(
+      c[3],
+      c[0]
+    )
+
+  ];
+
+
+  const minSide =
+  Math.min(...sides);
+
+  const maxSide =
+  Math.max(...sides);
+
+
+  if(
+    minSide <= 0
+  ){
+    return false;
+  }
+
+
+  /*
+    البطاقة يجب ألا تكون
+    مشوهة بشكل مبالغ فيه
+  */
+
+  if(
+    maxSide/minSide >
+    MAX_SIDE_RATIO
+  ){
+    return false;
+  }
+
+
+  /*
+    حساب مساحة البطاقة
+  */
+
+  let area = 0;
+
+  for(
+    let i=0;
+    i<4;
+    i++
+  ){
+
+    const j =
+    (i+1)%4;
+
+    area +=
+    c[i].x*c[j].y
+    -
+    c[j].x*c[i].y;
+
+  }
+
+
+  area =
+  Math.abs(area)/2;
+
+
+  /*
+    استبعاد العلامات الصغيرة
+    التي تظهر من تفاصيل الصورة
+  */
+
+  if(
+    area <
+    MIN_MARKER_AREA
+  ){
+    return false;
+  }
+
+
+  return true;
+
+}
 
 
 /* =========================================================
@@ -897,7 +957,7 @@ const READING_WINDOW = 1500;
 
 
 /* =========================================================
-   قارئ ARUCO
+   ARUCO
 ========================================================= */
 
 try{
@@ -935,19 +995,16 @@ function setToday(){
     today.getDate()
   ).padStart(2,"0");
 
+
   document
   .getElementById(
     "attendanceDate"
   )
   .value =
-  year
-  +
-  "-"
-  +
-  month
-  +
-  "-"
-  +
+  year +
+  "-" +
+  month +
+  "-" +
   day;
 
 }
@@ -957,8 +1014,6 @@ setToday();
 
 /* =========================================================
    تغيير الشعبة
-
-   يمنع اختلاط حضور شعبتين
 ========================================================= */
 
 function classChanged(){
@@ -971,12 +1026,14 @@ function classChanged(){
 
   individualLocked = false;
 
+
   document
   .getElementById(
     "individualResult"
   )
   .style.display =
   "none";
+
 
   document
   .getElementById(
@@ -985,7 +1042,9 @@ function classChanged(){
   .style.display =
   "none";
 
+
   updateAttendanceScreen();
+
 
   const className =
   document
@@ -993,6 +1052,7 @@ function classChanged(){
     "classSelect"
   )
   .value;
+
 
   if(className){
 
@@ -1031,6 +1091,7 @@ function selectMode(mode,button){
 
   currentMode = mode;
 
+
   document
   .querySelectorAll(
     ".tab"
@@ -1042,6 +1103,7 @@ function selectMode(mode,button){
     );
 
   });
+
 
   button.classList.add(
     "active"
@@ -1080,8 +1142,7 @@ function selectMode(mode,button){
 
 
   if(
-    mode ===
-    "attendance"
+    mode === "attendance"
   ){
 
     dateArea.style.display =
@@ -1107,8 +1168,7 @@ function selectMode(mode,button){
 
 
   else if(
-    mode ===
-    "homework"
+    mode === "homework"
   ){
 
     dateArea.style.display =
@@ -1133,8 +1193,7 @@ function selectMode(mode,button){
 
 
   else if(
-    mode ===
-    "task"
+    mode === "task"
   ){
 
     dateArea.style.display =
@@ -1177,6 +1236,7 @@ function selectMode(mode,button){
 
   }
 
+
   nextStudent();
 
 }
@@ -1195,6 +1255,7 @@ function validateSetup(){
   )
   .value;
 
+
   if(!className){
 
     alert(
@@ -1207,11 +1268,8 @@ function validateSetup(){
 
 
   if(
-    currentMode ===
-    "homework"
-    ||
-    currentMode ===
-    "task"
+    currentMode === "homework" ||
+    currentMode === "task"
   ){
 
     const number =
@@ -1220,6 +1278,7 @@ function validateSetup(){
       "activityNumber"
     )
     .value;
+
 
     if(!number){
 
@@ -1248,6 +1307,7 @@ function validateSetup(){
 
   }
 
+
   return true;
 
 }
@@ -1259,10 +1319,10 @@ function validateSetup(){
 
 async function startCamera(){
 
-  if(!validateSetup()){
-
+  if(
+    !validateSetup()
+  ){
     return;
-
   }
 
 
@@ -1275,8 +1335,7 @@ async function startCamera(){
   try{
 
     if(
-      !navigator.mediaDevices
-      ||
+      !navigator.mediaDevices ||
       !navigator.mediaDevices
       .getUserMedia
     ){
@@ -1397,36 +1456,37 @@ async function switchCamera(){
   :
   "environment";
 
+
   await startCamera();
 
 }
 
 
 /* =========================================================
-   المسح
+   المسح المستمر
 ========================================================= */
 
 function scanFrame(){
 
   if(
-    video.readyState >= 2
-    &&
+    video.readyState >= 2 &&
     detector
   ){
 
     const scanWidth =
     960;
 
+
     const ratio =
-    video.videoHeight
-    /
+    video.videoHeight /
     video.videoWidth;
+
 
     const scanHeight =
     Math.max(
       1,
       Math.round(
-        scanWidth * ratio
+        scanWidth*ratio
       )
     );
 
@@ -1465,7 +1525,11 @@ function scanFrame(){
 
 
       /*
-        يسمح فقط بـ ID 0 إلى 44
+        فلترة القراءة:
+
+        1- ID من 0 إلى 44
+        2- الطالب موجود
+        3- البطاقة بحجم وشكل مناسب
       */
 
       const validMarkers =
@@ -1475,13 +1539,24 @@ function scanFrame(){
           const id =
           Number(marker.id);
 
+
           return(
+
             Number.isInteger(id)
+
             &&
+
             ALLOWED_MARKER_IDS
             .has(id)
+
             &&
+
             getStudent(id)
+
+            &&
+
+            markerIsGood(marker)
+
           );
 
         }
@@ -1489,7 +1564,7 @@ function scanFrame(){
 
 
       /*
-        الحضور الجماعي
+        الحضور جماعي
       */
 
       if(
@@ -1506,13 +1581,14 @@ function scanFrame(){
 
         });
 
+
         cleanupAttendanceHits();
 
       }
 
 
       /*
-        قراءة فردية
+        بقية الأوضاع فردية
       */
 
       else if(
@@ -1549,7 +1625,7 @@ function scanFrame(){
 
 
 /* =========================================================
-   تجميع الحضور
+   تجميع قراءات الحضور
 ========================================================= */
 
 function collectAttendanceHit(
@@ -1564,9 +1640,7 @@ function collectAttendanceHit(
     !ALLOWED_MARKER_IDS
     .has(id)
   ){
-
     return;
-
   }
 
 
@@ -1575,18 +1649,14 @@ function collectAttendanceHit(
 
 
   if(!student){
-
     return;
-
   }
 
 
   if(
     attendanceStudents[id]
   ){
-
     return;
-
   }
 
 
@@ -1633,8 +1703,7 @@ function collectAttendanceHit(
   " — "
   +
   Math.min(
-    attendanceHits[id]
-    .length,
+    attendanceHits[id].length,
     ATTENDANCE_REQUIRED_HITS
   )
   +
@@ -1644,8 +1713,7 @@ function collectAttendanceHit(
 
 
   if(
-    attendanceHits[id]
-    .length
+    attendanceHits[id].length
     >=
     ATTENDANCE_REQUIRED_HITS
   ){
@@ -1666,9 +1734,7 @@ function confirmAttendance(id){
   if(
     attendanceStudents[id]
   ){
-
     return;
-
   }
 
 
@@ -1677,9 +1743,7 @@ function confirmAttendance(id){
 
 
   if(!student){
-
     return;
-
   }
 
 
@@ -1737,7 +1801,7 @@ function confirmAttendance(id){
 
 
 /* =========================================================
-   تنظيف القراءات
+   تنظيف القراءات القديمة
 ========================================================= */
 
 function cleanupAttendanceHits(){
@@ -1752,9 +1816,7 @@ function cleanupAttendanceHits(){
     if(
       attendanceStudents[id]
     ){
-
       return;
-
     }
 
 
@@ -1784,7 +1846,7 @@ function cleanupAttendanceHits(){
 
 
 /* =========================================================
-   تحديث ملخص الحضور
+   ملخص الحضور
 ========================================================= */
 
 function updateAttendanceScreen(){
@@ -1989,9 +2051,7 @@ function collectIndividual(
     !ALLOWED_MARKER_IDS
     .has(id)
   ){
-
     return;
-
   }
 
 
@@ -2000,9 +2060,7 @@ function collectIndividual(
 
 
   if(!student){
-
     return;
-
   }
 
 
@@ -2046,8 +2104,7 @@ function collectIndividual(
 
 
   if(
-    same.length
-    <
+    same.length <
     REQUIRED_READINGS
   ){
 
@@ -2084,8 +2141,7 @@ function collectIndividual(
         counts[
           reading.answer
         ]
-        !==
-        undefined
+        !== undefined
       ){
 
         counts[
@@ -2111,9 +2167,7 @@ function collectIndividual(
   .forEach(answer=>{
 
     if(
-      counts[answer]
-      >
-      max
+      counts[answer] > max
     ){
 
       max =
@@ -2153,9 +2207,7 @@ function showIndividualResult(
 
 
   if(!student){
-
     return;
-
   }
 
 
@@ -2325,8 +2377,7 @@ function nextStudent(){
 
 
   if(
-    currentMode
-    !==
+    currentMode !==
     "attendance"
   ){
 
@@ -2345,8 +2396,7 @@ function nextStudent(){
 /* =========================================================
    اتجاه البطاقة
 
-   لا نغيره
-   هذا هو التصحيح الذي اختبرناه:
+   لا نغيره:
 
    A = A
    B = B
@@ -2357,13 +2407,10 @@ function nextStudent(){
 function getAnswer(corners){
 
   if(
-    !corners
-    ||
+    !corners ||
     corners.length < 2
   ){
-
     return "?";
-
   }
 
 
@@ -2393,48 +2440,37 @@ function getAnswer(corners){
 
 
   if(angle < 0){
-
     angle += 360;
-
   }
 
 
   /* A */
 
   if(
-    angle >= 315
-    ||
+    angle >= 315 ||
     angle < 45
   ){
-
     return "A";
-
   }
 
 
   /* D */
 
   if(
-    angle >= 45
-    &&
+    angle >= 45 &&
     angle < 135
   ){
-
     return "D";
-
   }
 
 
   /* C */
 
   if(
-    angle >= 135
-    &&
+    angle >= 135 &&
     angle < 225
   ){
-
     return "C";
-
   }
 
 
