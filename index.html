@@ -361,7 +361,6 @@ canvas{
 </div>
 
 <div class="setup">
-
 <div class="setupGrid">
 
 <div>
@@ -515,7 +514,7 @@ id="attendanceCount">
 <div
 class="statNumber absentNumber"
 id="absentCount">
-45
+0
 </div>
 <div class="statLabel">غائب</div>
 </div>
@@ -524,7 +523,7 @@ id="absentCount">
 <div
 class="statNumber totalNumber"
 id="totalCount">
-45
+0
 </div>
 <div class="statLabel">الإجمالي</div>
 </div>
@@ -534,6 +533,7 @@ id="totalCount">
 <div id="attendanceList"></div>
 
 </div>
+
 
 <script>
 
@@ -566,23 +566,28 @@ let detector = null;
 let scanning = false;
 let saving = false;
 
-let facingMode =
-"environment";
-
-let currentMode =
-"attendance";
+let facingMode = "environment";
+let currentMode = "attendance";
 
 
 /* =========================================================
-   البطاقات
+   إعدادات البطاقات
+
+   الحد الأعلى الآن 46 بطاقة:
+   S01 = ID 0
+   ...
+   S46 = ID 45
+
+   getStudent يمنع S46 تلقائياً
+   في 301 و303.
 ========================================================= */
 
-const STUDENT_COUNT = 45;
+const MAX_STUDENT_COUNT = 46;
 
 const ALLOWED_MARKER_IDS =
 new Set(
   Array.from(
-    {length:STUDENT_COUNT},
+    {length:MAX_STUDENT_COUNT},
     (_,i)=>i
   )
 );
@@ -672,14 +677,14 @@ const classStudents = {
 "فهد عبدالله الدوسري",
 "فهد علي العجمي",
 "ماجد سعد البقومي",
-"مشتبى مجاهد عبدالرحمن",
+"مجتبى مجاهد عبدالرحمن",
 "محمد بندر العمران",
 "محمد فيصل برجس",
 "محمد حميد المالكي",
 "محمد مبخوت الدوسري",
 "محمد مشعان الدوسري",
 "مشاري جابر المري",
-"مهراز زيد المري",
+"مهراس زيد المري",
 "ناجي علي المري",
 "ناهض راشد الدوسري",
 "نايف راشد السبيعي",
@@ -687,7 +692,8 @@ const classStudents = {
 "وسيم حروبي العبدالله",
 "وليد عبدالرحمن الدوسري",
 "يوسف فارس الرداعي",
-"يوسف محمود الرفاعي"
+"يوسف محمود الرفاعي",
+"عبيد الدوسري"
 ],
 
 "303":[
@@ -742,18 +748,54 @@ const classStudents = {
 
 
 /* =========================================================
+   عدد طلاب الشعبة
+========================================================= */
+
+function getClassStudentCount(){
+
+  const className =
+    document.getElementById(
+      "classSelect"
+    ).value;
+
+  const list =
+    classStudents[className];
+
+  return list ? list.length : 0;
+}
+
+
+/* =========================================================
+   آخر بطاقة مسموحة للشعبة
+========================================================= */
+
+function getLastCardCode(){
+
+  const count =
+    getClassStudentCount();
+
+  if(count <= 0){
+    return "";
+  }
+
+  return "S" +
+    String(count).padStart(2,"0");
+}
+
+
+/* =========================================================
    جلب الطالب
 ========================================================= */
 
 function getStudent(id){
 
   const className =
-  document.getElementById(
-    "classSelect"
-  ).value;
+    document.getElementById(
+      "classSelect"
+    ).value;
 
   const list =
-  classStudents[className];
+    classStudents[className];
 
   if(
     !list ||
@@ -766,10 +808,13 @@ function getStudent(id){
 
   return{
     id:id,
+
     code:
       "S" +
       String(id+1).padStart(2,"0"),
+
     name:list[id],
+
     section:className
   };
 }
@@ -782,13 +827,18 @@ function getStudent(id){
 let attendanceStudents = {};
 let attendanceHits = {};
 
+
+/* =========================================================
+   إنشاء عدادات القراءات
+========================================================= */
+
 function createAttendanceHits(){
 
   attendanceHits = {};
 
   for(
     let i=0;
-    i<STUDENT_COUNT;
+    i<MAX_STUDENT_COUNT;
     i++
   ){
     attendanceHits[i] = [];
@@ -797,11 +847,44 @@ function createAttendanceHits(){
 
 createAttendanceHits();
 
-const ATTENDANCE_REQUIRED_HITS = 6;
-const ATTENDANCE_HIT_WINDOW = 1800;
 
-const MIN_MARKER_AREA = 1800;
-const MAX_SIDE_RATIO = 2.2;
+/*
+  الحضور يحتاج أكثر من قراءة
+  قبل اعتماد الطالب.
+
+  أبقينا التحقق المتكرر حتى نقلل
+  احتمالية القراءة الوهمية.
+*/
+
+const ATTENDANCE_REQUIRED_HITS = 5;
+const ATTENDANCE_HIT_WINDOW = 2000;
+
+
+/*
+  تحسين قراءة الطلاب البعيدين:
+
+  النسخة السابقة:
+  MIN_MARKER_AREA = 1800
+
+  الآن نحلل الصورة بدقة أعلى
+  ونسمح ببطاقات أصغر في الصورة،
+  مع بقاء فحص شكل البطاقة
+  وتكرار القراءة.
+*/
+
+const MIN_MARKER_AREA = 650;
+const MAX_SIDE_RATIO = 2.35;
+
+
+/* =========================================================
+   دقة تحليل الصورة
+
+   1280 تعطي تفاصيل أكثر من 960
+   للبطاقات البعيدة، مع بقاء الأداء
+   مناسباً على الهاتف في الغالب.
+========================================================= */
+
+const SCAN_WIDTH = 1280;
 
 
 /* =========================================================
@@ -818,6 +901,7 @@ function distanceBetween(a,b){
   );
 }
 
+
 function markerIsGood(marker){
 
   if(
@@ -828,7 +912,10 @@ function markerIsGood(marker){
     return false;
   }
 
-  const c = marker.corners;
+
+  const c =
+    marker.corners;
+
 
   const sides = [
     distanceBetween(c[0],c[1]),
@@ -837,15 +924,23 @@ function markerIsGood(marker){
     distanceBetween(c[3],c[0])
   ];
 
+
   const minSide =
     Math.min(...sides);
+
 
   const maxSide =
     Math.max(...sides);
 
-  if(minSide <= 0){
+
+  if(
+    !Number.isFinite(minSide) ||
+    !Number.isFinite(maxSide) ||
+    minSide <= 0
+  ){
     return false;
   }
+
 
   if(
     maxSide/minSide >
@@ -854,26 +949,32 @@ function markerIsGood(marker){
     return false;
   }
 
+
   let area = 0;
+
 
   for(let i=0;i<4;i++){
 
-    const j=(i+1)%4;
+    const j =
+      (i+1)%4;
 
     area +=
       c[i].x*c[j].y -
       c[j].x*c[i].y;
   }
 
+
   area =
     Math.abs(area)/2;
 
+
   if(
-    area <
-    MIN_MARKER_AREA
+    !Number.isFinite(area) ||
+    area < MIN_MARKER_AREA
   ){
     return false;
   }
+
 
   return true;
 }
@@ -895,10 +996,13 @@ const READING_WINDOW = 1500;
 ========================================================= */
 
 try{
+
   detector =
     new AR.Detector();
+
 }
 catch(error){
+
   console.error(error);
 }
 
@@ -912,18 +1016,22 @@ function setToday(){
   const today =
     new Date();
 
+
   const year =
     today.getFullYear();
+
 
   const month =
     String(
       today.getMonth()+1
     ).padStart(2,"0");
 
+
   const day =
     String(
       today.getDate()
     ).padStart(2,"0");
+
 
   document
     .getElementById(
@@ -947,7 +1055,9 @@ function classChanged(){
   createAttendanceHits();
 
   individualReadings = [];
+
   individualLocked = false;
+
 
   document
     .getElementById(
@@ -956,6 +1066,7 @@ function classChanged(){
     .style.display =
       "none";
 
+
   document
     .getElementById(
       "nextBtn"
@@ -963,7 +1074,9 @@ function classChanged(){
     .style.display =
       "none";
 
+
   updateAttendanceScreen();
+
 
   const className =
     document
@@ -972,7 +1085,12 @@ function classChanged(){
       )
       .value;
 
+
   if(className){
+
+    const total =
+      getClassStudentCount();
+
 
     document
       .getElementById(
@@ -983,7 +1101,27 @@ function classChanged(){
         +
         className
         +
-        " — جاهز للمسح";
+        " — "
+        +
+        total
+        +
+        " طالب — جاهز للمسح";
+
+
+    if(
+      currentMode === "attendance"
+    ){
+
+      document
+        .getElementById(
+          "guide"
+        )
+        .innerHTML =
+          "الحضور: بطاقات S01 إلى "
+          +
+          getLastCardCode();
+    }
+
   }
 
   else{
@@ -1006,52 +1144,64 @@ function selectMode(mode,button){
 
   currentMode = mode;
 
+
   document
     .querySelectorAll(".tab")
     .forEach(btn=>{
+
       btn.classList.remove(
         "active"
       );
+
     });
+
 
   button.classList.add(
     "active"
   );
+
 
   const dateArea =
     document.getElementById(
       "dateArea"
     );
 
+
   const numberArea =
     document.getElementById(
       "numberArea"
     );
+
 
   const numberLabel =
     document.getElementById(
       "numberLabel"
     );
 
+
   const guide =
     document.getElementById(
       "guide"
     );
+
 
   const summary =
     document.getElementById(
       "summary"
     );
 
+
   const resetButton =
     document.getElementById(
       "resetAttendanceBtn"
     );
 
+
   const saveButton =
     document.getElementById(
       "saveAttendanceBtn"
     );
+
 
   if(mode === "attendance"){
 
@@ -1064,15 +1214,29 @@ function selectMode(mode,button){
     summary.style.display =
       "block";
 
+
+    const lastCard =
+      getLastCardCode();
+
+
     guide.innerHTML =
+      lastCard
+      ?
+      "الحضور: بطاقات S01 إلى "
+      +
+      lastCard
+      :
       "الحضور: وجّه الكاميرا إلى بطاقات الطلاب";
+
 
     resetButton.style.display =
       stream ? "block" : "none";
 
+
     saveButton.style.display =
       stream ? "block" : "none";
   }
+
 
   else if(mode === "homework"){
 
@@ -1098,6 +1262,7 @@ function selectMode(mode,button){
       "none";
   }
 
+
   else if(mode === "task"){
 
     dateArea.style.display =
@@ -1122,6 +1287,7 @@ function selectMode(mode,button){
       "none";
   }
 
+
   else{
 
     dateArea.style.display =
@@ -1143,6 +1309,7 @@ function selectMode(mode,button){
       "none";
   }
 
+
   nextStudent();
 }
 
@@ -1160,6 +1327,7 @@ function validateSetup(){
       )
       .value;
 
+
   if(!className){
 
     alert(
@@ -1168,6 +1336,7 @@ function validateSetup(){
 
     return false;
   }
+
 
   if(
     currentMode === "homework" ||
@@ -1180,6 +1349,7 @@ function validateSetup(){
           "activityNumber"
         )
         .value;
+
 
     if(!number){
 
@@ -1195,6 +1365,7 @@ function validateSetup(){
     }
   }
 
+
   return true;
 }
 
@@ -1209,10 +1380,12 @@ async function startCamera(){
     return;
   }
 
+
   const status =
     document.getElementById(
       "status"
     );
+
 
   try{
 
@@ -1227,17 +1400,22 @@ async function startCamera(){
       return;
     }
 
+
     if(stream){
 
       stream
         .getTracks()
         .forEach(track=>{
+
           track.stop();
+
         });
     }
 
+
     status.innerHTML =
       "جاري تشغيل الكاميرا...";
+
 
     stream =
       await navigator
@@ -1245,27 +1423,35 @@ async function startCamera(){
         .getUserMedia({
 
           video:{
+
             facingMode:{
               ideal:facingMode
             },
+
             width:{
               ideal:1920
             },
+
             height:{
               ideal:1080
             }
+
           },
 
           audio:false
         });
 
+
     video.srcObject =
       stream;
 
+
     await video.play();
+
 
     status.innerHTML =
       "✅ الكاميرا تعمل — وجّهها إلى البطاقات";
+
 
     if(
       currentMode ===
@@ -1279,6 +1465,7 @@ async function startCamera(){
         .style.display =
           "block";
 
+
       document
         .getElementById(
           "saveAttendanceBtn"
@@ -1286,6 +1473,7 @@ async function startCamera(){
         .style.display =
           "block";
     }
+
 
     if(!scanning){
 
@@ -1295,11 +1483,13 @@ async function startCamera(){
         scanFrame
       );
     }
+
   }
 
   catch(error){
 
     console.error(error);
+
 
     status.innerHTML =
       "❌ تعذر تشغيل الكاميرا: "
@@ -1322,6 +1512,7 @@ async function switchCamera(){
     :
     "environment";
 
+
   await startCamera();
 }
 
@@ -1334,14 +1525,19 @@ function scanFrame(){
 
   if(
     video.readyState >= 2 &&
-    detector
+    detector &&
+    video.videoWidth > 0 &&
+    video.videoHeight > 0
   ){
 
-    const scanWidth = 960;
+    const scanWidth =
+      SCAN_WIDTH;
+
 
     const ratio =
       video.videoHeight /
       video.videoWidth;
+
 
     const scanHeight =
       Math.max(
@@ -1351,11 +1547,14 @@ function scanFrame(){
         )
       );
 
+
     canvas.width =
       scanWidth;
 
+
     canvas.height =
       scanHeight;
+
 
     ctx.drawImage(
       video,
@@ -1364,6 +1563,7 @@ function scanFrame(){
       scanWidth,
       scanHeight
     );
+
 
     try{
 
@@ -1375,10 +1575,12 @@ function scanFrame(){
           scanHeight
         );
 
+
       const detectedMarkers =
         detector.detect(
           imageData
         );
+
 
       const validMarkers =
         detectedMarkers.filter(
@@ -1386,6 +1588,7 @@ function scanFrame(){
 
             const id =
               Number(marker.id);
+
 
             return(
               Number.isInteger(id)
@@ -1396,8 +1599,10 @@ function scanFrame(){
               &&
               markerIsGood(marker)
             );
+
           }
         );
+
 
       if(
         currentMode ===
@@ -1406,13 +1611,17 @@ function scanFrame(){
 
         validMarkers
           .forEach(marker=>{
+
             collectAttendanceHit(
               marker
             );
+
           });
+
 
         cleanupAttendanceHits();
       }
+
 
       else if(
         validMarkers.length > 0
@@ -1424,6 +1633,7 @@ function scanFrame(){
           validMarkers[0]
         );
       }
+
     }
 
     catch(error){
@@ -1434,6 +1644,7 @@ function scanFrame(){
       );
     }
   }
+
 
   requestAnimationFrame(
     scanFrame
@@ -1450,18 +1661,22 @@ function collectAttendanceHit(marker){
   const id =
     Number(marker.id);
 
+
   if(
     !ALLOWED_MARKER_IDS.has(id)
   ){
     return;
   }
 
+
   const student =
     getStudent(id);
+
 
   if(!student){
     return;
   }
+
 
   if(
     attendanceStudents[id]
@@ -1469,17 +1684,21 @@ function collectAttendanceHit(marker){
     return;
   }
 
+
   if(
     !attendanceHits[id]
   ){
     attendanceHits[id] = [];
   }
 
+
   const now =
     Date.now();
 
+
   attendanceHits[id]
     .push(now);
+
 
   attendanceHits[id] =
     attendanceHits[id]
@@ -1489,6 +1708,7 @@ function collectAttendanceHit(marker){
           <=
           ATTENDANCE_HIT_WINDOW
       );
+
 
   document
     .getElementById(
@@ -1514,11 +1734,13 @@ function collectAttendanceHit(marker){
       +
       ATTENDANCE_REQUIRED_HITS;
 
+
   if(
     attendanceHits[id].length
     >=
     ATTENDANCE_REQUIRED_HITS
   ){
+
     confirmAttendance(id);
   }
 }
@@ -1536,12 +1758,15 @@ function confirmAttendance(id){
     return;
   }
 
+
   const student =
     getStudent(id);
+
 
   if(!student){
     return;
   }
+
 
   const className =
     document
@@ -1550,6 +1775,7 @@ function confirmAttendance(id){
       )
       .value;
 
+
   const date =
     document
       .getElementById(
@@ -1557,18 +1783,29 @@ function confirmAttendance(id){
       )
       .value;
 
+
   attendanceStudents[id] = {
+
     id:id,
+
     code:student.code,
+
     name:student.name,
+
     className:className,
+
     date:date,
+
     status:"حاضر"
+
   };
+
 
   attendanceHits[id] = [];
 
+
   updateAttendanceScreen();
+
 
   document
     .getElementById(
@@ -1592,6 +1829,7 @@ function cleanupAttendanceHits(){
   const now =
     Date.now();
 
+
   ALLOWED_MARKER_IDS
     .forEach(id=>{
 
@@ -1601,13 +1839,16 @@ function cleanupAttendanceHits(){
         return;
       }
 
+
       if(
         !attendanceHits[id]
       ){
 
         attendanceHits[id] = [];
+
         return;
       }
+
 
       attendanceHits[id] =
         attendanceHits[id]
@@ -1617,6 +1858,7 @@ function cleanupAttendanceHits(){
               <=
               ATTENDANCE_HIT_WINDOW
           );
+
     });
 }
 
@@ -1632,6 +1874,7 @@ function updateAttendanceScreen(){
       attendanceStudents
     );
 
+
   const className =
     document
       .getElementById(
@@ -1639,24 +1882,29 @@ function updateAttendanceScreen(){
       )
       .value;
 
+
   const listForClass =
     classStudents[className];
+
 
   const total =
     listForClass
     ?
     listForClass.length
     :
-    STUDENT_COUNT;
+    0;
+
 
   const present =
     ids.length;
+
 
   const absent =
     Math.max(
       0,
       total-present
     );
+
 
   document
     .getElementById(
@@ -1665,12 +1913,14 @@ function updateAttendanceScreen(){
     .textContent =
       present;
 
+
   document
     .getElementById(
       "absentCount"
     )
     .textContent =
       absent;
+
 
   document
     .getElementById(
@@ -1679,12 +1929,14 @@ function updateAttendanceScreen(){
     .textContent =
       total;
 
+
   const date =
     document
       .getElementById(
         "attendanceDate"
       )
       .value;
+
 
   if(className){
 
@@ -1697,10 +1949,15 @@ function updateAttendanceScreen(){
         +
         className
         +
-        "</b><br>"
+        " — "
+        +
+        total
+        +
+        " طالب</b><br>"
         +
         date;
   }
+
 
   else{
 
@@ -1712,12 +1969,15 @@ function updateAttendanceScreen(){
         "اختر الشعبة";
   }
 
+
   const list =
     document.getElementById(
       "attendanceList"
     );
 
+
   list.innerHTML = "";
+
 
   ids
     .sort(
@@ -1729,13 +1989,16 @@ function updateAttendanceScreen(){
       const student =
         attendanceStudents[id];
 
+
       const card =
         document.createElement(
           "div"
         );
 
+
       card.className =
         "resultCard";
+
 
       card.innerHTML =
         '<div class="studentName">'
@@ -1752,7 +2015,9 @@ function updateAttendanceScreen(){
         +
         '</div>';
 
+
       list.appendChild(card);
+
     });
 }
 
@@ -1767,6 +2032,7 @@ async function saveAttendanceToSheets(){
     return;
   }
 
+
   const section =
     document
       .getElementById(
@@ -1774,12 +2040,14 @@ async function saveAttendanceToSheets(){
       )
       .value;
 
+
   const date =
     document
       .getElementById(
         "attendanceDate"
       )
       .value;
+
 
   if(!section){
 
@@ -1790,6 +2058,7 @@ async function saveAttendanceToSheets(){
     return;
   }
 
+
   if(!date){
 
     alert(
@@ -1799,16 +2068,23 @@ async function saveAttendanceToSheets(){
     return;
   }
 
+
   const students =
     Object.values(
       attendanceStudents
     )
     .map(student=>({
+
       id:student.id,
+
       code:student.code,
+
       name:student.name,
+
       status:"حاضر"
+
     }));
+
 
   if(students.length === 0){
 
@@ -1819,14 +2095,18 @@ async function saveAttendanceToSheets(){
     return;
   }
 
+
   const total =
     classStudents[section].length;
+
 
   const present =
     students.length;
 
+
   const absent =
     total-present;
+
 
   const ok =
     confirm(
@@ -1851,42 +2131,57 @@ async function saveAttendanceToSheets(){
       "\n\nهل تريد الحفظ؟"
     );
 
+
   if(!ok){
     return;
   }
 
+
   saving = true;
+
 
   const button =
     document.getElementById(
       "saveAttendanceBtn"
     );
 
+
   const status =
     document.getElementById(
       "status"
     );
 
+
   button.disabled = true;
+
 
   button.innerHTML =
     "⏳ جاري الحفظ...";
 
+
   status.innerHTML =
     "⏳ جاري إرسال كشف الحضور...";
 
+
   const payload = {
+
     type:"attendance",
+
     section:section,
+
     date:date,
+
     students:students
+
   };
+
 
   try{
 
     await sendToServer(
       payload
     );
+
 
     status.innerHTML =
       "✅ تم إرسال حضور الشعبة "
@@ -1903,6 +2198,7 @@ async function saveAttendanceToSheets(){
       +
       " غائب";
 
+
     alert(
       "تم إرسال كشف الشعبة "
       +
@@ -1918,27 +2214,37 @@ async function saveAttendanceToSheets(){
       +
       absent
       +
-      "\n\nتحقق من ورقة «الحضور» في أول تجربة."
+      "\nالإجمالي: "
+      +
+      total
+      +
+      "\n\nتم إرسال البيانات إلى Google Sheets."
     );
+
   }
 
   catch(error){
 
     console.error(error);
 
+
     status.innerHTML =
       "❌ تعذر إرسال الحضور";
+
 
     alert(
       "تعذر إرسال الحضور."
     );
   }
 
+
   finally{
 
     saving = false;
 
+
     button.disabled = false;
+
 
     button.innerHTML =
       "💾 اعتماد وحفظ الحضور";
@@ -1960,16 +2266,29 @@ function resetAttendance(){
 
     attendanceStudents = {};
 
+
     createAttendanceHits();
 
+
     updateAttendanceScreen();
+
+
+    const lastCard =
+      getLastCardCode();
+
 
     document
       .getElementById(
         "status"
       )
       .innerHTML =
-        "جاهز لمسح بطاقات S01 إلى S45";
+        lastCard
+        ?
+        "جاهز لمسح بطاقات S01 إلى "
+        +
+        lastCard
+        :
+        "اختر الشعبة أولاً";
   }
 }
 
@@ -1983,32 +2302,43 @@ function collectIndividual(marker){
   const id =
     Number(marker.id);
 
+
   if(
     !ALLOWED_MARKER_IDS.has(id)
   ){
     return;
   }
 
+
   const student =
     getStudent(id);
+
 
   if(!student){
     return;
   }
 
+
   const now =
     Date.now();
+
 
   const answer =
     getAnswer(
       marker.corners
     );
 
+
   individualReadings.push({
+
     id:id,
+
     answer:answer,
+
     time:now
+
   });
+
 
   individualReadings =
     individualReadings
@@ -2019,12 +2349,14 @@ function collectIndividual(marker){
           READING_WINDOW
       );
 
+
   const same =
     individualReadings
       .filter(
         reading=>
           reading.id === id
       );
+
 
   if(
     same.length <
@@ -2042,15 +2374,23 @@ function collectIndividual(marker){
         +
         "...";
 
+
     return;
   }
 
+
   const counts = {
+
     A:0,
+
     B:0,
+
     C:0,
+
     D:0
+
   };
+
 
   same.forEach(reading=>{
 
@@ -2059,14 +2399,20 @@ function collectIndividual(marker){
         reading.answer
       ] !== undefined
     ){
+
       counts[
         reading.answer
       ]++;
+
     }
+
   });
 
+
   let bestAnswer = "A";
+
   let max = -1;
+
 
   Object.keys(counts)
     .forEach(answer=>{
@@ -2078,10 +2424,13 @@ function collectIndividual(marker){
         max =
           counts[answer];
 
+
         bestAnswer =
           answer;
       }
+
     });
+
 
   showIndividualResult(
     id,
@@ -2101,13 +2450,18 @@ async function showIndividualResult(
 
   individualLocked = true;
 
+
   const student =
     getStudent(id);
 
+
   if(!student){
+
     individualLocked = false;
+
     return;
   }
+
 
   const className =
     document
@@ -2116,12 +2470,14 @@ async function showIndividualResult(
       )
       .value;
 
+
   const activityNumber =
     document
       .getElementById(
         "activityNumber"
       )
       .value;
+
 
   const date =
     document
@@ -2130,15 +2486,19 @@ async function showIndividualResult(
       )
       .value;
 
+
   const box =
     document.getElementById(
       "individualResult"
     );
 
+
   box.style.display =
     "block";
 
+
   let title = "";
+
 
   if(
     currentMode ===
@@ -2151,6 +2511,7 @@ async function showIndividualResult(
       activityNumber;
   }
 
+
   else if(
     currentMode ===
     "task"
@@ -2162,6 +2523,7 @@ async function showIndividualResult(
       activityNumber;
   }
 
+
   else{
 
     title =
@@ -2169,6 +2531,7 @@ async function showIndividualResult(
       +
       date;
   }
+
 
   box.innerHTML =
     '<div class="studentName">'
@@ -2211,6 +2574,7 @@ async function showIndividualResult(
     +
     '</div>';
 
+
   document
     .getElementById(
       "status"
@@ -2220,32 +2584,47 @@ async function showIndividualResult(
       +
       student.name;
 
+
   const payload = {
+
     type:currentMode,
+
     section:className,
+
     student:{
+
       id:student.id,
+
       code:student.code,
+
       name:student.name
+
     },
+
     answer:answer
+
   };
+
 
   if(
     currentMode === "homework" ||
     currentMode === "task"
   ){
+
     payload.number =
       activityNumber;
   }
+
 
   if(
     currentMode ===
     "participation"
   ){
+
     payload.date =
       date;
   }
+
 
   try{
 
@@ -2253,16 +2632,19 @@ async function showIndividualResult(
       payload
     );
 
+
     const saveState =
       document.getElementById(
         "saveState"
       );
+
 
     if(saveState){
 
       saveState.innerHTML =
         "✅ تم إرسال التقييم للحفظ";
     }
+
 
     document
       .getElementById(
@@ -2277,28 +2659,33 @@ async function showIndividualResult(
         +
         answer;
 
+
     document
       .getElementById(
         "nextBtn"
       )
       .style.display =
         "block";
+
   }
 
   catch(error){
 
     console.error(error);
 
+
     const saveState =
       document.getElementById(
         "saveState"
       );
+
 
     if(saveState){
 
       saveState.innerHTML =
         "❌ تعذر الإرسال";
     }
+
 
     document
       .getElementById(
@@ -2308,6 +2695,7 @@ async function showIndividualResult(
         "❌ تعذر إرسال تقييم "
         +
         student.name;
+
 
     document
       .getElementById(
@@ -2330,27 +2718,39 @@ async function sendToServer(
   await fetch(
     WEB_APP_URL,
     {
+
       method:"POST",
 
       mode:"no-cors",
 
       headers:{
+
         "Content-Type":
           "text/plain;charset=utf-8"
+
       },
 
       body:
         JSON.stringify(payload)
+
     }
   );
 
-  /*
-    no-cors يسمح بالإرسال من GitHub Pages
-    لكنه لا يسمح بقراءة رد Apps Script.
 
-    لذلك التحقق النهائي في أول تجربة
-    يكون من Google Sheets.
+  /*
+    GitHub Pages -> Apps Script
+
+    no-cors يسمح بإرسال البيانات،
+    لكنه لا يسمح للصفحة بقراءة
+    محتوى رد Apps Script.
+
+    لذلك ظهور رسالة "تم الإرسال"
+    يعني أن طلب fetch تم إرساله،
+    وليس تأكيداً من الخادم نفسه.
+
+    التحقق النهائي يكون من Google Sheets.
   */
+
 
   return true;
 }
@@ -2364,17 +2764,22 @@ function nextStudent(){
 
   individualLocked = false;
 
+
   individualReadings = [];
+
 
   const box =
     document.getElementById(
       "individualResult"
     );
 
+
   box.style.display =
     "none";
 
+
   box.innerHTML = "";
+
 
   document
     .getElementById(
@@ -2382,6 +2787,7 @@ function nextStudent(){
     )
     .style.display =
       "none";
+
 
   if(
     currentMode !==
@@ -2400,7 +2806,9 @@ function nextStudent(){
 
 /* =========================================================
    اتجاه البطاقة
-   لا نغيره
+
+   تم الإبقاء عليه كما هو لأنه سبق
+   اختبار A/B/C/D ونجح.
 ========================================================= */
 
 function getAnswer(corners){
@@ -2412,17 +2820,22 @@ function getAnswer(corners){
     return "?";
   }
 
+
   const p0 =
     corners[0];
+
 
   const p1 =
     corners[1];
 
+
   const dx =
     p1.x-p0.x;
 
+
   const dy =
     p1.y-p0.y;
+
 
   let angle =
     Math.atan2(
@@ -2434,30 +2847,39 @@ function getAnswer(corners){
     /
     Math.PI;
 
+
   if(angle < 0){
+
     angle += 360;
   }
+
 
   if(
     angle >= 315 ||
     angle < 45
   ){
+
     return "A";
   }
+
 
   if(
     angle >= 45 &&
     angle < 135
   ){
+
     return "D";
   }
+
 
   if(
     angle >= 135 &&
     angle < 225
   ){
+
     return "C";
   }
+
 
   return "B";
 }
@@ -2476,6 +2898,7 @@ window.addEventListener(
         "status"
       );
 
+
     if(
       typeof AR ===
       "undefined"
@@ -2487,6 +2910,7 @@ window.addEventListener(
       return;
     }
 
+
     if(!detector){
 
       status.innerHTML =
@@ -2495,7 +2919,9 @@ window.addEventListener(
       return;
     }
 
+
     updateAttendanceScreen();
+
 
     status.innerHTML =
       "اختر الشعبة ثم افتح الكاميرا";
