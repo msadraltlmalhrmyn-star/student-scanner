@@ -572,14 +572,6 @@ let currentMode = "attendance";
 
 /* =========================================================
    إعدادات البطاقات
-
-   الحد الأعلى الآن 46 بطاقة:
-   S01 = ID 0
-   ...
-   S46 = ID 45
-
-   getStudent يمنع S46 تلقائياً
-   في 301 و303.
 ========================================================= */
 
 const MAX_STUDENT_COUNT = 46;
@@ -766,7 +758,7 @@ function getClassStudentCount(){
 
 
 /* =========================================================
-   آخر بطاقة مسموحة للشعبة
+   آخر بطاقة
 ========================================================= */
 
 function getLastCardCode(){
@@ -848,41 +840,15 @@ function createAttendanceHits(){
 createAttendanceHits();
 
 
-/*
-  الحضور يحتاج أكثر من قراءة
-  قبل اعتماد الطالب.
-
-  أبقينا التحقق المتكرر حتى نقلل
-  احتمالية القراءة الوهمية.
-*/
+/* =========================================================
+   إعدادات تثبيت قراءة الحضور
+========================================================= */
 
 const ATTENDANCE_REQUIRED_HITS = 5;
 const ATTENDANCE_HIT_WINDOW = 2000;
 
-
-/*
-  تحسين قراءة الطلاب البعيدين:
-
-  النسخة السابقة:
-  MIN_MARKER_AREA = 1800
-
-  الآن نحلل الصورة بدقة أعلى
-  ونسمح ببطاقات أصغر في الصورة،
-  مع بقاء فحص شكل البطاقة
-  وتكرار القراءة.
-*/
-
 const MIN_MARKER_AREA = 650;
 const MAX_SIDE_RATIO = 2.35;
-
-
-/* =========================================================
-   دقة تحليل الصورة
-
-   1280 تعطي تفاصيل أكثر من 960
-   للبطاقات البعيدة، مع بقاء الأداء
-   مناسباً على الهاتف في الغالب.
-========================================================= */
 
 const SCAN_WIDTH = 1280;
 
@@ -1748,6 +1714,7 @@ function collectAttendanceHit(marker){
 
 /* =========================================================
    اعتماد الطالب حاضر
+   + تسجيله فوراً في Google Sheets
 ========================================================= */
 
 function confirmAttendance(id){
@@ -1784,6 +1751,17 @@ function confirmAttendance(id){
       .value;
 
 
+  if(
+    !className ||
+    !date
+  ){
+    return;
+  }
+
+
+  // أولاً: اعتماده حاضر محلياً
+  // حتى لا تتكرر البطاقة أثناء الإرسال.
+
   attendanceStudents[id] = {
 
     id:id,
@@ -1816,7 +1794,69 @@ function confirmAttendance(id){
       +
       student.name
       +
-      " — حاضر";
+      " — حاضر — جاري التسجيل...";
+
+
+  // ثانياً: تسجيله فوراً في Google Sheets.
+
+  const payload = {
+
+    type:"attendanceLive",
+
+    section:className,
+
+    date:date,
+
+    student:{
+
+      id:student.id,
+
+      code:student.code,
+
+      name:student.name
+
+    }
+
+  };
+
+
+  sendToServer(payload)
+
+    .then(function(){
+
+      document
+        .getElementById(
+          "status"
+        )
+        .innerHTML =
+          "🟢 "
+          +
+          student.name
+          +
+          " — حاضر";
+
+    })
+
+    .catch(function(error){
+
+      console.error(
+        "Live attendance error:",
+        error
+      );
+
+
+      document
+        .getElementById(
+          "status"
+        )
+        .innerHTML =
+          "⚠️ "
+          +
+          student.name
+          +
+          " ظهر حاضر — تحقق من سجل الحضور";
+
+    });
 }
 
 
@@ -2023,7 +2063,7 @@ function updateAttendanceScreen(){
 
 
 /* =========================================================
-   حفظ الحضور
+   الاعتماد النهائي للحضور
 ========================================================= */
 
 async function saveAttendanceToSheets(){
@@ -2160,7 +2200,7 @@ async function saveAttendanceToSheets(){
 
 
   status.innerHTML =
-    "⏳ جاري إرسال كشف الحضور...";
+    "⏳ جاري اعتماد كشف الحضور...";
 
 
   const payload = {
@@ -2218,7 +2258,7 @@ async function saveAttendanceToSheets(){
       +
       total
       +
-      "\n\nتم إرسال البيانات إلى Google Sheets."
+      "\n\nتم إرسال الاعتماد النهائي إلى Google Sheets."
     );
 
   }
@@ -2737,21 +2777,6 @@ async function sendToServer(
   );
 
 
-  /*
-    GitHub Pages -> Apps Script
-
-    no-cors يسمح بإرسال البيانات،
-    لكنه لا يسمح للصفحة بقراءة
-    محتوى رد Apps Script.
-
-    لذلك ظهور رسالة "تم الإرسال"
-    يعني أن طلب fetch تم إرساله،
-    وليس تأكيداً من الخادم نفسه.
-
-    التحقق النهائي يكون من Google Sheets.
-  */
-
-
   return true;
 }
 
@@ -2806,9 +2831,6 @@ function nextStudent(){
 
 /* =========================================================
    اتجاه البطاقة
-
-   تم الإبقاء عليه كما هو لأنه سبق
-   اختبار A/B/C/D ونجح.
 ========================================================= */
 
 function getAnswer(corners){
