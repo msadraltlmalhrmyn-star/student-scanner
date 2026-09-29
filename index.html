@@ -2,2955 +2,562 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <title>نظام الحضور والتقييم</title>
 
 <script src="https://cdn.jsdelivr.net/gh/damianofalcioni/js-aruco2@master/src/cv.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/damianofalcioni/js-aruco2@master/src/aruco.js"></script>
 
 <style>
-
-*{
-  box-sizing:border-box;
-}
-
-body{
-  margin:0;
-  padding:10px;
-  font-family:Arial,sans-serif;
-  background:#f4f6f9;
-  color:#14233a;
-  text-align:center;
-}
-
-h1{
-  color:#14558e;
-  margin:8px 0 2px;
-  font-size:26px;
-}
-
-.school{
-  color:#667085;
-  font-size:16px;
-  margin-bottom:8px;
-}
-
-.setup{
-  max-width:700px;
-  margin:0 auto 7px;
-  background:white;
-  padding:8px;
-  border-radius:14px;
-}
-
-.setupGrid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:6px;
-}
-
-label{
-  display:block;
-  text-align:right;
-  font-weight:bold;
-  margin:3px 2px;
-  font-size:13px;
-}
-
-select,
-input{
-  width:100%;
-  padding:9px;
-  border:1px solid #d0d5dd;
-  border-radius:9px;
-  font-size:16px;
-  background:white;
-}
-
-.tabs{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:5px;
-  max-width:700px;
-  margin:0 auto 7px;
-}
-
-.tab{
-  border:0;
-  padding:10px 2px;
-  border-radius:11px;
-  background:white;
-  color:#1671d9;
-  font-size:14px;
-  font-weight:bold;
-}
-
-.tab.active{
-  background:#19558e;
-  color:white;
-}
-
-#status{
-  max-width:700px;
-  margin:0 auto 6px;
-  background:white;
-  border-radius:10px;
-  padding:8px;
-  font-size:15px;
-  font-weight:bold;
-}
-
-.cameraBox{
-  position:relative;
-  max-width:700px;
-  margin:auto;
-  background:#111;
-  overflow:hidden;
-  border-radius:14px;
-}
-
-video{
-  width:100%;
-  display:block;
-  height:58vh;
-  min-height:360px;
-  object-fit:cover;
-}
-
-.frame{
-  position:absolute;
-  width:96%;
-  height:92%;
-  left:2%;
-  top:2%;
-  border:2px solid white;
-  border-radius:14px;
-  pointer-events:none;
-}
-
-.guide{
-  position:absolute;
-  bottom:8px;
-  width:100%;
-  padding:0 8px;
-  color:white;
-  font-weight:bold;
-  font-size:14px;
-  text-shadow:0 2px 6px black;
-}
-
-canvas{
-  display:none;
-}
-
-.buttons{
-  max-width:700px;
-  margin:6px auto;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:5px;
-}
-
-.main{
-  width:100%;
-  padding:11px 5px;
-  border:0;
-  border-radius:11px;
-  color:white;
-  font-size:14px;
-  font-weight:bold;
-}
-
-.main:disabled{
-  opacity:.55;
-}
-
-#startBtn{
-  background:#159447;
-}
-
-#switchBtn{
-  background:#19558e;
-}
-
-#nextBtn{
-  background:#e58a00;
-  display:none;
-}
-
-#resetAttendanceBtn{
-  background:#b42318;
-  display:none;
-}
-
-#saveAttendanceBtn{
-  background:#6b21a8;
-  display:none;
-}
-
-#summary{
-  max-width:700px;
-  margin:7px auto;
-  background:white;
-  border-radius:14px;
-  padding:10px;
-}
-
-.stats{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:6px;
-  margin:8px 0;
-}
-
-.statBox{
-  background:#f4f6f9;
-  border-radius:10px;
-  padding:7px 2px;
-}
-
-.statNumber{
-  font-size:25px;
-  font-weight:bold;
-}
-
-.presentNumber{
-  color:#159447;
-}
-
-.absentNumber{
-  color:#b42318;
-}
-
-.totalNumber{
-  color:#19558e;
-}
-
-.statLabel{
-  font-size:12px;
-  color:#667085;
-}
-
-.resultCard{
-  border:1px solid #159447;
-  background:#e4f7eb;
-  border-radius:11px;
-  padding:8px;
-  margin:5px 0;
-}
-
-.studentName{
-  font-size:18px;
-  font-weight:bold;
-  color:#174d82;
-}
-
-.studentCode{
-  font-weight:bold;
-  font-size:15px;
-  margin:3px;
-}
-
-.answer{
-  font-size:26px;
-  font-weight:bold;
-  color:#159447;
-  margin-top:7px;
-}
-
-.small{
-  color:#667085;
-  font-size:14px;
-  margin-top:4px;
-}
-
-#individualResult{
-  display:none;
-  max-width:700px;
-  margin:7px auto;
-  background:#e4f7eb;
-  border:2px solid #159447;
-  border-radius:14px;
-  padding:12px;
-}
-
+*{box-sizing:border-box}
+body{margin:0;padding:8px;font-family:Arial,sans-serif;background:#f4f6f9;color:#14233a;text-align:center}
+h1{color:#14558e;margin:6px 0 2px;font-size:24px}
+.school{color:#667085;font-size:15px;margin-bottom:7px}
+.setup{max-width:700px;margin:0 auto 7px;background:#fff;padding:8px;border-radius:14px}
+.setupGrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.full{grid-column:1/-1}
+label{display:block;text-align:right;font-weight:bold;margin:3px 2px;font-size:13px}
+select,input{width:100%;padding:9px;border:1px solid #d0d5dd;border-radius:9px;font-size:16px;background:#fff}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;max-width:700px;margin:0 auto 7px}
+.tab{border:0;padding:10px 2px;border-radius:11px;background:#fff;color:#1671d9;font-size:14px;font-weight:bold}
+.tab.active{background:#19558e;color:#fff}
+#status{max-width:700px;margin:0 auto 6px;background:#fff;border-radius:10px;padding:8px;font-size:15px;font-weight:bold}
+.cameraBox{position:relative;max-width:700px;margin:auto;background:#111;overflow:hidden;border-radius:14px}
+video{width:100%;display:block;height:58vh;min-height:360px;object-fit:cover}
+.frame{position:absolute;width:96%;height:92%;left:2%;top:2%;border:2px solid #fff;border-radius:14px;pointer-events:none}
+.guide{position:absolute;bottom:8px;width:100%;padding:0 8px;color:#fff;font-weight:bold;font-size:14px;text-shadow:0 2px 6px #000}
+canvas{display:none}
+.buttons{max-width:700px;margin:6px auto;display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.main{width:100%;padding:11px 5px;border:0;border-radius:11px;color:#fff;font-size:14px;font-weight:bold}
+.main:disabled{opacity:.55}
+#startBtn{background:#159447} #switchBtn{background:#19558e}
+#nextBtn{background:#e58a00;display:none} #resetAttendanceBtn{background:#b42318;display:none}
+#saveAttendanceBtn{background:#6b21a8;display:none} #finishParticipationBtn{background:#6b21a8;display:none}
+#summary{max-width:700px;margin:7px auto;background:#fff;border-radius:14px;padding:10px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0}
+.statBox{background:#f4f6f9;border-radius:10px;padding:7px 2px}
+.statNumber{font-size:25px;font-weight:bold}.presentNumber{color:#159447}.absentNumber{color:#b42318}.totalNumber{color:#19558e}
+.statLabel{font-size:12px;color:#667085}
+.resultCard{border:1px solid #159447;background:#e4f7eb;border-radius:11px;padding:8px;margin:5px 0}
+.wrongCard{border-color:#b42318;background:#fee2e2}
+.studentName{font-size:18px;font-weight:bold;color:#174d82}.studentCode{font-weight:bold;font-size:15px;margin:3px}
+.answer{font-size:24px;font-weight:bold;color:#159447;margin-top:7px}.small{color:#667085;font-size:14px;margin-top:4px}
+#individualResult{display:none;max-width:700px;margin:7px auto;background:#e4f7eb;border:2px solid #159447;border-radius:14px;padding:12px}
+.answerButtons{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.answerBtn{padding:10px;border:1px solid #d0d5dd;background:#fff;border-radius:9px;font-weight:bold;font-size:17px}
+.answerBtn.selected{background:#19558e;color:#fff;border-color:#19558e}
 @media(max-width:700px){
-
-  body{
-    padding:5px;
-  }
-
-  h1{
-    font-size:19px;
-    margin:2px 0;
-  }
-
-  .school{
-    font-size:12px;
-    margin-bottom:4px;
-  }
-
-  .setup{
-    padding:5px;
-    margin-bottom:4px;
-  }
-
-  label{
-    display:none;
-  }
-
-  select,
-  input{
-    padding:7px 5px;
-    font-size:14px;
-  }
-
-  .tabs{
-    gap:3px;
-    margin-bottom:4px;
-  }
-
-  .tab{
-    padding:7px 1px;
-    font-size:11px;
-  }
-
-  #status{
-    margin-bottom:4px;
-    padding:5px;
-    font-size:12px;
-  }
-
-  video{
-    height:62vh;
-    min-height:330px;
-  }
-
-  .guide{
-    font-size:12px;
-    bottom:5px;
-  }
-
-  .buttons{
-    margin:4px auto;
-  }
-
-  .main{
-    padding:8px 3px;
-    font-size:12px;
-  }
-
-  #summary{
-    margin:4px auto;
-    padding:7px;
-  }
+ body{padding:5px}h1{font-size:19px;margin:2px 0}.school{font-size:12px;margin-bottom:4px}.setup{padding:5px;margin-bottom:4px}
+ label{display:none}select,input{padding:7px 5px;font-size:14px}.tabs{gap:3px;margin-bottom:4px}.tab{padding:7px 1px;font-size:11px}
+ #status{margin-bottom:4px;padding:5px;font-size:12px}video{height:62vh;min-height:330px}.guide{font-size:12px;bottom:5px}
+ .buttons{margin:4px auto}.main{padding:8px 3px;font-size:12px}#summary{margin:4px auto;padding:7px}
 }
-
 </style>
 </head>
-
 <body>
 
 <h1>📷 الحضور والتقييم</h1>
-
-<div class="school">
-مدرسة الحرمين الثانوية
-</div>
+<div class="school">مدرسة الحرمين الثانوية</div>
 
 <div class="setup">
-<div class="setupGrid">
-
-<div>
-<label>الشعبة</label>
-
-<select id="classSelect" onchange="classChanged()">
-<option value="">اختر الشعبة</option>
-<option value="301">301</option>
-<option value="302">302</option>
-<option value="303">303</option>
-</select>
-</div>
-
-<div id="dateArea">
-
-<label>التاريخ</label>
-
-<input
-id="attendanceDate"
-type="date">
-
-</div>
-
-<div id="numberArea" style="display:none">
-
-<label id="numberLabel">
-رقم الواجب
-</label>
-
-<input
-id="activityNumber"
-type="number"
-min="1"
-placeholder="رقم النشاط">
-
-</div>
-
-</div>
+ <div class="setupGrid">
+  <div>
+   <label>الشعبة</label>
+   <select id="classSelect" onchange="classChanged()">
+    <option value="">اختر الشعبة</option>
+    <option value="301">301</option><option value="302">302</option><option value="303">303</option>
+   </select>
+  </div>
+  <div id="dateArea">
+   <label>التاريخ</label>
+   <input id="attendanceDate" type="date" onchange="dateChanged()">
+  </div>
+  <div id="numberArea" style="display:none">
+   <label id="numberLabel">رقم الواجب</label>
+   <input id="activityNumber" type="number" min="1" placeholder="رقم النشاط">
+  </div>
+  <div id="participationNumberArea" style="display:none">
+   <label>رقم المشاركة</label>
+   <input id="participationNumber" type="number" min="1" value="1">
+  </div>
+  <div id="correctAnswerArea" class="full" style="display:none">
+   <label>الإجابة الصحيحة</label>
+   <div class="answerButtons">
+    <button class="answerBtn" type="button" onclick="chooseCorrectAnswer('A',this)">A</button>
+    <button class="answerBtn" type="button" onclick="chooseCorrectAnswer('B',this)">B</button>
+    <button class="answerBtn" type="button" onclick="chooseCorrectAnswer('C',this)">C</button>
+    <button class="answerBtn" type="button" onclick="chooseCorrectAnswer('D',this)">D</button>
+   </div>
+  </div>
+ </div>
 </div>
 
 <div class="tabs">
-
-<button
-class="tab active"
-onclick="selectMode('attendance',this)">
-👥 الحضور
-</button>
-
-<button
-class="tab"
-onclick="selectMode('homework',this)">
-📝 الواجب
-</button>
-
-<button
-class="tab"
-onclick="selectMode('task',this)">
-📋 مهمة
-</button>
-
-<button
-class="tab"
-onclick="selectMode('participation',this)">
-⭐ مشاركة
-</button>
-
+ <button class="tab active" onclick="selectMode('attendance',this)">👥 الحضور</button>
+ <button class="tab" onclick="selectMode('homework',this)">📝 الواجب</button>
+ <button class="tab" onclick="selectMode('task',this)">📋 مهمة</button>
+ <button class="tab" onclick="selectMode('participation',this)">⭐ مشاركة</button>
 </div>
 
-<div id="status">
-اختر الشعبة ثم افتح الكاميرا
-</div>
+<div id="status">اختر الشعبة ثم افتح الكاميرا</div>
 
 <div class="cameraBox">
-
-<video
-id="video"
-autoplay
-muted
-playsinline>
-</video>
-
-<div class="frame"></div>
-
-<div class="guide" id="guide">
-الحضور: وجّه الكاميرا إلى بطاقات الطلاب
+ <video id="video" autoplay muted playsinline></video>
+ <div class="frame"></div>
+ <div class="guide" id="guide">الحضور: وجّه الكاميرا إلى بطاقات الطلاب</div>
 </div>
-
-</div>
-
 <canvas id="canvas"></canvas>
 
 <div class="buttons">
-
-<button
-id="startBtn"
-class="main"
-onclick="startCamera()">
-📷 فتح الكاميرا
-</button>
-
-<button
-id="switchBtn"
-class="main"
-onclick="switchCamera()">
-🔄 تبديل الكاميرا
-</button>
-
-<button
-id="saveAttendanceBtn"
-class="main"
-onclick="saveAttendanceToSheets()">
-💾 اعتماد وحفظ الحضور
-</button>
-
-<button
-id="resetAttendanceBtn"
-class="main"
-onclick="resetAttendance()">
-🗑 حضور جديد
-</button>
-
-<button
-id="nextBtn"
-class="main"
-onclick="nextStudent()">
-➡️ مسح طالب آخر
-</button>
-
+ <button id="startBtn" class="main" onclick="startCamera()">📷 فتح الكاميرا</button>
+ <button id="switchBtn" class="main" onclick="switchCamera()">🔄 تبديل الكاميرا</button>
+ <button id="saveAttendanceBtn" class="main" onclick="saveAttendanceToSheets()">💾 اعتماد وحفظ الحضور</button>
+ <button id="resetAttendanceBtn" class="main" onclick="resetAttendance()">🗑 مسح الشاشة فقط</button>
+ <button id="finishParticipationBtn" class="main" onclick="finishParticipationQuestion()">✅ إنهاء السؤال</button>
+ <button id="nextBtn" class="main" onclick="nextStudent()">➡️ مسح طالب آخر</button>
 </div>
 
 <div id="individualResult"></div>
 
 <div id="summary">
-
-<div id="summaryTitle">
-اختر الشعبة
+ <div id="summaryTitle">اختر الشعبة</div>
+ <div class="stats">
+  <div class="statBox"><div class="statNumber presentNumber" id="attendanceCount">0</div><div class="statLabel" id="stat1Label">حاضر</div></div>
+  <div class="statBox"><div class="statNumber absentNumber" id="absentCount">0</div><div class="statLabel" id="stat2Label">غائب</div></div>
+  <div class="statBox"><div class="statNumber totalNumber" id="totalCount">0</div><div class="statLabel" id="stat3Label">الإجمالي</div></div>
+ </div>
+ <div id="attendanceList"></div>
 </div>
-
-<div class="stats">
-
-<div class="statBox">
-<div
-class="statNumber presentNumber"
-id="attendanceCount">
-0
-</div>
-<div class="statLabel">حاضر</div>
-</div>
-
-<div class="statBox">
-<div
-class="statNumber absentNumber"
-id="absentCount">
-0
-</div>
-<div class="statLabel">غائب</div>
-</div>
-
-<div class="statBox">
-<div
-class="statNumber totalNumber"
-id="totalCount">
-0
-</div>
-<div class="statLabel">الإجمالي</div>
-</div>
-
-</div>
-
-<div id="attendanceList"></div>
-
-</div>
-
 
 <script>
-
-/* =========================================================
-   رابط Apps Script
-========================================================= */
-
-const WEB_APP_URL =
-"https://script.google.com/macros/s/AKfycbwLCbp9ele6la-y8Vf3SUfSU8_Ct9lzKgtCAcj5mhC_Off8nCxyzK3HtQnBzMsrD7Fr/exec";
-
-
-/* =========================================================
-   الكاميرا
-========================================================= */
-
-const video =
-document.getElementById("video");
-
-const canvas =
-document.getElementById("canvas");
-
-const ctx =
-canvas.getContext(
-  "2d",
-  {willReadFrequently:true}
-);
-
-let stream = null;
-let detector = null;
-let scanning = false;
-let saving = false;
-
-let facingMode = "environment";
-let currentMode = "attendance";
-
-
-/* =========================================================
-   إعدادات البطاقات
-========================================================= */
-
-const MAX_STUDENT_COUNT = 46;
-
-const ALLOWED_MARKER_IDS =
-new Set(
-  Array.from(
-    {length:MAX_STUDENT_COUNT},
-    (_,i)=>i
-  )
-);
-
-
-/* =========================================================
-   الطلاب
-========================================================= */
-
-const classStudents = {
-
-"301":[
-"أحمد عبدالفتاح عبدالله البعداني",
-"الوليد بن عبدالرحمن بن صالح التيسان",
-"إياد علي محمد العبداللطيف",
-"تركي منصور عوض المالكي",
-"حزام فهد بن عبدالله العتيبي",
-"حسين محمد عوض سعيد",
-"حيدر محمد بن علي الحمود",
-"خالد بن محمد بن حمود الشمري",
-"خالد جابر بن حنين الحربي",
-"راشد سعيد بن راشد المري",
-"راكان مفلح بن جويهر العنبر",
-"ريان محمد بن جمعان المالكي",
-"سالم بن نافل بن دعيرم العرجاني العجمي",
-"سامي سعيد محمد الزبيدي",
-"سعود عيسى رجاء العنزي",
-"سعيد محمد بن سعيد الدوسري",
-"سند عوضه سعد القحطاني",
-"صنهات محمد صنهات الدوسري",
-"عبدالاله بن سعد بن شايع القحطاني",
-"عبدالله بن محمد بن عبدالله القحطاني",
-"عبدالله حمد بن صالح المري",
-"عبدالله ضيف الله عبدالرزاق المالكي",
-"عبدالله غانم ظافر القحطاني",
-"عثمان محمد بن عبدالله العيسى",
-"عزالدين علي محمد إبراهيم السيد",
-"علي الدين أحمد محمود السيد أحمد",
-"عوض صالح بن عوض الصيعري",
-"فارس حمد بن محمد المري",
-"فارس عبدالله بن علي الرويشد",
-"فهاد نواف بن عجي الدوسري",
-"فيصل جمال هندي الرجاء",
-"مبارك عادل بن مبارك الأحمد",
-"محمد براك بن مشلح العرجاني",
-"محمد بن بدر بن محمد آل روق القحطاني",
-"محمد حمد بن محمد المري",
-"محمد قطبي عمر أحمد",
-"مشعل عبدالسلام محمد القحطاني",
-"مصلح محسن بن سعيد الدوسري",
-"معتز وسيم جمعة أبو عمشة",
-"ميثم عبدالله بن عيسى العويض",
-"ناصر بن فهد بن بداح الدوسري",
-"ناصر عبدالله بن محمد الدوسري",
-"نواف محمد بن غانم الدوسري",
-"ياسر محمد آدم حمزة",
-"سلطان سعد القحطاني"
-],
-
-"302":[
-"إبراهيم حسن أسكر",
-"إبراهيم خالد بوسعد",
-"أسامة حروبي العبدالله",
-"بدر إبراهيم القحطاني",
-"تركي ضحوي الحربي",
-"حسين علي مري",
-"حمد علي العجمي",
-"ريان عبدالسلام القحطاني",
-"زياد عبدالله الحربي",
-"سعيد محمد مري",
-"سلطان سعد فهيد القحطاني",
-"سلطان عبدالله القحطاني",
-"صبيح محمد المري",
-"عبدالرحمن جلوي المطيري",
-"عبدالعزيز خلف المطيري",
-"عبدالله حسن أسكر",
-"عبدالله سالم اليامي",
-"عبدالله صالح حسين",
-"عبدالله عبدالمحسن الدوسري",
-"عبدالله مبارك المري",
-"عبدالله متعب الدوسري",
-"عبدالله منصر الصيعري",
-"عبودي عبدي عثمان",
-"علي ماجد العبدالله",
-"علي سالم المري",
-"فارس فايز بالقحوم",
-"فهد عبدالله الدوسري",
-"فهد علي العجمي",
-"ماجد سعد البقومي",
-"مجتبى مجاهد عبدالرحمن",
-"محمد بندر العمران",
-"محمد فيصل برجس",
-"محمد حميد المالكي",
-"محمد مبخوت الدوسري",
-"محمد مشعان الدوسري",
-"مشاري جابر المري",
-"مهراس زيد المري",
-"ناجي علي المري",
-"ناهض راشد الدوسري",
-"نايف راشد السبيعي",
-"نواف عبدالهادي المري",
-"وسيم حروبي العبدالله",
-"وليد عبدالرحمن الدوسري",
-"يوسف فارس الرداعي",
-"يوسف محمود الرفاعي",
-"عبيد الدوسري"
-],
-
-"303":[
-"إبراهيم عبدالحافظ راشد",
-"أحمد جلوي المطيري",
-"أحمد عبدالله باوحال",
-"جابر محمد مري",
-"حمد جار الله العجمي",
-"حمد سالم مري",
-"حمزة حسن حداد",
-"خالد محمد سالم أحمد",
-"ريان علي مدشل",
-"سالم علي مري",
-"سالم صلاح بالخدر",
-"سالم فهد المري",
-"سامي محمد العنزي",
-"سعد عبدالهدي قحطاني",
-"سعيد عبيد قحطاني",
-"سلطان جمال امليفي",
-"سيف عبدالله القحطاني",
-"عبدالرحمن عوض بشير",
-"عبدالله بخيت المري",
-"عبدالله عيد الدوسري",
-"عبدالله ظافر قحطاني",
-"عبدالله مناور قحطاني",
-"عرفات أحمد الضبياني",
-"علي متعب المري",
-"علي محمد المري",
-"علي محمد مهري",
-"عماش حزمي السبيعي",
-"عمر حسن شيخ",
-"فايز محمد عبده",
-"محمد حمد المري",
-"محمد رائد الرحال",
-"محمد عبدالرحمن أبو دماغ",
-"محمد محمد العولقي",
-"محمد ناجي المري",
-"مروان عادل محمود",
-"مروان عارف عبدالله",
-"مسفر عوض قحطاني",
-"مصطفى عوض الكريم",
-"منصور عبدالرحمن أبو دماغ",
-"مهند ناصر الديهبلي",
-"نبيل نادر أحمد",
-"نواف أمين أحمد",
-"وهيب نادر أحمد",
-"يوسف محسن المشجري",
-"يونس محمد ضربوش"
-]
-
-};
-
-
-/* =========================================================
-   عدد طلاب الشعبة
-========================================================= */
-
-function getClassStudentCount(){
-
-  const className =
-    document.getElementById(
-      "classSelect"
-    ).value;
-
-  const list =
-    classStudents[className];
-
-  return list ? list.length : 0;
-}
-
-
-/* =========================================================
-   آخر بطاقة
-========================================================= */
-
-function getLastCardCode(){
-
-  const count =
-    getClassStudentCount();
-
-  if(count <= 0){
-    return "";
-  }
-
-  return "S" +
-    String(count).padStart(2,"0");
-}
-
-
-/* =========================================================
-   جلب الطالب
-========================================================= */
-
-function getStudent(id){
-
-  const className =
-    document.getElementById(
-      "classSelect"
-    ).value;
-
-  const list =
-    classStudents[className];
-
-  if(
-    !list ||
-    !Number.isInteger(id) ||
-    id < 0 ||
-    id >= list.length
-  ){
-    return null;
-  }
-
-  return{
-    id:id,
-
-    code:
-      "S" +
-      String(id+1).padStart(2,"0"),
-
-    name:list[id],
-
-    section:className
-  };
-}
-
-
-/* =========================================================
-   الحضور
-========================================================= */
-
-let attendanceStudents = {};
-let attendanceHits = {};
-
-
-/* =========================================================
-   إنشاء عدادات القراءات
-========================================================= */
-
-function createAttendanceHits(){
-
-  attendanceHits = {};
-
-  for(
-    let i=0;
-    i<MAX_STUDENT_COUNT;
-    i++
-  ){
-    attendanceHits[i] = [];
-  }
-}
-
-createAttendanceHits();
-
-
-/* =========================================================
-   إعدادات تثبيت قراءة الحضور
-========================================================= */
-
-const ATTENDANCE_REQUIRED_HITS = 5;
-const ATTENDANCE_HIT_WINDOW = 2000;
-
-const MIN_MARKER_AREA = 650;
-const MAX_SIDE_RATIO = 2.35;
-
-const SCAN_WIDTH = 1280;
-
-
-/* =========================================================
-   فلتر البطاقة
-========================================================= */
-
-function distanceBetween(a,b){
-
-  const dx = a.x-b.x;
-  const dy = a.y-b.y;
-
-  return Math.sqrt(
-    dx*dx + dy*dy
-  );
-}
-
-
-function markerIsGood(marker){
-
-  if(
-    !marker ||
-    !marker.corners ||
-    marker.corners.length !== 4
-  ){
-    return false;
-  }
-
-
-  const c =
-    marker.corners;
-
-
-  const sides = [
-    distanceBetween(c[0],c[1]),
-    distanceBetween(c[1],c[2]),
-    distanceBetween(c[2],c[3]),
-    distanceBetween(c[3],c[0])
-  ];
-
-
-  const minSide =
-    Math.min(...sides);
-
-
-  const maxSide =
-    Math.max(...sides);
-
-
-  if(
-    !Number.isFinite(minSide) ||
-    !Number.isFinite(maxSide) ||
-    minSide <= 0
-  ){
-    return false;
-  }
-
-
-  if(
-    maxSide/minSide >
-    MAX_SIDE_RATIO
-  ){
-    return false;
-  }
-
-
-  let area = 0;
-
-
-  for(let i=0;i<4;i++){
-
-    const j =
-      (i+1)%4;
-
-    area +=
-      c[i].x*c[j].y -
-      c[j].x*c[i].y;
-  }
-
-
-  area =
-    Math.abs(area)/2;
-
-
-  if(
-    !Number.isFinite(area) ||
-    area < MIN_MARKER_AREA
-  ){
-    return false;
-  }
-
-
-  return true;
-}
-
-
-/* =========================================================
-   القراءة الفردية
-========================================================= */
-
-let individualReadings = [];
-let individualLocked = false;
-
-const REQUIRED_READINGS = 5;
-const READING_WINDOW = 1500;
-
-
-/* =========================================================
-   ARUCO
-========================================================= */
-
-try{
-
-  detector =
-    new AR.Detector();
-
-}
-catch(error){
-
-  console.error(error);
-}
-
-
-/* =========================================================
-   التاريخ
-========================================================= */
+const WEB_APP_URL="https://script.google.com/macros/s/AKfycbwLCbp9ele6la-y8Vf3SUfSU8_Ct9lzKgtCAcj5mhC_Off8nCxyzK3HtQnBzMsrD7Fr/exec";
+
+const video=document.getElementById("video");
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d",{willReadFrequently:true});
+
+let stream=null, detector=null, scanning=false, saving=false;
+let facingMode="environment", currentMode="attendance";
+let classStudents={};
+let allowedMarkerIds=new Set();
+
+let attendanceStudents={};
+let attendanceHits={};
+
+let participationStudents={};
+let participationHits={};
+let correctAnswer="";
+
+let individualReadings=[];
+let individualLocked=false;
+
+const ATTENDANCE_REQUIRED_HITS=5;
+const PARTICIPATION_REQUIRED_HITS=5;
+const ATTENDANCE_HIT_WINDOW=2000;
+const PARTICIPATION_HIT_WINDOW=1800;
+const REQUIRED_READINGS=5;
+const READING_WINDOW=1500;
+const MIN_MARKER_AREA=650;
+const MAX_SIDE_RATIO=2.35;
+const SCAN_WIDTH=1280;
+
+try{ detector=new AR.Detector(); }catch(e){console.error(e)}
 
 function setToday(){
-
-  const today =
-    new Date();
-
-
-  const year =
-    today.getFullYear();
-
-
-  const month =
-    String(
-      today.getMonth()+1
-    ).padStart(2,"0");
-
-
-  const day =
-    String(
-      today.getDate()
-    ).padStart(2,"0");
-
-
-  document
-    .getElementById(
-      "attendanceDate"
-    )
-    .value =
-      year+"-"+month+"-"+day;
+ const d=new Date(), y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0");
+ document.getElementById("attendanceDate").value=`${y}-${m}-${day}`;
 }
-
 setToday();
 
-
-/* =========================================================
-   تغيير الشعبة
-========================================================= */
-
-function classChanged(){
-
-  attendanceStudents = {};
-
-  createAttendanceHits();
-
-  individualReadings = [];
-
-  individualLocked = false;
-
-
-  document
-    .getElementById(
-      "individualResult"
-    )
-    .style.display =
-      "none";
-
-
-  document
-    .getElementById(
-      "nextBtn"
-    )
-    .style.display =
-      "none";
-
-
-  updateAttendanceScreen();
-
-
-  const className =
-    document
-      .getElementById(
-        "classSelect"
-      )
-      .value;
-
-
-  if(className){
-
-    const total =
-      getClassStudentCount();
-
-
-    document
-      .getElementById(
-        "status"
-      )
-      .innerHTML =
-        "الشعبة "
-        +
-        className
-        +
-        " — "
-        +
-        total
-        +
-        " طالب — جاهز للمسح";
-
-
-    if(
-      currentMode === "attendance"
-    ){
-
-      document
-        .getElementById(
-          "guide"
-        )
-        .innerHTML =
-          "الحضور: بطاقات S01 إلى "
-          +
-          getLastCardCode();
-    }
-
-  }
-
-  else{
-
-    document
-      .getElementById(
-        "status"
-      )
-      .innerHTML =
-        "اختر الشعبة ثم افتح الكاميرا";
-  }
+async function apiGet(params){
+ const url=new URL(WEB_APP_URL);
+ Object.entries(params).forEach(([k,v])=>url.searchParams.set(k,v));
+ const r=await fetch(url.toString(),{method:"GET",cache:"no-store"});
+ if(!r.ok) throw new Error("HTTP "+r.status);
+ return await r.json();
 }
 
+async function sendToServer(payload){
+ await fetch(WEB_APP_URL,{
+   method:"POST",mode:"no-cors",
+   headers:{"Content-Type":"text/plain;charset=utf-8"},
+   body:JSON.stringify(payload)
+ });
+ return true;
+}
 
-/* =========================================================
-   اختيار الوضع
-========================================================= */
+async function loadStudents(section){
+ const status=document.getElementById("status");
+ status.textContent="⏳ جاري تحميل طلاب الشعبة...";
+ try{
+   const data=await apiGet({action:"students",section});
+   if(!data.success) throw new Error(data.message||"تعذر تحميل الطلاب");
+   classStudents[section]=data.students||[];
+   allowedMarkerIds=new Set(classStudents[section].map(s=>Number(s.id)));
+   createAttendanceHits();
+   createParticipationHits();
+   return true;
+ }catch(e){
+   console.error(e);
+   status.textContent="❌ تعذر تحميل الطلاب من Google Sheets. تأكد من نشر Web App الجديد.";
+   return false;
+ }
+}
+
+function getStudents(){ return classStudents[document.getElementById("classSelect").value]||[]; }
+function getClassStudentCount(){ return getStudents().length; }
+function getStudent(id){ return getStudents().find(s=>Number(s.id)===Number(id))||null; }
+function getLastCardCode(){
+ const list=getStudents(); if(!list.length)return "";
+ const max=Math.max(...list.map(s=>Number(s.id)));
+ return "S"+String(max+1).padStart(2,"0");
+}
+function createAttendanceHits(){ attendanceHits={}; allowedMarkerIds.forEach(id=>attendanceHits[id]=[]); }
+function createParticipationHits(){ participationHits={}; allowedMarkerIds.forEach(id=>participationHits[id]=[]); }
+
+async function classChanged(){
+ attendanceStudents={}; participationStudents={}; individualReadings=[]; individualLocked=false;
+ document.getElementById("individualResult").style.display="none";
+ document.getElementById("nextBtn").style.display="none";
+ const section=document.getElementById("classSelect").value;
+ if(!section){updateSummary();document.getElementById("status").textContent="اختر الشعبة ثم افتح الكاميرا";return;}
+ if(!(await loadStudents(section))) return;
+ if(currentMode==="attendance") await loadExistingAttendance();
+ if(currentMode==="participation") await loadNextParticipationNumber();
+ updateGuide(); updateSummary();
+ document.getElementById("status").textContent=`الشعبة ${section} — ${getClassStudentCount()} طالب — جاهز للمسح`;
+}
+
+async function dateChanged(){
+ if(currentMode==="attendance") await loadExistingAttendance();
+ if(currentMode==="participation") await loadNextParticipationNumber();
+}
+
+async function loadExistingAttendance(){
+ const section=document.getElementById("classSelect").value;
+ const date=document.getElementById("attendanceDate").value;
+ if(!section||!date)return;
+ try{
+   const data=await apiGet({action:"attendance",section,date});
+   attendanceStudents={};
+   (data.attendance||[]).forEach(r=>{
+     if(r.status==="حاضر"){
+       const s=getStudent(Number(r.id));
+       if(s) attendanceStudents[s.id]={...s,status:"حاضر"};
+     }
+   });
+   updateSummary();
+ }catch(e){console.error(e)}
+}
+
+async function loadNextParticipationNumber(){
+ const section=document.getElementById("classSelect").value;
+ const date=document.getElementById("attendanceDate").value;
+ if(!section||!date)return;
+ try{
+   const d=await apiGet({action:"nextParticipation",section,date});
+   document.getElementById("participationNumber").value=d.number||1;
+ }catch(e){console.error(e)}
+}
+
+function chooseCorrectAnswer(ans,btn){
+ correctAnswer=ans;
+ document.querySelectorAll(".answerBtn").forEach(b=>b.classList.remove("selected"));
+ btn.classList.add("selected");
+}
 
 function selectMode(mode,button){
+ currentMode=mode;
+ document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));
+ button.classList.add("active");
 
-  currentMode = mode;
+ const dateArea=document.getElementById("dateArea");
+ const numberArea=document.getElementById("numberArea");
+ const pNum=document.getElementById("participationNumberArea");
+ const correct=document.getElementById("correctAnswerArea");
+ const summary=document.getElementById("summary");
+ const reset=document.getElementById("resetAttendanceBtn");
+ const save=document.getElementById("saveAttendanceBtn");
+ const finish=document.getElementById("finishParticipationBtn");
 
+ dateArea.style.display=(mode==="attendance"||mode==="participation")?"block":"none";
+ numberArea.style.display=(mode==="homework"||mode==="task")?"block":"none";
+ pNum.style.display=mode==="participation"?"block":"none";
+ correct.style.display=mode==="participation"?"block":"none";
+ summary.style.display=(mode==="attendance"||mode==="participation")?"block":"none";
+ reset.style.display=(mode==="attendance"&&stream)?"block":"none";
+ save.style.display=(mode==="attendance"&&stream)?"block":"none";
+ finish.style.display=(mode==="participation"&&stream)?"block":"none";
 
-  document
-    .querySelectorAll(".tab")
-    .forEach(btn=>{
+ if(mode==="homework") document.getElementById("numberLabel").textContent="رقم الواجب";
+ if(mode==="task") document.getElementById("numberLabel").textContent="رقم المهمة الأدائية";
 
-      btn.classList.remove(
-        "active"
-      );
-
-    });
-
-
-  button.classList.add(
-    "active"
-  );
-
-
-  const dateArea =
-    document.getElementById(
-      "dateArea"
-    );
-
-
-  const numberArea =
-    document.getElementById(
-      "numberArea"
-    );
-
-
-  const numberLabel =
-    document.getElementById(
-      "numberLabel"
-    );
-
-
-  const guide =
-    document.getElementById(
-      "guide"
-    );
-
-
-  const summary =
-    document.getElementById(
-      "summary"
-    );
-
-
-  const resetButton =
-    document.getElementById(
-      "resetAttendanceBtn"
-    );
-
-
-  const saveButton =
-    document.getElementById(
-      "saveAttendanceBtn"
-    );
-
-
-  if(mode === "attendance"){
-
-    dateArea.style.display =
-      "block";
-
-    numberArea.style.display =
-      "none";
-
-    summary.style.display =
-      "block";
-
-
-    const lastCard =
-      getLastCardCode();
-
-
-    guide.innerHTML =
-      lastCard
-      ?
-      "الحضور: بطاقات S01 إلى "
-      +
-      lastCard
-      :
-      "الحضور: وجّه الكاميرا إلى بطاقات الطلاب";
-
-
-    resetButton.style.display =
-      stream ? "block" : "none";
-
-
-    saveButton.style.display =
-      stream ? "block" : "none";
-  }
-
-
-  else if(mode === "homework"){
-
-    dateArea.style.display =
-      "none";
-
-    numberArea.style.display =
-      "block";
-
-    numberLabel.innerHTML =
-      "رقم الواجب";
-
-    summary.style.display =
-      "none";
-
-    guide.innerHTML =
-      "الواجب: امسح بطاقة طالب واحد";
-
-    resetButton.style.display =
-      "none";
-
-    saveButton.style.display =
-      "none";
-  }
-
-
-  else if(mode === "task"){
-
-    dateArea.style.display =
-      "none";
-
-    numberArea.style.display =
-      "block";
-
-    numberLabel.innerHTML =
-      "رقم المهمة الأدائية";
-
-    summary.style.display =
-      "none";
-
-    guide.innerHTML =
-      "المهمة: امسح بطاقة طالب واحد";
-
-    resetButton.style.display =
-      "none";
-
-    saveButton.style.display =
-      "none";
-  }
-
-
-  else{
-
-    dateArea.style.display =
-      "block";
-
-    numberArea.style.display =
-      "none";
-
-    summary.style.display =
-      "none";
-
-    guide.innerHTML =
-      "المشاركة: امسح بطاقة طالب واحد";
-
-    resetButton.style.display =
-      "none";
-
-    saveButton.style.display =
-      "none";
-  }
-
-
-  nextStudent();
+ participationStudents={}; createParticipationHits(); nextStudent();
+ if(mode==="attendance") loadExistingAttendance();
+ if(mode==="participation") loadNextParticipationNumber();
+ updateGuide(); updateSummary();
 }
 
-
-/* =========================================================
-   التحقق
-========================================================= */
+function updateGuide(){
+ const g=document.getElementById("guide"), last=getLastCardCode();
+ if(currentMode==="attendance") g.textContent=last?`الحضور: بطاقات S01 إلى ${last}`:"الحضور: وجّه الكاميرا إلى البطاقات";
+ else if(currentMode==="homework") g.textContent="الواجب: امسح بطاقة طالب واحد";
+ else if(currentMode==="task") g.textContent="المهمة: امسح بطاقة طالب واحد";
+ else g.textContent="المشاركة: اختر الإجابة الصحيحة ثم وجّه الكاميرا إلى بطاقات الطلاب";
+}
 
 function validateSetup(){
-
-  const className =
-    document
-      .getElementById(
-        "classSelect"
-      )
-      .value;
-
-
-  if(!className){
-
-    alert(
-      "اختر الشعبة أولاً"
-    );
-
-    return false;
-  }
-
-
-  if(
-    currentMode === "homework" ||
-    currentMode === "task"
-  ){
-
-    const number =
-      document
-        .getElementById(
-          "activityNumber"
-        )
-        .value;
-
-
-    if(!number){
-
-      alert(
-        currentMode === "homework"
-        ?
-        "أدخل رقم الواجب"
-        :
-        "أدخل رقم المهمة الأدائية"
-      );
-
-      return false;
-    }
-  }
-
-
-  return true;
+ const section=document.getElementById("classSelect").value;
+ if(!section){alert("اختر الشعبة أولاً");return false;}
+ if(!getStudents().length){alert("لم يتم تحميل طلاب الشعبة");return false;}
+ if(currentMode==="homework"||currentMode==="task"){
+   if(!document.getElementById("activityNumber").value){
+     alert(currentMode==="homework"?"أدخل رقم الواجب":"أدخل رقم المهمة الأدائية");return false;
+   }
+ }
+ if(currentMode==="participation"){
+   if(!document.getElementById("participationNumber").value){alert("أدخل رقم المشاركة");return false;}
+   if(!correctAnswer){alert("اختر الإجابة الصحيحة A أو B أو C أو D");return false;}
+ }
+ return true;
 }
-
-
-/* =========================================================
-   فتح الكاميرا
-========================================================= */
 
 async function startCamera(){
-
-  if(!validateSetup()){
-    return;
-  }
-
-
-  const status =
-    document.getElementById(
-      "status"
-    );
-
-
-  try{
-
-    if(
-      !navigator.mediaDevices ||
-      !navigator.mediaDevices.getUserMedia
-    ){
-
-      status.innerHTML =
-        "❌ المتصفح لا يدعم الكاميرا";
-
-      return;
-    }
-
-
-    if(stream){
-
-      stream
-        .getTracks()
-        .forEach(track=>{
-
-          track.stop();
-
-        });
-    }
-
-
-    status.innerHTML =
-      "جاري تشغيل الكاميرا...";
-
-
-    stream =
-      await navigator
-        .mediaDevices
-        .getUserMedia({
-
-          video:{
-
-            facingMode:{
-              ideal:facingMode
-            },
-
-            width:{
-              ideal:1920
-            },
-
-            height:{
-              ideal:1080
-            }
-
-          },
-
-          audio:false
-        });
-
-
-    video.srcObject =
-      stream;
-
-
-    await video.play();
-
-
-    status.innerHTML =
-      "✅ الكاميرا تعمل — وجّهها إلى البطاقات";
-
-
-    if(
-      currentMode ===
-      "attendance"
-    ){
-
-      document
-        .getElementById(
-          "resetAttendanceBtn"
-        )
-        .style.display =
-          "block";
-
-
-      document
-        .getElementById(
-          "saveAttendanceBtn"
-        )
-        .style.display =
-          "block";
-    }
-
-
-    if(!scanning){
-
-      scanning = true;
-
-      requestAnimationFrame(
-        scanFrame
-      );
-    }
-
-  }
-
-  catch(error){
-
-    console.error(error);
-
-
-    status.innerHTML =
-      "❌ تعذر تشغيل الكاميرا: "
-      +
-      error.name;
-  }
+ if(!validateSetup())return;
+ const status=document.getElementById("status");
+ try{
+   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){status.textContent="❌ المتصفح لا يدعم الكاميرا";return;}
+   if(stream) stream.getTracks().forEach(t=>t.stop());
+   status.textContent="جاري تشغيل الكاميرا...";
+   stream=await navigator.mediaDevices.getUserMedia({
+     video:{facingMode:{ideal:facingMode},width:{ideal:1920},height:{ideal:1080}},audio:false
+   });
+   video.srcObject=stream; await video.play();
+   status.textContent="✅ الكاميرا تعمل — وجّهها إلى البطاقات";
+   document.getElementById("resetAttendanceBtn").style.display=currentMode==="attendance"?"block":"none";
+   document.getElementById("saveAttendanceBtn").style.display=currentMode==="attendance"?"block":"none";
+   document.getElementById("finishParticipationBtn").style.display=currentMode==="participation"?"block":"none";
+   if(!scanning){scanning=true;requestAnimationFrame(scanFrame);}
+ }catch(e){console.error(e);status.textContent="❌ تعذر تشغيل الكاميرا: "+e.name}
 }
+async function switchCamera(){facingMode=facingMode==="environment"?"user":"environment";await startCamera()}
 
-
-/* =========================================================
-   تبديل الكاميرا
-========================================================= */
-
-async function switchCamera(){
-
-  facingMode =
-    facingMode === "environment"
-    ?
-    "user"
-    :
-    "environment";
-
-
-  await startCamera();
+function distanceBetween(a,b){const dx=a.x-b.x,dy=a.y-b.y;return Math.sqrt(dx*dx+dy*dy)}
+function markerIsGood(marker){
+ if(!marker||!marker.corners||marker.corners.length!==4)return false;
+ const c=marker.corners;
+ const sides=[distanceBetween(c[0],c[1]),distanceBetween(c[1],c[2]),distanceBetween(c[2],c[3]),distanceBetween(c[3],c[0])];
+ const min=Math.min(...sides),max=Math.max(...sides);
+ if(!Number.isFinite(min)||!Number.isFinite(max)||min<=0||max/min>MAX_SIDE_RATIO)return false;
+ let area=0;for(let i=0;i<4;i++){const j=(i+1)%4;area+=c[i].x*c[j].y-c[j].x*c[i].y}
+ area=Math.abs(area)/2;
+ return Number.isFinite(area)&&area>=MIN_MARKER_AREA;
 }
-
-
-/* =========================================================
-   المسح المستمر
-========================================================= */
 
 function scanFrame(){
+ if(video.readyState>=2&&detector&&video.videoWidth>0&&video.videoHeight>0){
+   const w=SCAN_WIDTH, h=Math.max(1,Math.round(w*video.videoHeight/video.videoWidth));
+   canvas.width=w;canvas.height=h;ctx.drawImage(video,0,0,w,h);
+   try{
+     const markers=detector.detect(ctx.getImageData(0,0,w,h))
+       .filter(m=>Number.isInteger(Number(m.id))&&allowedMarkerIds.has(Number(m.id))&&getStudent(Number(m.id))&&markerIsGood(m));
 
-  if(
-    video.readyState >= 2 &&
-    detector &&
-    video.videoWidth > 0 &&
-    video.videoHeight > 0
-  ){
-
-    const scanWidth =
-      SCAN_WIDTH;
-
-
-    const ratio =
-      video.videoHeight /
-      video.videoWidth;
-
-
-    const scanHeight =
-      Math.max(
-        1,
-        Math.round(
-          scanWidth*ratio
-        )
-      );
-
-
-    canvas.width =
-      scanWidth;
-
-
-    canvas.height =
-      scanHeight;
-
-
-    ctx.drawImage(
-      video,
-      0,
-      0,
-      scanWidth,
-      scanHeight
-    );
-
-
-    try{
-
-      const imageData =
-        ctx.getImageData(
-          0,
-          0,
-          scanWidth,
-          scanHeight
-        );
-
-
-      const detectedMarkers =
-        detector.detect(
-          imageData
-        );
-
-
-      const validMarkers =
-        detectedMarkers.filter(
-          marker=>{
-
-            const id =
-              Number(marker.id);
-
-
-            return(
-              Number.isInteger(id)
-              &&
-              ALLOWED_MARKER_IDS.has(id)
-              &&
-              getStudent(id)
-              &&
-              markerIsGood(marker)
-            );
-
-          }
-        );
-
-
-      if(
-        currentMode ===
-        "attendance"
-      ){
-
-        validMarkers
-          .forEach(marker=>{
-
-            collectAttendanceHit(
-              marker
-            );
-
-          });
-
-
-        cleanupAttendanceHits();
-      }
-
-
-      else if(
-        validMarkers.length > 0
-        &&
-        !individualLocked
-      ){
-
-        collectIndividual(
-          validMarkers[0]
-        );
-      }
-
-    }
-
-    catch(error){
-
-      console.error(
-        "Detection error:",
-        error
-      );
-    }
-  }
-
-
-  requestAnimationFrame(
-    scanFrame
-  );
+     if(currentMode==="attendance"){
+       markers.forEach(collectAttendanceHit); cleanupHits(attendanceHits,ATTENDANCE_HIT_WINDOW,attendanceStudents);
+     }else if(currentMode==="participation"){
+       markers.forEach(collectParticipationHit); cleanupHits(participationHits,PARTICIPATION_HIT_WINDOW,participationStudents);
+     }else if(markers.length&&!individualLocked){
+       collectIndividual(markers[0]);
+     }
+   }catch(e){console.error("Detection error:",e)}
+ }
+ requestAnimationFrame(scanFrame);
 }
-
-
-/* =========================================================
-   تجميع قراءات الحضور
-========================================================= */
 
 function collectAttendanceHit(marker){
-
-  const id =
-    Number(marker.id);
-
-
-  if(
-    !ALLOWED_MARKER_IDS.has(id)
-  ){
-    return;
-  }
-
-
-  const student =
-    getStudent(id);
-
-
-  if(!student){
-    return;
-  }
-
-
-  if(
-    attendanceStudents[id]
-  ){
-    return;
-  }
-
-
-  if(
-    !attendanceHits[id]
-  ){
-    attendanceHits[id] = [];
-  }
-
-
-  const now =
-    Date.now();
-
-
-  attendanceHits[id]
-    .push(now);
-
-
-  attendanceHits[id] =
-    attendanceHits[id]
-      .filter(
-        time=>
-          now-time
-          <=
-          ATTENDANCE_HIT_WINDOW
-      );
-
-
-  document
-    .getElementById(
-      "status"
-    )
-    .innerHTML =
-      "🔍 "
-      +
-      student.code
-      +
-      " "
-      +
-      student.name
-      +
-      " — "
-      +
-      Math.min(
-        attendanceHits[id].length,
-        ATTENDANCE_REQUIRED_HITS
-      )
-      +
-      "/"
-      +
-      ATTENDANCE_REQUIRED_HITS;
-
-
-  if(
-    attendanceHits[id].length
-    >=
-    ATTENDANCE_REQUIRED_HITS
-  ){
-
-    confirmAttendance(id);
-  }
+ const id=Number(marker.id),s=getStudent(id); if(!s||attendanceStudents[id])return;
+ const now=Date.now(); if(!attendanceHits[id])attendanceHits[id]=[];
+ attendanceHits[id].push(now); attendanceHits[id]=attendanceHits[id].filter(t=>now-t<=ATTENDANCE_HIT_WINDOW);
+ document.getElementById("status").textContent=`🔍 ${s.code} ${s.name} — ${Math.min(attendanceHits[id].length,ATTENDANCE_REQUIRED_HITS)}/${ATTENDANCE_REQUIRED_HITS}`;
+ if(attendanceHits[id].length>=ATTENDANCE_REQUIRED_HITS) confirmAttendance(id);
 }
-
-
-/* =========================================================
-   اعتماد الطالب حاضر
-   + تسجيله فوراً في Google Sheets
-========================================================= */
 
 function confirmAttendance(id){
-
-  if(
-    attendanceStudents[id]
-  ){
-    return;
-  }
-
-
-  const student =
-    getStudent(id);
-
-
-  if(!student){
-    return;
-  }
-
-
-  const className =
-    document
-      .getElementById(
-        "classSelect"
-      )
-      .value;
-
-
-  const date =
-    document
-      .getElementById(
-        "attendanceDate"
-      )
-      .value;
-
-
-  if(
-    !className ||
-    !date
-  ){
-    return;
-  }
-
-
-  // أولاً: اعتماده حاضر محلياً
-  // حتى لا تتكرر البطاقة أثناء الإرسال.
-
-  attendanceStudents[id] = {
-
-    id:id,
-
-    code:student.code,
-
-    name:student.name,
-
-    className:className,
-
-    date:date,
-
-    status:"حاضر"
-
-  };
-
-
-  attendanceHits[id] = [];
-
-
-  updateAttendanceScreen();
-
-
-  document
-    .getElementById(
-      "status"
-    )
-    .innerHTML =
-      "✅ "
-      +
-      student.name
-      +
-      " — حاضر — جاري التسجيل...";
-
-
-  // ثانياً: تسجيله فوراً في Google Sheets.
-
-  const payload = {
-
-    type:"attendanceLive",
-
-    section:className,
-
-    date:date,
-
-    student:{
-
-      id:student.id,
-
-      code:student.code,
-
-      name:student.name
-
-    }
-
-  };
-
-
-  sendToServer(payload)
-
-    .then(function(){
-
-      document
-        .getElementById(
-          "status"
-        )
-        .innerHTML =
-          "🟢 "
-          +
-          student.name
-          +
-          " — حاضر";
-
-    })
-
-    .catch(function(error){
-
-      console.error(
-        "Live attendance error:",
-        error
-      );
-
-
-      document
-        .getElementById(
-          "status"
-        )
-        .innerHTML =
-          "⚠️ "
-          +
-          student.name
-          +
-          " ظهر حاضر — تحقق من سجل الحضور";
-
-    });
+ if(attendanceStudents[id])return;
+ const s=getStudent(id),section=document.getElementById("classSelect").value,date=document.getElementById("attendanceDate").value;
+ if(!s||!section||!date)return;
+ attendanceStudents[id]={...s,status:"حاضر"}; attendanceHits[id]=[]; updateSummary();
+ document.getElementById("status").textContent=`✅ ${s.name} — حاضر — جاري التسجيل...`;
+ sendToServer({type:"attendanceLive",section,date,student:{id:s.id,code:s.code,name:s.name}})
+  .then(()=>document.getElementById("status").textContent=`🟢 ${s.name} — حاضر`)
+  .catch(()=>document.getElementById("status").textContent=`⚠️ ${s.name} ظهر حاضر — تحقق من سجل الحضور`);
 }
 
+function collectParticipationHit(marker){
+ const id=Number(marker.id),s=getStudent(id); if(!s||participationStudents[id])return;
+ const ans=getAnswer(marker.corners); if(!["A","B","C","D"].includes(ans))return;
+ const now=Date.now(); if(!participationHits[id])participationHits[id]=[];
+ participationHits[id].push({time:now,answer:ans});
+ participationHits[id]=participationHits[id].filter(x=>now-x.time<=PARTICIPATION_HIT_WINDOW);
 
-/* =========================================================
-   تنظيف القراءات القديمة
-========================================================= */
+ const counts={A:0,B:0,C:0,D:0};
+ participationHits[id].forEach(x=>counts[x.answer]++);
+ const best=Object.keys(counts).sort((a,b)=>counts[b]-counts[a])[0];
+ const hits=counts[best];
 
-function cleanupAttendanceHits(){
-
-  const now =
-    Date.now();
-
-
-  ALLOWED_MARKER_IDS
-    .forEach(id=>{
-
-      if(
-        attendanceStudents[id]
-      ){
-        return;
-      }
-
-
-      if(
-        !attendanceHits[id]
-      ){
-
-        attendanceHits[id] = [];
-
-        return;
-      }
-
-
-      attendanceHits[id] =
-        attendanceHits[id]
-          .filter(
-            time=>
-              now-time
-              <=
-              ATTENDANCE_HIT_WINDOW
-          );
-
-    });
+ document.getElementById("status").textContent=`🔍 ${s.code} ${s.name} — ${best} — ${Math.min(hits,PARTICIPATION_REQUIRED_HITS)}/${PARTICIPATION_REQUIRED_HITS}`;
+ if(hits>=PARTICIPATION_REQUIRED_HITS) confirmParticipation(id,best);
 }
 
+function confirmParticipation(id,answer){
+ if(participationStudents[id])return;
+ const s=getStudent(id),section=document.getElementById("classSelect").value,date=document.getElementById("attendanceDate").value;
+ const number=Number(document.getElementById("participationNumber").value);
+ if(!s||!correctAnswer||!number)return;
+ const result=answer===correctAnswer?"صحيح":"خطأ";
+ participationStudents[id]={...s,answer,result}; participationHits[id]=[]; updateSummary();
 
-/* =========================================================
-   ملخص الحضور
-========================================================= */
-
-function updateAttendanceScreen(){
-
-  const ids =
-    Object.keys(
-      attendanceStudents
-    );
-
-
-  const className =
-    document
-      .getElementById(
-        "classSelect"
-      )
-      .value;
-
-
-  const listForClass =
-    classStudents[className];
-
-
-  const total =
-    listForClass
-    ?
-    listForClass.length
-    :
-    0;
-
-
-  const present =
-    ids.length;
-
-
-  const absent =
-    Math.max(
-      0,
-      total-present
-    );
-
-
-  document
-    .getElementById(
-      "attendanceCount"
-    )
-    .textContent =
-      present;
-
-
-  document
-    .getElementById(
-      "absentCount"
-    )
-    .textContent =
-      absent;
-
-
-  document
-    .getElementById(
-      "totalCount"
-    )
-    .textContent =
-      total;
-
-
-  const date =
-    document
-      .getElementById(
-        "attendanceDate"
-      )
-      .value;
-
-
-  if(className){
-
-    document
-      .getElementById(
-        "summaryTitle"
-      )
-      .innerHTML =
-        "<b>الشعبة "
-        +
-        className
-        +
-        " — "
-        +
-        total
-        +
-        " طالب</b><br>"
-        +
-        date;
-  }
-
-
-  else{
-
-    document
-      .getElementById(
-        "summaryTitle"
-      )
-      .innerHTML =
-        "اختر الشعبة";
-  }
-
-
-  const list =
-    document.getElementById(
-      "attendanceList"
-    );
-
-
-  list.innerHTML = "";
-
-
-  ids
-    .sort(
-      (a,b)=>
-        Number(a)-Number(b)
-    )
-    .forEach(id=>{
-
-      const student =
-        attendanceStudents[id];
-
-
-      const card =
-        document.createElement(
-          "div"
-        );
-
-
-      card.className =
-        "resultCard";
-
-
-      card.innerHTML =
-        '<div class="studentName">'
-        +
-        student.name
-        +
-        '</div>'
-        +
-        '<div class="studentCode">'
-        +
-        student.code
-        +
-        ' — حاضر ✅'
-        +
-        '</div>';
-
-
-      list.appendChild(card);
-
-    });
+ sendToServer({
+   type:"participation",section,date,number,correctAnswer,answer,
+   student:{id:s.id,code:s.code,name:s.name}
+ }).catch(console.error);
+ document.getElementById("status").textContent=`${result==="صحيح"?"✅":"❌"} ${s.name} — ${answer} — ${result}`;
 }
 
+function cleanupHits(store,windowMs,locked){
+ const now=Date.now();
+ allowedMarkerIds.forEach(id=>{
+   if(locked[id])return;
+   if(!store[id])store[id]=[];
+   store[id]=store[id].filter(x=>now-(typeof x==="number"?x:x.time)<=windowMs);
+ });
+}
 
-/* =========================================================
-   الاعتماد النهائي للحضور
-========================================================= */
+function updateSummary(){
+ const section=document.getElementById("classSelect").value,total=getClassStudentCount();
+ const list=document.getElementById("attendanceList"); list.innerHTML="";
+
+ if(currentMode==="participation"){
+   const vals=Object.values(participationStudents);
+   const correct=vals.filter(x=>x.result==="صحيح").length, wrong=vals.filter(x=>x.result==="خطأ").length;
+   document.getElementById("attendanceCount").textContent=correct;
+   document.getElementById("absentCount").textContent=wrong;
+   document.getElementById("totalCount").textContent=vals.length;
+   document.getElementById("stat1Label").textContent="صحيح";
+   document.getElementById("stat2Label").textContent="خطأ";
+   document.getElementById("stat3Label").textContent="تمت القراءة";
+   document.getElementById("summaryTitle").innerHTML=section?`<b>الشعبة ${section} — المشاركة ${document.getElementById("participationNumber").value}</b>`:"اختر الشعبة";
+   vals.sort((a,b)=>a.id-b.id).forEach(s=>{
+     const d=document.createElement("div");d.className="resultCard "+(s.result==="خطأ"?"wrongCard":"");
+     d.innerHTML=`<div class="studentName">${s.name}</div><div class="studentCode">${s.code} — ${s.answer} — ${s.result}</div>`;
+     list.appendChild(d);
+   });
+   return;
+ }
+
+ const vals=Object.values(attendanceStudents);
+ document.getElementById("attendanceCount").textContent=vals.length;
+ document.getElementById("absentCount").textContent=Math.max(0,total-vals.length);
+ document.getElementById("totalCount").textContent=total;
+ document.getElementById("stat1Label").textContent="حاضر";
+ document.getElementById("stat2Label").textContent="غائب";
+ document.getElementById("stat3Label").textContent="الإجمالي";
+ document.getElementById("summaryTitle").innerHTML=section?`<b>الشعبة ${section} — ${total} طالب</b><br>${document.getElementById("attendanceDate").value}`:"اختر الشعبة";
+ vals.sort((a,b)=>a.id-b.id).forEach(s=>{
+   const d=document.createElement("div");d.className="resultCard";
+   d.innerHTML=`<div class="studentName">${s.name}</div><div class="studentCode">${s.code} — حاضر ✅</div>`;
+   list.appendChild(d);
+ });
+}
 
 async function saveAttendanceToSheets(){
-
-  if(saving){
-    return;
-  }
-
-
-  const section =
-    document
-      .getElementById(
-        "classSelect"
-      )
-      .value;
-
-
-  const date =
-    document
-      .getElementById(
-        "attendanceDate"
-      )
-      .value;
-
-
-  if(!section){
-
-    alert(
-      "اختر الشعبة أولاً"
-    );
-
-    return;
-  }
-
-
-  if(!date){
-
-    alert(
-      "اختر تاريخ الحضور"
-    );
-
-    return;
-  }
-
-
-  const students =
-    Object.values(
-      attendanceStudents
-    )
-    .map(student=>({
-
-      id:student.id,
-
-      code:student.code,
-
-      name:student.name,
-
-      status:"حاضر"
-
-    }));
-
-
-  if(students.length === 0){
-
-    alert(
-      "لم يتم تسجيل أي طالب حاضر حتى الآن"
-    );
-
-    return;
-  }
-
-
-  const total =
-    classStudents[section].length;
-
-
-  const present =
-    students.length;
-
-
-  const absent =
-    total-present;
-
-
-  const ok =
-    confirm(
-      "اعتماد حضور الشعبة "
-      +
-      section
-      +
-      "\n\nالحاضر: "
-      +
-      present
-      +
-      "\nالغائب: "
-      +
-      absent
-      +
-      "\nالإجمالي: "
-      +
-      total
-      +
-      "\n\nسيتم تسجيل بقية الطلاب غائبين."
-      +
-      "\n\nهل تريد الحفظ؟"
-    );
-
-
-  if(!ok){
-    return;
-  }
-
-
-  saving = true;
-
-
-  const button =
-    document.getElementById(
-      "saveAttendanceBtn"
-    );
-
-
-  const status =
-    document.getElementById(
-      "status"
-    );
-
-
-  button.disabled = true;
-
-
-  button.innerHTML =
-    "⏳ جاري الحفظ...";
-
-
-  status.innerHTML =
-    "⏳ جاري اعتماد كشف الحضور...";
-
-
-  const payload = {
-
-    type:"attendance",
-
-    section:section,
-
-    date:date,
-
-    students:students
-
-  };
-
-
-  try{
-
-    await sendToServer(
-      payload
-    );
-
-
-    status.innerHTML =
-      "✅ تم إرسال حضور الشعبة "
-      +
-      section
-      +
-      " — "
-      +
-      present
-      +
-      " حاضر / "
-      +
-      absent
-      +
-      " غائب";
-
-
-    alert(
-      "تم إرسال كشف الشعبة "
-      +
-      section
-      +
-      ".\n\n"
-      +
-      "الحاضر: "
-      +
-      present
-      +
-      "\nالغائب: "
-      +
-      absent
-      +
-      "\nالإجمالي: "
-      +
-      total
-      +
-      "\n\nتم إرسال الاعتماد النهائي إلى Google Sheets."
-    );
-
-  }
-
-  catch(error){
-
-    console.error(error);
-
-
-    status.innerHTML =
-      "❌ تعذر إرسال الحضور";
-
-
-    alert(
-      "تعذر إرسال الحضور."
-    );
-  }
-
-
-  finally{
-
-    saving = false;
-
-
-    button.disabled = false;
-
-
-    button.innerHTML =
-      "💾 اعتماد وحفظ الحضور";
-  }
+ if(saving)return;
+ const section=document.getElementById("classSelect").value,date=document.getElementById("attendanceDate").value;
+ if(!section||!date){alert("اختر الشعبة والتاريخ");return;}
+ const students=Object.values(attendanceStudents).map(s=>({id:s.id,code:s.code,name:s.name,status:"حاضر"}));
+ if(!students.length){alert("لم يتم تسجيل أي طالب حاضر حتى الآن");return;}
+
+ const total=getClassStudentCount();
+ if(!confirm(`اعتماد حضور الشعبة ${section}؟\n\nالموجود في الشاشة: ${students.length}\nإجمالي الشعبة: ${total}\n\nالحضور المسجل سابقاً لن يُمسح.`))return;
+
+ saving=true; const btn=document.getElementById("saveAttendanceBtn");btn.disabled=true;btn.textContent="⏳ جاري الحفظ...";
+ try{
+   await sendToServer({type:"attendance",section,date,students});
+   document.getElementById("status").textContent="✅ تم إرسال اعتماد الحضور";
+   alert("تم إرسال الاعتماد إلى Google Sheets.\nيمكنك فتح الكاميرا لاحقاً لاستكمال الطلاب الذين لم تُقرأ بطاقاتهم.");
+ }catch(e){console.error(e);alert("تعذر إرسال الحضور");}
+ finally{saving=false;btn.disabled=false;btn.textContent="💾 اعتماد وحفظ الحضور";}
 }
-
-
-/* =========================================================
-   حضور جديد
-========================================================= */
 
 function resetAttendance(){
-
-  if(
-    confirm(
-      "هل تريد مسح الحضور الحالي وبدء مسح جديد؟"
-    )
-  ){
-
-    attendanceStudents = {};
-
-
-    createAttendanceHits();
-
-
-    updateAttendanceScreen();
-
-
-    const lastCard =
-      getLastCardCode();
-
-
-    document
-      .getElementById(
-        "status"
-      )
-      .innerHTML =
-        lastCard
-        ?
-        "جاهز لمسح بطاقات S01 إلى "
-        +
-        lastCard
-        :
-        "اختر الشعبة أولاً";
-  }
+ if(confirm("هذا يمسح قائمة الشاشة فقط، ولا يحذف الحضور المحفوظ في Google Sheets.\n\nمتابعة؟")){
+   attendanceStudents={};createAttendanceHits();updateSummary();
+   document.getElementById("status").textContent="تم مسح الشاشة فقط. الحضور المحفوظ لم يُحذف.";
+ }
 }
 
-
-/* =========================================================
-   القراءة الفردية
-========================================================= */
+function finishParticipationQuestion(){
+ if(!Object.keys(participationStudents).length){alert("لم تتم قراءة أي طالب في هذا السؤال");return;}
+ const n=Number(document.getElementById("participationNumber").value);
+ if(!confirm(`إنهاء المشاركة رقم ${n} والانتقال للسؤال التالي؟`))return;
+ participationStudents={};createParticipationHits();correctAnswer="";
+ document.querySelectorAll(".answerBtn").forEach(b=>b.classList.remove("selected"));
+ document.getElementById("participationNumber").value=n+1;
+ updateSummary();
+ document.getElementById("status").textContent=`جاهز للمشاركة رقم ${n+1} — اختر الإجابة الصحيحة`;
+}
 
 function collectIndividual(marker){
-
-  const id =
-    Number(marker.id);
-
-
-  if(
-    !ALLOWED_MARKER_IDS.has(id)
-  ){
-    return;
-  }
-
-
-  const student =
-    getStudent(id);
-
-
-  if(!student){
-    return;
-  }
-
-
-  const now =
-    Date.now();
-
-
-  const answer =
-    getAnswer(
-      marker.corners
-    );
-
-
-  individualReadings.push({
-
-    id:id,
-
-    answer:answer,
-
-    time:now
-
-  });
-
-
-  individualReadings =
-    individualReadings
-      .filter(
-        reading=>
-          now-reading.time
-          <=
-          READING_WINDOW
-      );
-
-
-  const same =
-    individualReadings
-      .filter(
-        reading=>
-          reading.id === id
-      );
-
-
-  if(
-    same.length <
-    REQUIRED_READINGS
-  ){
-
-    document
-      .getElementById(
-        "status"
-      )
-      .innerHTML =
-        "🔍 جاري تثبيت "
-        +
-        student.name
-        +
-        "...";
-
-
-    return;
-  }
-
-
-  const counts = {
-
-    A:0,
-
-    B:0,
-
-    C:0,
-
-    D:0
-
-  };
-
-
-  same.forEach(reading=>{
-
-    if(
-      counts[
-        reading.answer
-      ] !== undefined
-    ){
-
-      counts[
-        reading.answer
-      ]++;
-
-    }
-
-  });
-
-
-  let bestAnswer = "A";
-
-  let max = -1;
-
-
-  Object.keys(counts)
-    .forEach(answer=>{
-
-      if(
-        counts[answer] > max
-      ){
-
-        max =
-          counts[answer];
-
-
-        bestAnswer =
-          answer;
-      }
-
-    });
-
-
-  showIndividualResult(
-    id,
-    bestAnswer
-  );
+ const id=Number(marker.id),s=getStudent(id);if(!s)return;
+ const now=Date.now(),answer=getAnswer(marker.corners);
+ individualReadings.push({id,answer,time:now});
+ individualReadings=individualReadings.filter(r=>now-r.time<=READING_WINDOW);
+ const same=individualReadings.filter(r=>r.id===id);
+ if(same.length<REQUIRED_READINGS){document.getElementById("status").textContent=`🔍 جاري تثبيت ${s.name}...`;return;}
+ const counts={A:0,B:0,C:0,D:0};same.forEach(r=>{if(counts[r.answer]!==undefined)counts[r.answer]++});
+ let best="A",max=-1;Object.keys(counts).forEach(a=>{if(counts[a]>max){max=counts[a];best=a}});
+ showIndividualResult(id,best);
 }
 
-
-/* =========================================================
-   نتيجة فردية + حفظ تلقائي
-========================================================= */
-
-async function showIndividualResult(
-  id,
-  answer
-){
-
-  individualLocked = true;
-
-
-  const student =
-    getStudent(id);
-
-
-  if(!student){
-
-    individualLocked = false;
-
-    return;
-  }
-
-
-  const className =
-    document
-      .getElementById(
-        "classSelect"
-      )
-      .value;
-
-
-  const activityNumber =
-    document
-      .getElementById(
-        "activityNumber"
-      )
-      .value;
-
-
-  const date =
-    document
-      .getElementById(
-        "attendanceDate"
-      )
-      .value;
-
-
-  const box =
-    document.getElementById(
-      "individualResult"
-    );
-
-
-  box.style.display =
-    "block";
-
-
-  let title = "";
-
-
-  if(
-    currentMode ===
-    "homework"
-  ){
-
-    title =
-      "📝 الواجب رقم "
-      +
-      activityNumber;
-  }
-
-
-  else if(
-    currentMode ===
-    "task"
-  ){
-
-    title =
-      "📋 المهمة الأدائية رقم "
-      +
-      activityNumber;
-  }
-
-
-  else{
-
-    title =
-      "⭐ المشاركة — "
-      +
-      date;
-  }
-
-
-  box.innerHTML =
-    '<div class="studentName">'
-    +
-    student.name
-    +
-    '</div>'
-    +
-    '<div class="studentCode">'
-    +
-    student.code
-    +
-    '</div>'
-    +
-    '<div class="small">'
-    +
-    'الشعبة: '
-    +
-    className
-    +
-    '</div>'
-    +
-    '<div style="margin-top:6px;font-weight:bold">'
-    +
-    title
-    +
-    '</div>'
-    +
-    '<div class="answer">'
-    +
-    'التقييم: '
-    +
-    answer
-    +
-    '</div>'
-    +
-    '<div class="small" id="saveState">'
-    +
-    '⏳ جاري الحفظ...'
-    +
-    '</div>';
-
-
-  document
-    .getElementById(
-      "status"
-    )
-    .innerHTML =
-      "⏳ جاري حفظ "
-      +
-      student.name;
-
-
-  const payload = {
-
-    type:currentMode,
-
-    section:className,
-
-    student:{
-
-      id:student.id,
-
-      code:student.code,
-
-      name:student.name
-
-    },
-
-    answer:answer
-
-  };
-
-
-  if(
-    currentMode === "homework" ||
-    currentMode === "task"
-  ){
-
-    payload.number =
-      activityNumber;
-  }
-
-
-  if(
-    currentMode ===
-    "participation"
-  ){
-
-    payload.date =
-      date;
-  }
-
-
-  try{
-
-    await sendToServer(
-      payload
-    );
-
-
-    const saveState =
-      document.getElementById(
-        "saveState"
-      );
-
-
-    if(saveState){
-
-      saveState.innerHTML =
-        "✅ تم إرسال التقييم للحفظ";
-    }
-
-
-    document
-      .getElementById(
-        "status"
-      )
-      .innerHTML =
-        "✅ "
-        +
-        student.name
-        +
-        " — "
-        +
-        answer;
-
-
-    document
-      .getElementById(
-        "nextBtn"
-      )
-      .style.display =
-        "block";
-
-  }
-
-  catch(error){
-
-    console.error(error);
-
-
-    const saveState =
-      document.getElementById(
-        "saveState"
-      );
-
-
-    if(saveState){
-
-      saveState.innerHTML =
-        "❌ تعذر الإرسال";
-    }
-
-
-    document
-      .getElementById(
-        "status"
-      )
-      .innerHTML =
-        "❌ تعذر إرسال تقييم "
-        +
-        student.name;
-
-
-    document
-      .getElementById(
-        "nextBtn"
-      )
-      .style.display =
-        "block";
-  }
+async function showIndividualResult(id,answer){
+ individualLocked=true;
+ const s=getStudent(id);if(!s){individualLocked=false;return;}
+ const section=document.getElementById("classSelect").value;
+ const number=document.getElementById("activityNumber").value;
+ const box=document.getElementById("individualResult");box.style.display="block";
+ const title=currentMode==="homework"?`📝 الواجب رقم ${number}`:`📋 المهمة الأدائية رقم ${number}`;
+ box.innerHTML=`<div class="studentName">${s.name}</div><div class="studentCode">${s.code}</div><div class="small">الشعبة: ${section}</div><div style="margin-top:6px;font-weight:bold">${title}</div><div class="answer">التقييم: ${answer}</div><div class="small" id="saveState">⏳ جاري الحفظ...</div>`;
+ try{
+   await sendToServer({type:currentMode,section,number,answer,student:{id:s.id,code:s.code,name:s.name}});
+   document.getElementById("saveState").textContent="✅ تم إرسال التقييم للحفظ";
+   document.getElementById("status").textContent=`✅ ${s.name} — ${answer}`;
+ }catch(e){document.getElementById("saveState").textContent="❌ تعذر الإرسال";}
+ document.getElementById("nextBtn").style.display="block";
 }
-
-
-/* =========================================================
-   الإرسال إلى Apps Script
-========================================================= */
-
-async function sendToServer(
-  payload
-){
-
-  await fetch(
-    WEB_APP_URL,
-    {
-
-      method:"POST",
-
-      mode:"no-cors",
-
-      headers:{
-
-        "Content-Type":
-          "text/plain;charset=utf-8"
-
-      },
-
-      body:
-        JSON.stringify(payload)
-
-    }
-  );
-
-
-  return true;
-}
-
-
-/* =========================================================
-   طالب آخر
-========================================================= */
 
 function nextStudent(){
-
-  individualLocked = false;
-
-
-  individualReadings = [];
-
-
-  const box =
-    document.getElementById(
-      "individualResult"
-    );
-
-
-  box.style.display =
-    "none";
-
-
-  box.innerHTML = "";
-
-
-  document
-    .getElementById(
-      "nextBtn"
-    )
-    .style.display =
-      "none";
-
-
-  if(
-    currentMode !==
-    "attendance"
-  ){
-
-    document
-      .getElementById(
-        "status"
-      )
-      .innerHTML =
-        "جاهز لمسح طالب";
-  }
+ individualLocked=false;individualReadings=[];
+ const box=document.getElementById("individualResult");box.style.display="none";box.innerHTML="";
+ document.getElementById("nextBtn").style.display="none";
+ if(currentMode==="homework"||currentMode==="task")document.getElementById("status").textContent="جاهز لمسح طالب";
 }
-
-
-/* =========================================================
-   اتجاه البطاقة
-========================================================= */
 
 function getAnswer(corners){
-
-  if(
-    !corners ||
-    corners.length < 2
-  ){
-    return "?";
-  }
-
-
-  const p0 =
-    corners[0];
-
-
-  const p1 =
-    corners[1];
-
-
-  const dx =
-    p1.x-p0.x;
-
-
-  const dy =
-    p1.y-p0.y;
-
-
-  let angle =
-    Math.atan2(
-      dy,
-      dx
-    )
-    *
-    180
-    /
-    Math.PI;
-
-
-  if(angle < 0){
-
-    angle += 360;
-  }
-
-
-  if(
-    angle >= 315 ||
-    angle < 45
-  ){
-
-    return "A";
-  }
-
-
-  if(
-    angle >= 45 &&
-    angle < 135
-  ){
-
-    return "D";
-  }
-
-
-  if(
-    angle >= 135 &&
-    angle < 225
-  ){
-
-    return "C";
-  }
-
-
-  return "B";
+ if(!corners||corners.length<2)return "?";
+ const p0=corners[0],p1=corners[1],dx=p1.x-p0.x,dy=p1.y-p0.y;
+ let angle=Math.atan2(dy,dx)*180/Math.PI;if(angle<0)angle+=360;
+ if(angle>=315||angle<45)return "A";
+ if(angle>=45&&angle<135)return "D";
+ if(angle>=135&&angle<225)return "C";
+ return "B";
 }
 
-
-/* =========================================================
-   تحميل الصفحة
-========================================================= */
-
-window.addEventListener(
-  "load",
-  function(){
-
-    const status =
-      document.getElementById(
-        "status"
-      );
-
-
-    if(
-      typeof AR ===
-      "undefined"
-    ){
-
-      status.innerHTML =
-        "❌ لم يتم تحميل قارئ البطاقات";
-
-      return;
-    }
-
-
-    if(!detector){
-
-      status.innerHTML =
-        "❌ تعذر تشغيل قارئ البطاقات";
-
-      return;
-    }
-
-
-    updateAttendanceScreen();
-
-
-    status.innerHTML =
-      "اختر الشعبة ثم افتح الكاميرا";
-  }
-);
-
+window.addEventListener("load",()=>{
+ const status=document.getElementById("status");
+ if(typeof AR==="undefined"){status.textContent="❌ لم يتم تحميل قارئ البطاقات";return;}
+ if(!detector){status.textContent="❌ تعذر تشغيل قارئ البطاقات";return;}
+ updateSummary();status.textContent="اختر الشعبة ثم افتح الكاميرا";
+});
 </script>
-
 </body>
 </html>
