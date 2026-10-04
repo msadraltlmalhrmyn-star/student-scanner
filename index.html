@@ -30,27 +30,70 @@ canvas{display:none}
 .buttons{max-width:700px;margin:6px auto;display:grid;grid-template-columns:1fr 1fr;gap:5px}
 .main{width:100%;padding:11px 5px;border:0;border-radius:11px;color:#fff;font-size:14px;font-weight:bold}
 .main:disabled{opacity:.55}
-#startBtn{background:#159447} #switchBtn{background:#19558e}
-#nextBtn{background:#e58a00;display:none} #resetAttendanceBtn{background:#b42318;display:none}
-#saveAttendanceBtn{background:#6b21a8;display:none} #finishParticipationBtn{background:#6b21a8;display:none}
+#startBtn{background:#159447}
+#switchBtn{background:#19558e}
+#nextBtn{background:#e58a00;display:none}
+#resetAttendanceBtn{background:#b42318;display:none}
+#saveAttendanceBtn{background:#6b21a8;display:none}
+#finishParticipationBtn{background:#6b21a8;display:none}
 #summary{max-width:700px;margin:7px auto;background:#fff;border-radius:14px;padding:10px}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:8px 0}
 .statBox{background:#f4f6f9;border-radius:10px;padding:7px 2px}
-.statNumber{font-size:25px;font-weight:bold}.presentNumber{color:#159447}.absentNumber{color:#b42318}.totalNumber{color:#19558e}
+.statNumber{font-size:25px;font-weight:bold}
+.presentNumber{color:#159447}
+.absentNumber{color:#b42318}
+.totalNumber{color:#19558e}
 .statLabel{font-size:12px;color:#667085}
 .resultCard{border:1px solid #159447;background:#e4f7eb;border-radius:11px;padding:8px;margin:5px 0}
 .wrongCard{border-color:#b42318;background:#fee2e2}
-.studentName{font-size:18px;font-weight:bold;color:#174d82}.studentCode{font-weight:bold;font-size:15px;margin:3px}
-.answer{font-size:24px;font-weight:bold;color:#159447;margin-top:7px}.small{color:#667085;font-size:14px;margin-top:4px}
+.studentName{font-size:18px;font-weight:bold;color:#174d82}
+.studentCode{font-weight:bold;font-size:15px;margin:3px}
+.answer{font-size:24px;font-weight:bold;color:#159447;margin-top:7px}
+.small{color:#667085;font-size:14px;margin-top:4px}
 #individualResult{display:none;max-width:700px;margin:7px auto;background:#e4f7eb;border:2px solid #159447;border-radius:14px;padding:12px}
 .answerButtons{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
 .answerBtn{padding:10px;border:1px solid #d0d5dd;background:#fff;border-radius:9px;font-weight:bold;font-size:17px}
 .answerBtn.selected{background:#19558e;color:#fff;border-color:#19558e}
+
+#homeworkEvaluation{
+  display:none;
+  max-width:700px;
+  margin:7px auto;
+  background:white;
+  border:2px solid #7C3AED;
+  border-radius:14px;
+  padding:12px;
+  text-align:right;
+}
+.hwTitle{text-align:center;font-size:20px;font-weight:bold;color:#5b21b6;margin-bottom:4px}
+.hwStudent{text-align:center;font-size:18px;font-weight:bold;color:#174d82;margin-bottom:10px}
+.hwRow{display:grid;grid-template-columns:1.35fr .75fr auto .75fr .8fr;gap:5px;align-items:center;margin:8px 0}
+.hwRow .name{font-weight:bold;font-size:14px}
+.hwRow input{padding:8px;text-align:center}
+.hwSlash{text-align:center;font-weight:bold}
+.hwScore{background:#f3e8ff;border-radius:8px;padding:8px 4px;text-align:center;font-weight:bold;color:#6b21a8}
+.hwTotals{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+.hwTotalBox{background:#f4f6f9;border-radius:10px;padding:10px;text-align:center;font-weight:bold}
+#saveHomeworkBtn{margin-top:10px;background:#7C3AED}
+#cancelHomeworkBtn{margin-top:10px;background:#667085}
+
 @media(max-width:700px){
- body{padding:5px}h1{font-size:19px;margin:2px 0}.school{font-size:12px;margin-bottom:4px}.setup{padding:5px;margin-bottom:4px}
- label{display:none}select,input{padding:7px 5px;font-size:14px}.tabs{gap:3px;margin-bottom:4px}.tab{padding:7px 1px;font-size:11px}
- #status{margin-bottom:4px;padding:5px;font-size:12px}video{height:62vh;min-height:330px}.guide{font-size:12px;bottom:5px}
- .buttons{margin:4px auto}.main{padding:8px 3px;font-size:12px}#summary{margin:4px auto;padding:7px}
+ body{padding:5px}
+ h1{font-size:19px;margin:2px 0}
+ .school{font-size:12px;margin-bottom:4px}
+ .setup{padding:5px;margin-bottom:4px}
+ label{display:none}
+ select,input{padding:7px 5px;font-size:14px}
+ .tabs{gap:3px;margin-bottom:4px}
+ .tab{padding:7px 1px;font-size:11px}
+ #status{margin-bottom:4px;padding:5px;font-size:12px}
+ video{height:62vh;min-height:330px}
+ .guide{font-size:12px;bottom:5px}
+ .buttons{margin:4px auto}
+ .main{padding:8px 3px;font-size:12px}
+ #summary{margin:4px auto;padding:7px}
+ .hwRow{grid-template-columns:1.25fr .7fr auto .7fr .8fr}
+ .hwRow .name{font-size:12px}
 }
 </style>
 </head>
@@ -60,84 +103,149 @@ canvas{display:none}
 <div class="school">مدرسة الحرمين الثانوية</div>
 
 <div class="setup">
- <div class="setupGrid">
-  <div>
-   <label>الشعبة</label>
-   <select id="classSelect" onchange="classChanged()">
-    <option value="">اختر الشعبة</option>
-    <option value="301">301</option><option value="302">302</option><option value="303">303</option>
-   </select>
-  </div>
-  <div id="dateArea">
-   <label>التاريخ</label>
-   <input id="attendanceDate" type="date" onchange="dateChanged()">
-  </div>
-  <div id="numberArea" style="display:none">
-   <label id="numberLabel">رقم الواجب</label>
-   <input id="activityNumber" type="number" min="1" placeholder="رقم النشاط">
-  </div>
-  <div id="participationNumberArea" style="display:none">
-   <label>رقم المشاركة</label>
-   <input id="participationNumber" type="number" min="1" value="1">
-  </div>
-  <div id="correctAnswerArea" class="full" style="display:none">
-   <label>الإجابة الصحيحة</label>
-   <div class="answerButtons">
-    <button class="answerBtn" type="button" onclick="chooseCorrectAnswer('A',this)">A</button>
-    <button class="answerBtn" type="button" onclick="chooseCorrectAnswer('B',this)">B</button>
-    <button class="answerBtn" type="button" onclick="chooseCorrectAnswer('C',this)">C</button>
-    <button class="answerBtn" type="button" onclick="chooseCorrectAnswer('D',this)">D</button>
-   </div>
-  </div>
- </div>
+<div class="setupGrid">
+
+<div>
+<label>الشعبة</label>
+<select id="classSelect" onchange="classChanged()">
+<option value="">اختر الشعبة</option>
+<option value="301">301</option>
+<option value="302">302</option>
+<option value="303">303</option>
+</select>
+</div>
+
+<div id="dateArea">
+<label>التاريخ</label>
+<input id="attendanceDate" type="date" onchange="dateChanged()">
+</div>
+
+<div id="numberArea" style="display:none">
+<label id="numberLabel">رقم الواجب</label>
+<input id="activityNumber" type="number" min="1" placeholder="رقم النشاط">
+</div>
+
+<div id="participationNumberArea" style="display:none">
+<label>رقم المشاركة</label>
+<input id="participationNumber" type="number" min="1" value="1">
+</div>
+
+<div id="correctAnswerArea" class="full" style="display:none">
+<label>الإجابة الصحيحة</label>
+<div class="answerButtons">
+<button class="answerBtn" type="button" onclick="chooseCorrectAnswer('A',this)">A</button>
+<button class="answerBtn" type="button" onclick="chooseCorrectAnswer('B',this)">B</button>
+<button class="answerBtn" type="button" onclick="chooseCorrectAnswer('C',this)">C</button>
+<button class="answerBtn" type="button" onclick="chooseCorrectAnswer('D',this)">D</button>
+</div>
+</div>
+
+</div>
 </div>
 
 <div class="tabs">
- <button class="tab active" onclick="selectMode('attendance',this)">👥 الحضور</button>
- <button class="tab" onclick="selectMode('homework',this)">📝 الواجب</button>
- <button class="tab" onclick="selectMode('task',this)">📋 مهمة</button>
- <button class="tab" onclick="selectMode('participation',this)">⭐ مشاركة</button>
+<button class="tab active" onclick="selectMode('attendance',this)">👥 الحضور</button>
+<button class="tab" onclick="selectMode('homework',this)">📝 الواجب</button>
+<button class="tab" onclick="selectMode('task',this)">📋 مهمة</button>
+<button class="tab" onclick="selectMode('participation',this)">⭐ مشاركة</button>
 </div>
 
 <div id="status">اختر الشعبة ثم افتح الكاميرا</div>
 
 <div class="cameraBox">
- <video id="video" autoplay muted playsinline></video>
- <div class="frame"></div>
- <div class="guide" id="guide">الحضور: وجّه الكاميرا إلى بطاقات الطلاب</div>
+<video id="video" autoplay muted playsinline></video>
+<div class="frame"></div>
+<div class="guide" id="guide">الحضور: وجّه الكاميرا إلى بطاقات الطلاب</div>
 </div>
+
 <canvas id="canvas"></canvas>
 
 <div class="buttons">
- <button id="startBtn" class="main" onclick="startCamera()">📷 فتح الكاميرا</button>
- <button id="switchBtn" class="main" onclick="switchCamera()">🔄 تبديل الكاميرا</button>
- <button id="saveAttendanceBtn" class="main" onclick="saveAttendanceToSheets()">💾 اعتماد وحفظ الحضور</button>
- <button id="resetAttendanceBtn" class="main" onclick="resetAttendance()">🗑 مسح الشاشة فقط</button>
- <button id="finishParticipationBtn" class="main" onclick="finishParticipationQuestion()">✅ إنهاء السؤال</button>
- <button id="nextBtn" class="main" onclick="nextStudent()">➡️ مسح طالب آخر</button>
+<button id="startBtn" class="main" onclick="startCamera()">📷 فتح الكاميرا</button>
+<button id="switchBtn" class="main" onclick="switchCamera()">🔄 تبديل الكاميرا</button>
+<button id="saveAttendanceBtn" class="main" onclick="saveAttendanceToSheets()">💾 اعتماد وحفظ الحضور</button>
+<button id="resetAttendanceBtn" class="main" onclick="resetAttendance()">🗑 مسح الشاشة فقط</button>
+<button id="finishParticipationBtn" class="main" onclick="finishParticipationQuestion()">✅ إنهاء السؤال</button>
+<button id="nextBtn" class="main" onclick="nextStudent()">➡️ مسح طالب آخر</button>
 </div>
 
 <div id="individualResult"></div>
 
+<div id="homeworkEvaluation">
+<div class="hwTitle">📝 تقييم الواجب</div>
+<div class="hwStudent" id="hwStudentName"></div>
+
+<div class="hwRow">
+<div class="name">عدد أسئلة الكتاب</div>
+<input id="bookPart" type="number" min="0" step="0.01" placeholder="الجزء" oninput="calculateHomework()">
+<div class="hwSlash">من</div>
+<input id="bookTotal" type="number" min="0.01" step="0.01" placeholder="الكل" oninput="calculateHomework()">
+<div class="hwScore" id="bookScore">0 / 10</div>
+</div>
+
+<div class="hwRow">
+<div class="name">أداء المهام داخل الصف</div>
+<input id="classPart" type="number" min="0" step="0.01" placeholder="الجزء" oninput="calculateHomework()">
+<div class="hwSlash">من</div>
+<input id="classTotal" type="number" min="0.01" step="0.01" placeholder="الكل" oninput="calculateHomework()">
+<div class="hwScore" id="classScore">0 / 10</div>
+</div>
+
+<div class="hwRow">
+<div class="name">أداء المهام في المنزل</div>
+<input id="homePart" type="number" min="0" step="0.01" placeholder="الجزء" oninput="calculateHomework()">
+<div class="hwSlash">من</div>
+<input id="homeTotal" type="number" min="0.01" step="0.01" placeholder="الكل" oninput="calculateHomework()">
+<div class="hwScore" id="homeScore">0 / 10</div>
+</div>
+
+<div class="hwTotals">
+<div class="hwTotalBox">المجموع: <span id="hwTotal30">0</span> / 30</div>
+<div class="hwTotalBox">النسبة: <span id="hwPercent">0%</span></div>
+</div>
+
+<button id="saveHomeworkBtn" class="main" onclick="saveHomeworkEvaluation()">💾 حفظ تقييم الطالب</button>
+<button id="cancelHomeworkBtn" class="main" onclick="cancelHomeworkEvaluation()">إلغاء</button>
+</div>
+
 <div id="summary">
- <div id="summaryTitle">اختر الشعبة</div>
- <div class="stats">
-  <div class="statBox"><div class="statNumber presentNumber" id="attendanceCount">0</div><div class="statLabel" id="stat1Label">حاضر</div></div>
-  <div class="statBox"><div class="statNumber absentNumber" id="absentCount">0</div><div class="statLabel" id="stat2Label">غائب</div></div>
-  <div class="statBox"><div class="statNumber totalNumber" id="totalCount">0</div><div class="statLabel" id="stat3Label">الإجمالي</div></div>
- </div>
- <div id="attendanceList"></div>
+<div id="summaryTitle">اختر الشعبة</div>
+
+<div class="stats">
+<div class="statBox">
+<div class="statNumber presentNumber" id="attendanceCount">0</div>
+<div class="statLabel" id="stat1Label">حاضر</div>
+</div>
+
+<div class="statBox">
+<div class="statNumber absentNumber" id="absentCount">0</div>
+<div class="statLabel" id="stat2Label">غائب</div>
+</div>
+
+<div class="statBox">
+<div class="statNumber totalNumber" id="totalCount">0</div>
+<div class="statLabel" id="stat3Label">الإجمالي</div>
+</div>
+</div>
+
+<div id="attendanceList"></div>
 </div>
 
 <script>
-const WEB_APP_URL="https://script.google.com/macros/s/AKfycbwLCbp9ele6la-y8Vf3SUfSU8_Ct9lzKgtCAcj5mhC_Off8nCxyzK3HtQnBzMsrD7Fr/exec";
+const WEB_APP_URL=
+"https://script.google.com/macros/s/AKfycbwLCbp9ele6la-y8Vf3SUfSU8_Ct9lzKgtCAcj5mhC_Off8nCxyzK3HtQnBzMsrD7Fr/exec";
 
 const video=document.getElementById("video");
 const canvas=document.getElementById("canvas");
 const ctx=canvas.getContext("2d",{willReadFrequently:true});
 
-let stream=null, detector=null, scanning=false, saving=false;
-let facingMode="environment", currentMode="attendance";
+let stream=null;
+let detector=null;
+let scanning=false;
+let saving=false;
+let facingMode="environment";
+let currentMode="attendance";
+
 let classStudents={};
 let allowedMarkerIds=new Set();
 
@@ -151,413 +259,1146 @@ let correctAnswer="";
 let individualReadings=[];
 let individualLocked=false;
 
+let currentHomeworkStudent=null;
+let homeworkReadings=[];
+
 const ATTENDANCE_REQUIRED_HITS=5;
 const PARTICIPATION_REQUIRED_HITS=5;
+const HOMEWORK_REQUIRED_HITS=5;
+
 const ATTENDANCE_HIT_WINDOW=2000;
 const PARTICIPATION_HIT_WINDOW=1800;
+const HOMEWORK_HIT_WINDOW=1500;
+
 const REQUIRED_READINGS=5;
 const READING_WINDOW=1500;
+
 const MIN_MARKER_AREA=650;
 const MAX_SIDE_RATIO=2.35;
 const SCAN_WIDTH=1280;
 
-try{ detector=new AR.Detector(); }catch(e){console.error(e)}
+try{
+  detector=new AR.Detector();
+}catch(e){
+  console.error(e);
+}
 
 function setToday(){
- const d=new Date(), y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0");
- document.getElementById("attendanceDate").value=`${y}-${m}-${day}`;
+  const d=new Date();
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,"0");
+  const day=String(d.getDate()).padStart(2,"0");
+  document.getElementById("attendanceDate").value=`${y}-${m}-${day}`;
 }
 setToday();
 
 async function apiGet(params){
- const url=new URL(WEB_APP_URL);
- Object.entries(params).forEach(([k,v])=>url.searchParams.set(k,v));
- const r=await fetch(url.toString(),{method:"GET",cache:"no-store"});
- if(!r.ok) throw new Error("HTTP "+r.status);
- return await r.json();
+  const url=new URL(WEB_APP_URL);
+  Object.entries(params).forEach(([k,v])=>url.searchParams.set(k,v));
+  const r=await fetch(url.toString(),{method:"GET",cache:"no-store"});
+  if(!r.ok) throw new Error("HTTP "+r.status);
+  return await r.json();
 }
 
 async function sendToServer(payload){
- await fetch(WEB_APP_URL,{
-   method:"POST",mode:"no-cors",
-   headers:{"Content-Type":"text/plain;charset=utf-8"},
-   body:JSON.stringify(payload)
- });
- return true;
+  await fetch(WEB_APP_URL,{
+    method:"POST",
+    mode:"no-cors",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify(payload)
+  });
+  return true;
 }
 
 async function loadStudents(section){
- const status=document.getElementById("status");
- status.textContent="⏳ جاري تحميل طلاب الشعبة...";
- try{
-   const data=await apiGet({action:"students",section});
-   if(!data.success) throw new Error(data.message||"تعذر تحميل الطلاب");
-   classStudents[section]=data.students||[];
-   allowedMarkerIds=new Set(classStudents[section].map(s=>Number(s.id)));
-   createAttendanceHits();
-   createParticipationHits();
-   return true;
- }catch(e){
-   console.error(e);
-   status.textContent="❌ تعذر تحميل الطلاب من Google Sheets. تأكد من نشر Web App الجديد.";
-   return false;
- }
+  const status=document.getElementById("status");
+  status.textContent="⏳ جاري تحميل طلاب الشعبة...";
+
+  try{
+    const data=await apiGet({action:"students",section});
+    if(!data.success) throw new Error(data.message||"تعذر تحميل الطلاب");
+
+    classStudents[section]=data.students||[];
+    allowedMarkerIds=new Set(classStudents[section].map(s=>Number(s.id)));
+    createAttendanceHits();
+    createParticipationHits();
+
+    return true;
+  }catch(e){
+    console.error(e);
+    status.textContent="❌ تعذر تحميل الطلاب من Google Sheets. تأكد من نشر Web App الجديد.";
+    return false;
+  }
 }
 
-function getStudents(){ return classStudents[document.getElementById("classSelect").value]||[]; }
-function getClassStudentCount(){ return getStudents().length; }
-function getStudent(id){ return getStudents().find(s=>Number(s.id)===Number(id))||null; }
-function getLastCardCode(){
- const list=getStudents(); if(!list.length)return "";
- const max=Math.max(...list.map(s=>Number(s.id)));
- return "S"+String(max+1).padStart(2,"0");
+function getStudents(){
+  return classStudents[document.getElementById("classSelect").value]||[];
 }
-function createAttendanceHits(){ attendanceHits={}; allowedMarkerIds.forEach(id=>attendanceHits[id]=[]); }
-function createParticipationHits(){ participationHits={}; allowedMarkerIds.forEach(id=>participationHits[id]=[]); }
+
+function getClassStudentCount(){
+  return getStudents().length;
+}
+
+function getStudent(id){
+  return getStudents().find(s=>Number(s.id)===Number(id))||null;
+}
+
+function getLastCardCode(){
+  const list=getStudents();
+  if(!list.length) return "";
+
+  const max=Math.max(...list.map(s=>Number(s.id)));
+  return "S"+String(max+1).padStart(2,"0");
+}
+
+function createAttendanceHits(){
+  attendanceHits={};
+  allowedMarkerIds.forEach(id=>attendanceHits[id]=[]);
+}
+
+function createParticipationHits(){
+  participationHits={};
+  allowedMarkerIds.forEach(id=>participationHits[id]=[]);
+}
 
 async function classChanged(){
- attendanceStudents={}; participationStudents={}; individualReadings=[]; individualLocked=false;
- document.getElementById("individualResult").style.display="none";
- document.getElementById("nextBtn").style.display="none";
- const section=document.getElementById("classSelect").value;
- if(!section){updateSummary();document.getElementById("status").textContent="اختر الشعبة ثم افتح الكاميرا";return;}
- if(!(await loadStudents(section))) return;
- if(currentMode==="attendance") await loadExistingAttendance();
- if(currentMode==="participation") await loadNextParticipationNumber();
- updateGuide(); updateSummary();
- document.getElementById("status").textContent=`الشعبة ${section} — ${getClassStudentCount()} طالب — جاهز للمسح`;
+  attendanceStudents={};
+  participationStudents={};
+  individualReadings=[];
+  individualLocked=false;
+  currentHomeworkStudent=null;
+  homeworkReadings=[];
+
+  document.getElementById("individualResult").style.display="none";
+  document.getElementById("homeworkEvaluation").style.display="none";
+  document.getElementById("nextBtn").style.display="none";
+
+  const section=document.getElementById("classSelect").value;
+
+  if(!section){
+    updateSummary();
+    document.getElementById("status").textContent="اختر الشعبة ثم افتح الكاميرا";
+    return;
+  }
+
+  if(!(await loadStudents(section))) return;
+
+  if(currentMode==="attendance") await loadExistingAttendance();
+  if(currentMode==="participation") await loadNextParticipationNumber();
+
+  updateGuide();
+  updateSummary();
+
+  document.getElementById("status").textContent=
+    `الشعبة ${section} — ${getClassStudentCount()} طالب — جاهز للمسح`;
 }
 
 async function dateChanged(){
- if(currentMode==="attendance") await loadExistingAttendance();
- if(currentMode==="participation") await loadNextParticipationNumber();
+  if(currentMode==="attendance") await loadExistingAttendance();
+  if(currentMode==="participation") await loadNextParticipationNumber();
 }
 
 async function loadExistingAttendance(){
- const section=document.getElementById("classSelect").value;
- const date=document.getElementById("attendanceDate").value;
- if(!section||!date)return;
- try{
-   const data=await apiGet({action:"attendance",section,date});
-   attendanceStudents={};
-   (data.attendance||[]).forEach(r=>{
-     if(r.status==="حاضر"){
-       const s=getStudent(Number(r.id));
-       if(s) attendanceStudents[s.id]={...s,status:"حاضر"};
-     }
-   });
-   updateSummary();
- }catch(e){console.error(e)}
+  const section=document.getElementById("classSelect").value;
+  const date=document.getElementById("attendanceDate").value;
+
+  if(!section||!date) return;
+
+  try{
+    const data=await apiGet({action:"attendance",section,date});
+    attendanceStudents={};
+
+    (data.attendance||[]).forEach(r=>{
+      if(r.status==="حاضر"){
+        const s=getStudent(Number(r.id));
+        if(s){
+          attendanceStudents[s.id]={...s,status:"حاضر"};
+        }
+      }
+    });
+
+    updateSummary();
+  }catch(e){
+    console.error(e);
+  }
 }
 
 async function loadNextParticipationNumber(){
- const section=document.getElementById("classSelect").value;
- const date=document.getElementById("attendanceDate").value;
- if(!section||!date)return;
- try{
-   const d=await apiGet({action:"nextParticipation",section,date});
-   document.getElementById("participationNumber").value=d.number||1;
- }catch(e){console.error(e)}
+  const section=document.getElementById("classSelect").value;
+  const date=document.getElementById("attendanceDate").value;
+
+  if(!section||!date) return;
+
+  try{
+    const d=await apiGet({action:"nextParticipation",section,date});
+    document.getElementById("participationNumber").value=d.number||1;
+  }catch(e){
+    console.error(e);
+  }
 }
 
 function chooseCorrectAnswer(ans,btn){
- correctAnswer=ans;
- document.querySelectorAll(".answerBtn").forEach(b=>b.classList.remove("selected"));
- btn.classList.add("selected");
+  correctAnswer=ans;
+  document.querySelectorAll(".answerBtn").forEach(b=>b.classList.remove("selected"));
+  btn.classList.add("selected");
 }
 
 function selectMode(mode,button){
- currentMode=mode;
- document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));
- button.classList.add("active");
+  currentMode=mode;
 
- const dateArea=document.getElementById("dateArea");
- const numberArea=document.getElementById("numberArea");
- const pNum=document.getElementById("participationNumberArea");
- const correct=document.getElementById("correctAnswerArea");
- const summary=document.getElementById("summary");
- const reset=document.getElementById("resetAttendanceBtn");
- const save=document.getElementById("saveAttendanceBtn");
- const finish=document.getElementById("finishParticipationBtn");
+  document.querySelectorAll(".tab").forEach(b=>b.classList.remove("active"));
+  button.classList.add("active");
 
- dateArea.style.display=(mode==="attendance"||mode==="participation")?"block":"none";
- numberArea.style.display=(mode==="homework"||mode==="task")?"block":"none";
- pNum.style.display=mode==="participation"?"block":"none";
- correct.style.display=mode==="participation"?"block":"none";
- summary.style.display=(mode==="attendance"||mode==="participation")?"block":"none";
- reset.style.display=(mode==="attendance"&&stream)?"block":"none";
- save.style.display=(mode==="attendance"&&stream)?"block":"none";
- finish.style.display=(mode==="participation"&&stream)?"block":"none";
+  const dateArea=document.getElementById("dateArea");
+  const numberArea=document.getElementById("numberArea");
+  const pNum=document.getElementById("participationNumberArea");
+  const correct=document.getElementById("correctAnswerArea");
+  const summary=document.getElementById("summary");
+  const reset=document.getElementById("resetAttendanceBtn");
+  const save=document.getElementById("saveAttendanceBtn");
+  const finish=document.getElementById("finishParticipationBtn");
 
- if(mode==="homework") document.getElementById("numberLabel").textContent="رقم الواجب";
- if(mode==="task") document.getElementById("numberLabel").textContent="رقم المهمة الأدائية";
+  dateArea.style.display=(mode==="attendance"||mode==="participation")?"block":"none";
+  numberArea.style.display=(mode==="homework"||mode==="task")?"block":"none";
+  pNum.style.display=mode==="participation"?"block":"none";
+  correct.style.display=mode==="participation"?"block":"none";
+  summary.style.display=(mode==="attendance"||mode==="participation")?"block":"none";
 
- participationStudents={}; createParticipationHits(); nextStudent();
- if(mode==="attendance") loadExistingAttendance();
- if(mode==="participation") loadNextParticipationNumber();
- updateGuide(); updateSummary();
+  reset.style.display=(mode==="attendance"&&stream)?"block":"none";
+  save.style.display=(mode==="attendance"&&stream)?"block":"none";
+  finish.style.display=(mode==="participation"&&stream)?"block":"none";
+
+  if(mode==="homework"){
+    document.getElementById("numberLabel").textContent="رقم الواجب";
+  }
+
+  if(mode==="task"){
+    document.getElementById("numberLabel").textContent="رقم المهمة الأدائية";
+  }
+
+  participationStudents={};
+  createParticipationHits();
+
+  cancelHomeworkEvaluation();
+  nextStudent();
+
+  if(mode==="attendance") loadExistingAttendance();
+  if(mode==="participation") loadNextParticipationNumber();
+
+  updateGuide();
+  updateSummary();
 }
 
 function updateGuide(){
- const g=document.getElementById("guide"), last=getLastCardCode();
- if(currentMode==="attendance") g.textContent=last?`الحضور: بطاقات S01 إلى ${last}`:"الحضور: وجّه الكاميرا إلى البطاقات";
- else if(currentMode==="homework") g.textContent="الواجب: امسح بطاقة طالب واحد";
- else if(currentMode==="task") g.textContent="المهمة: امسح بطاقة طالب واحد";
- else g.textContent="المشاركة: اختر الإجابة الصحيحة ثم وجّه الكاميرا إلى بطاقات الطلاب";
+  const g=document.getElementById("guide");
+  const last=getLastCardCode();
+
+  if(currentMode==="attendance"){
+    g.textContent=last
+      ? `الحضور: بطاقات S01 إلى ${last}`
+      : "الحضور: وجّه الكاميرا إلى البطاقات";
+  }else if(currentMode==="homework"){
+    g.textContent="الواجب: امسح بطاقة الطالب ثم أدخل الجزء من الكل لكل بند";
+  }else if(currentMode==="task"){
+    g.textContent="المهمة: امسح بطاقة طالب واحد";
+  }else{
+    g.textContent="المشاركة: اختر الإجابة الصحيحة ثم وجّه الكاميرا إلى بطاقات الطلاب";
+  }
 }
 
 function validateSetup(){
- const section=document.getElementById("classSelect").value;
- if(!section){alert("اختر الشعبة أولاً");return false;}
- if(!getStudents().length){alert("لم يتم تحميل طلاب الشعبة");return false;}
- if(currentMode==="homework"||currentMode==="task"){
-   if(!document.getElementById("activityNumber").value){
-     alert(currentMode==="homework"?"أدخل رقم الواجب":"أدخل رقم المهمة الأدائية");return false;
-   }
- }
- if(currentMode==="participation"){
-   if(!document.getElementById("participationNumber").value){alert("أدخل رقم المشاركة");return false;}
-   if(!correctAnswer){alert("اختر الإجابة الصحيحة A أو B أو C أو D");return false;}
- }
- return true;
+  const section=document.getElementById("classSelect").value;
+
+  if(!section){
+    alert("اختر الشعبة أولاً");
+    return false;
+  }
+
+  if(!getStudents().length){
+    alert("لم يتم تحميل طلاب الشعبة");
+    return false;
+  }
+
+  if(currentMode==="homework"||currentMode==="task"){
+    if(!document.getElementById("activityNumber").value){
+      alert(currentMode==="homework"?"أدخل رقم الواجب":"أدخل رقم المهمة الأدائية");
+      return false;
+    }
+  }
+
+  if(currentMode==="participation"){
+    if(!document.getElementById("participationNumber").value){
+      alert("أدخل رقم المشاركة");
+      return false;
+    }
+
+    if(!correctAnswer){
+      alert("اختر الإجابة الصحيحة A أو B أو C أو D");
+      return false;
+    }
+  }
+
+  return true;
 }
 
 async function startCamera(){
- if(!validateSetup())return;
- const status=document.getElementById("status");
- try{
-   if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){status.textContent="❌ المتصفح لا يدعم الكاميرا";return;}
-   if(stream) stream.getTracks().forEach(t=>t.stop());
-   status.textContent="جاري تشغيل الكاميرا...";
-   stream=await navigator.mediaDevices.getUserMedia({
-     video:{facingMode:{ideal:facingMode},width:{ideal:1920},height:{ideal:1080}},audio:false
-   });
-   video.srcObject=stream; await video.play();
-   status.textContent="✅ الكاميرا تعمل — وجّهها إلى البطاقات";
-   document.getElementById("resetAttendanceBtn").style.display=currentMode==="attendance"?"block":"none";
-   document.getElementById("saveAttendanceBtn").style.display=currentMode==="attendance"?"block":"none";
-   document.getElementById("finishParticipationBtn").style.display=currentMode==="participation"?"block":"none";
-   if(!scanning){scanning=true;requestAnimationFrame(scanFrame);}
- }catch(e){console.error(e);status.textContent="❌ تعذر تشغيل الكاميرا: "+e.name}
-}
-async function switchCamera(){facingMode=facingMode==="environment"?"user":"environment";await startCamera()}
+  if(!validateSetup()) return;
 
-function distanceBetween(a,b){const dx=a.x-b.x,dy=a.y-b.y;return Math.sqrt(dx*dx+dy*dy)}
+  const status=document.getElementById("status");
+
+  try{
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+      status.textContent="❌ المتصفح لا يدعم الكاميرا";
+      return;
+    }
+
+    if(stream){
+      stream.getTracks().forEach(t=>t.stop());
+    }
+
+    status.textContent="جاري تشغيل الكاميرا...";
+
+    stream=await navigator.mediaDevices.getUserMedia({
+      video:{
+        facingMode:{ideal:facingMode},
+        width:{ideal:1920},
+        height:{ideal:1080}
+      },
+      audio:false
+    });
+
+    video.srcObject=stream;
+    await video.play();
+
+    status.textContent="✅ الكاميرا تعمل — وجّهها إلى البطاقات";
+
+    document.getElementById("resetAttendanceBtn").style.display=
+      currentMode==="attendance"?"block":"none";
+
+    document.getElementById("saveAttendanceBtn").style.display=
+      currentMode==="attendance"?"block":"none";
+
+    document.getElementById("finishParticipationBtn").style.display=
+      currentMode==="participation"?"block":"none";
+
+    if(!scanning){
+      scanning=true;
+      requestAnimationFrame(scanFrame);
+    }
+
+  }catch(e){
+    console.error(e);
+    status.textContent="❌ تعذر تشغيل الكاميرا: "+e.name;
+  }
+}
+
+async function switchCamera(){
+  facingMode=facingMode==="environment"?"user":"environment";
+  await startCamera();
+}
+
+function distanceBetween(a,b){
+  const dx=a.x-b.x;
+  const dy=a.y-b.y;
+  return Math.sqrt(dx*dx+dy*dy);
+}
+
 function markerIsGood(marker){
- if(!marker||!marker.corners||marker.corners.length!==4)return false;
- const c=marker.corners;
- const sides=[distanceBetween(c[0],c[1]),distanceBetween(c[1],c[2]),distanceBetween(c[2],c[3]),distanceBetween(c[3],c[0])];
- const min=Math.min(...sides),max=Math.max(...sides);
- if(!Number.isFinite(min)||!Number.isFinite(max)||min<=0||max/min>MAX_SIDE_RATIO)return false;
- let area=0;for(let i=0;i<4;i++){const j=(i+1)%4;area+=c[i].x*c[j].y-c[j].x*c[i].y}
- area=Math.abs(area)/2;
- return Number.isFinite(area)&&area>=MIN_MARKER_AREA;
+  if(!marker||!marker.corners||marker.corners.length!==4){
+    return false;
+  }
+
+  const c=marker.corners;
+
+  const sides=[
+    distanceBetween(c[0],c[1]),
+    distanceBetween(c[1],c[2]),
+    distanceBetween(c[2],c[3]),
+    distanceBetween(c[3],c[0])
+  ];
+
+  const min=Math.min(...sides);
+  const max=Math.max(...sides);
+
+  if(!Number.isFinite(min)||!Number.isFinite(max)||min<=0||max/min>MAX_SIDE_RATIO){
+    return false;
+  }
+
+  let area=0;
+
+  for(let i=0;i<4;i++){
+    const j=(i+1)%4;
+    area+=c[i].x*c[j].y-c[j].x*c[i].y;
+  }
+
+  area=Math.abs(area)/2;
+
+  return Number.isFinite(area)&&area>=MIN_MARKER_AREA;
 }
 
 function scanFrame(){
- if(video.readyState>=2&&detector&&video.videoWidth>0&&video.videoHeight>0){
-   const w=SCAN_WIDTH, h=Math.max(1,Math.round(w*video.videoHeight/video.videoWidth));
-   canvas.width=w;canvas.height=h;ctx.drawImage(video,0,0,w,h);
-   try{
-     const markers=detector.detect(ctx.getImageData(0,0,w,h))
-       .filter(m=>Number.isInteger(Number(m.id))&&allowedMarkerIds.has(Number(m.id))&&getStudent(Number(m.id))&&markerIsGood(m));
+  if(
+    video.readyState>=2&&
+    detector&&
+    video.videoWidth>0&&
+    video.videoHeight>0
+  ){
+    const w=SCAN_WIDTH;
+    const h=Math.max(1,Math.round(w*video.videoHeight/video.videoWidth));
 
-     if(currentMode==="attendance"){
-       markers.forEach(collectAttendanceHit); cleanupHits(attendanceHits,ATTENDANCE_HIT_WINDOW,attendanceStudents);
-     }else if(currentMode==="participation"){
-       markers.forEach(collectParticipationHit); cleanupHits(participationHits,PARTICIPATION_HIT_WINDOW,participationStudents);
-     }else if(markers.length&&!individualLocked){
-       collectIndividual(markers[0]);
-     }
-   }catch(e){console.error("Detection error:",e)}
- }
- requestAnimationFrame(scanFrame);
+    canvas.width=w;
+    canvas.height=h;
+
+    ctx.drawImage(video,0,0,w,h);
+
+    try{
+      const markers=
+        detector.detect(
+          ctx.getImageData(0,0,w,h)
+        )
+        .filter(m=>
+          Number.isInteger(Number(m.id)) &&
+          allowedMarkerIds.has(Number(m.id)) &&
+          getStudent(Number(m.id)) &&
+          markerIsGood(m)
+        );
+
+      if(currentMode==="attendance"){
+        markers.forEach(collectAttendanceHit);
+        cleanupHits(attendanceHits,ATTENDANCE_HIT_WINDOW,attendanceStudents);
+
+      }else if(currentMode==="participation"){
+        markers.forEach(collectParticipationHit);
+        cleanupHits(participationHits,PARTICIPATION_HIT_WINDOW,participationStudents);
+
+      }else if(currentMode==="homework"){
+        if(markers.length&&!currentHomeworkStudent){
+          collectHomeworkStudent(markers[0]);
+        }
+
+      }else if(markers.length&&!individualLocked){
+        collectIndividual(markers[0]);
+      }
+
+    }catch(e){
+      console.error("Detection error:",e);
+    }
+  }
+
+  requestAnimationFrame(scanFrame);
 }
 
 function collectAttendanceHit(marker){
- const id=Number(marker.id),s=getStudent(id); if(!s||attendanceStudents[id])return;
- const now=Date.now(); if(!attendanceHits[id])attendanceHits[id]=[];
- attendanceHits[id].push(now); attendanceHits[id]=attendanceHits[id].filter(t=>now-t<=ATTENDANCE_HIT_WINDOW);
- document.getElementById("status").textContent=`🔍 ${s.code} ${s.name} — ${Math.min(attendanceHits[id].length,ATTENDANCE_REQUIRED_HITS)}/${ATTENDANCE_REQUIRED_HITS}`;
- if(attendanceHits[id].length>=ATTENDANCE_REQUIRED_HITS) confirmAttendance(id);
+  const id=Number(marker.id);
+  const s=getStudent(id);
+
+  if(!s||attendanceStudents[id]) return;
+
+  const now=Date.now();
+
+  if(!attendanceHits[id]){
+    attendanceHits[id]=[];
+  }
+
+  attendanceHits[id].push(now);
+
+  attendanceHits[id]=attendanceHits[id]
+    .filter(t=>now-t<=ATTENDANCE_HIT_WINDOW);
+
+  document.getElementById("status").textContent=
+    `🔍 ${s.code} ${s.name} — ${Math.min(attendanceHits[id].length,ATTENDANCE_REQUIRED_HITS)}/${ATTENDANCE_REQUIRED_HITS}`;
+
+  if(attendanceHits[id].length>=ATTENDANCE_REQUIRED_HITS){
+    confirmAttendance(id);
+  }
 }
 
 function confirmAttendance(id){
- if(attendanceStudents[id])return;
- const s=getStudent(id),section=document.getElementById("classSelect").value,date=document.getElementById("attendanceDate").value;
- if(!s||!section||!date)return;
- attendanceStudents[id]={...s,status:"حاضر"}; attendanceHits[id]=[]; updateSummary();
- document.getElementById("status").textContent=`✅ ${s.name} — حاضر — جاري التسجيل...`;
- sendToServer({type:"attendanceLive",section,date,student:{id:s.id,code:s.code,name:s.name}})
-  .then(()=>document.getElementById("status").textContent=`🟢 ${s.name} — حاضر`)
-  .catch(()=>document.getElementById("status").textContent=`⚠️ ${s.name} ظهر حاضر — تحقق من سجل الحضور`);
+  if(attendanceStudents[id]) return;
+
+  const s=getStudent(id);
+  const section=document.getElementById("classSelect").value;
+  const date=document.getElementById("attendanceDate").value;
+
+  if(!s||!section||!date) return;
+
+  attendanceStudents[id]={...s,status:"حاضر"};
+  attendanceHits[id]=[];
+
+  updateSummary();
+
+  document.getElementById("status").textContent=
+    `✅ ${s.name} — حاضر — جاري التسجيل...`;
+
+  sendToServer({
+    type:"attendanceLive",
+    section,
+    date,
+    student:{
+      id:s.id,
+      code:s.code,
+      name:s.name
+    }
+  })
+  .then(()=>{
+    document.getElementById("status").textContent=`🟢 ${s.name} — حاضر`;
+  })
+  .catch(()=>{
+    document.getElementById("status").textContent=`⚠️ ${s.name} ظهر حاضر — تحقق من سجل الحضور`;
+  });
+}
+
+function collectHomeworkStudent(marker){
+  const id=Number(marker.id);
+  const student=getStudent(id);
+
+  if(!student) return;
+
+  const now=Date.now();
+
+  homeworkReadings.push({
+    id,
+    time:now
+  });
+
+  homeworkReadings=homeworkReadings
+    .filter(r=>now-r.time<=HOMEWORK_HIT_WINDOW);
+
+  const same=homeworkReadings.filter(r=>r.id===id);
+
+  document.getElementById("status").textContent=
+    `🔍 جاري تثبيت ${student.name} — ${Math.min(same.length,HOMEWORK_REQUIRED_HITS)}/${HOMEWORK_REQUIRED_HITS}`;
+
+  if(same.length>=HOMEWORK_REQUIRED_HITS){
+    openHomeworkEvaluation(student);
+  }
+}
+
+function openHomeworkEvaluation(student){
+  currentHomeworkStudent=student;
+  homeworkReadings=[];
+
+  document.getElementById("hwStudentName").textContent=
+    `${student.name} — ${student.code}`;
+
+  [
+    "bookPart","bookTotal",
+    "classPart","classTotal",
+    "homePart","homeTotal"
+  ].forEach(id=>{
+    document.getElementById(id).value="";
+  });
+
+  calculateHomework();
+
+  document.getElementById("homeworkEvaluation").style.display="block";
+
+  document.getElementById("status").textContent=
+    "✅ تم التعرف على الطالب — أدخل الجزء من الكل لكل بند";
+
+  document.getElementById("bookPart").focus();
+}
+
+function safeHomeworkScore(partId,totalId){
+  const part=Number(document.getElementById(partId).value);
+  const total=Number(document.getElementById(totalId).value);
+
+  if(
+    !Number.isFinite(part)||
+    !Number.isFinite(total)||
+    total<=0||
+    part<0
+  ){
+    return 0;
+  }
+
+  return Math.min(10,(part/total)*10);
+}
+
+function calculateHomework(){
+  const book=safeHomeworkScore("bookPart","bookTotal");
+  const cls=safeHomeworkScore("classPart","classTotal");
+  const home=safeHomeworkScore("homePart","homeTotal");
+
+  const total=book+cls+home;
+  const percent=total/30*100;
+
+  document.getElementById("bookScore").textContent=
+    book.toFixed(2)+" / 10";
+
+  document.getElementById("classScore").textContent=
+    cls.toFixed(2)+" / 10";
+
+  document.getElementById("homeScore").textContent=
+    home.toFixed(2)+" / 10";
+
+  document.getElementById("hwTotal30").textContent=
+    total.toFixed(2);
+
+  document.getElementById("hwPercent").textContent=
+    percent.toFixed(1)+"%";
+}
+
+function getHomeworkValues(){
+  const values={
+    bookPart:Number(document.getElementById("bookPart").value),
+    bookTotal:Number(document.getElementById("bookTotal").value),
+
+    classPart:Number(document.getElementById("classPart").value),
+    classTotal:Number(document.getElementById("classTotal").value),
+
+    homePart:Number(document.getElementById("homePart").value),
+    homeTotal:Number(document.getElementById("homeTotal").value)
+  };
+
+  const items=[
+    [values.bookPart,values.bookTotal,"عدد أسئلة الكتاب"],
+    [values.classPart,values.classTotal,"أداء المهام داخل الصف"],
+    [values.homePart,values.homeTotal,"أداء المهام في المنزل"]
+  ];
+
+  for(const [part,total,label] of items){
+    if(!Number.isFinite(part)||!Number.isFinite(total)){
+      alert("أدخل الجزء والكل في "+label);
+      return null;
+    }
+
+    if(total<=0){
+      alert("الكل يجب أن يكون أكبر من صفر في "+label);
+      return null;
+    }
+
+    if(part<0||part>total){
+      alert("الجزء يجب أن يكون من 0 إلى "+total+" في "+label);
+      return null;
+    }
+  }
+
+  return values;
+}
+
+async function saveHomeworkEvaluation(){
+  if(!currentHomeworkStudent) return;
+
+  const values=getHomeworkValues();
+  if(!values) return;
+
+  const section=document.getElementById("classSelect").value;
+  const number=document.getElementById("activityNumber").value;
+
+  if(!number){
+    alert("أدخل رقم الواجب");
+    return;
+  }
+
+  const button=document.getElementById("saveHomeworkBtn");
+
+  button.disabled=true;
+  button.textContent="⏳ جاري الحفظ...";
+
+  document.getElementById("status").textContent=
+    "⏳ جاري حفظ تقييم "+currentHomeworkStudent.name;
+
+  const payload={
+    type:"homework",
+    section,
+    number,
+    student:{
+      id:currentHomeworkStudent.id,
+      code:currentHomeworkStudent.code,
+      name:currentHomeworkStudent.name
+    },
+    ...values
+  };
+
+  try{
+    await sendToServer(payload);
+
+    document.getElementById("status").textContent=
+      "✅ تم إرسال تقييم "+currentHomeworkStudent.name;
+
+    document.getElementById("homeworkEvaluation").style.display="none";
+
+    currentHomeworkStudent=null;
+    homeworkReadings=[];
+
+    document.getElementById("nextBtn").style.display="block";
+
+  }catch(e){
+    console.error(e);
+    document.getElementById("status").textContent=
+      "❌ تعذر إرسال تقييم الطالب";
+
+  }finally{
+    button.disabled=false;
+    button.textContent="💾 حفظ تقييم الطالب";
+  }
+}
+
+function cancelHomeworkEvaluation(){
+  currentHomeworkStudent=null;
+  homeworkReadings=[];
+
+  const box=document.getElementById("homeworkEvaluation");
+
+  if(box){
+    box.style.display="none";
+  }
 }
 
 function collectParticipationHit(marker){
- const id=Number(marker.id),s=getStudent(id); if(!s||participationStudents[id])return;
- const ans=getAnswer(marker.corners); if(!["A","B","C","D"].includes(ans))return;
- const now=Date.now(); if(!participationHits[id])participationHits[id]=[];
- participationHits[id].push({time:now,answer:ans});
- participationHits[id]=participationHits[id].filter(x=>now-x.time<=PARTICIPATION_HIT_WINDOW);
+  const id=Number(marker.id);
+  const s=getStudent(id);
 
- const counts={A:0,B:0,C:0,D:0};
- participationHits[id].forEach(x=>counts[x.answer]++);
- const best=Object.keys(counts).sort((a,b)=>counts[b]-counts[a])[0];
- const hits=counts[best];
+  if(!s||participationStudents[id]) return;
 
- document.getElementById("status").textContent=`🔍 ${s.code} ${s.name} — ${best} — ${Math.min(hits,PARTICIPATION_REQUIRED_HITS)}/${PARTICIPATION_REQUIRED_HITS}`;
- if(hits>=PARTICIPATION_REQUIRED_HITS) confirmParticipation(id,best);
+  const ans=getAnswer(marker.corners);
+
+  if(!["A","B","C","D"].includes(ans)) return;
+
+  const now=Date.now();
+
+  if(!participationHits[id]){
+    participationHits[id]=[];
+  }
+
+  participationHits[id].push({
+    time:now,
+    answer:ans
+  });
+
+  participationHits[id]=participationHits[id]
+    .filter(x=>now-x.time<=PARTICIPATION_HIT_WINDOW);
+
+  const counts={A:0,B:0,C:0,D:0};
+
+  participationHits[id].forEach(x=>{
+    counts[x.answer]++;
+  });
+
+  const best=Object.keys(counts)
+    .sort((a,b)=>counts[b]-counts[a])[0];
+
+  const hits=counts[best];
+
+  document.getElementById("status").textContent=
+    `🔍 ${s.code} ${s.name} — ${best} — ${Math.min(hits,PARTICIPATION_REQUIRED_HITS)}/${PARTICIPATION_REQUIRED_HITS}`;
+
+  if(hits>=PARTICIPATION_REQUIRED_HITS){
+    confirmParticipation(id,best);
+  }
 }
 
 function confirmParticipation(id,answer){
- if(participationStudents[id])return;
- const s=getStudent(id),section=document.getElementById("classSelect").value,date=document.getElementById("attendanceDate").value;
- const number=Number(document.getElementById("participationNumber").value);
- if(!s||!correctAnswer||!number)return;
- const result=answer===correctAnswer?"صحيح":"خطأ";
- participationStudents[id]={...s,answer,result}; participationHits[id]=[]; updateSummary();
+  if(participationStudents[id]) return;
 
- sendToServer({
-   type:"participation",section,date,number,correctAnswer,answer,
-   student:{id:s.id,code:s.code,name:s.name}
- }).catch(console.error);
- document.getElementById("status").textContent=`${result==="صحيح"?"✅":"❌"} ${s.name} — ${answer} — ${result}`;
+  const s=getStudent(id);
+  const section=document.getElementById("classSelect").value;
+  const date=document.getElementById("attendanceDate").value;
+  const number=Number(document.getElementById("participationNumber").value);
+
+  if(!s||!correctAnswer||!number) return;
+
+  const result=answer===correctAnswer?"صحيح":"خطأ";
+
+  participationStudents[id]={
+    ...s,
+    answer,
+    result
+  };
+
+  participationHits[id]=[];
+
+  updateSummary();
+
+  sendToServer({
+    type:"participation",
+    section,
+    date,
+    number,
+    correctAnswer,
+    answer,
+    student:{
+      id:s.id,
+      code:s.code,
+      name:s.name
+    }
+  }).catch(console.error);
+
+  document.getElementById("status").textContent=
+    `${result==="صحيح"?"✅":"❌"} ${s.name} — ${answer} — ${result}`;
 }
 
 function cleanupHits(store,windowMs,locked){
- const now=Date.now();
- allowedMarkerIds.forEach(id=>{
-   if(locked[id])return;
-   if(!store[id])store[id]=[];
-   store[id]=store[id].filter(x=>now-(typeof x==="number"?x:x.time)<=windowMs);
- });
+  const now=Date.now();
+
+  allowedMarkerIds.forEach(id=>{
+    if(locked[id]) return;
+
+    if(!store[id]){
+      store[id]=[];
+    }
+
+    store[id]=store[id]
+      .filter(x=>
+        now-(typeof x==="number"?x:x.time)<=windowMs
+      );
+  });
 }
 
 function updateSummary(){
- const section=document.getElementById("classSelect").value,total=getClassStudentCount();
- const list=document.getElementById("attendanceList"); list.innerHTML="";
+  const section=document.getElementById("classSelect").value;
+  const total=getClassStudentCount();
+  const list=document.getElementById("attendanceList");
 
- if(currentMode==="participation"){
-   const vals=Object.values(participationStudents);
-   const correct=vals.filter(x=>x.result==="صحيح").length, wrong=vals.filter(x=>x.result==="خطأ").length;
-   document.getElementById("attendanceCount").textContent=correct;
-   document.getElementById("absentCount").textContent=wrong;
-   document.getElementById("totalCount").textContent=vals.length;
-   document.getElementById("stat1Label").textContent="صحيح";
-   document.getElementById("stat2Label").textContent="خطأ";
-   document.getElementById("stat3Label").textContent="تمت القراءة";
-   document.getElementById("summaryTitle").innerHTML=section?`<b>الشعبة ${section} — المشاركة ${document.getElementById("participationNumber").value}</b>`:"اختر الشعبة";
-   vals.sort((a,b)=>a.id-b.id).forEach(s=>{
-     const d=document.createElement("div");d.className="resultCard "+(s.result==="خطأ"?"wrongCard":"");
-     d.innerHTML=`<div class="studentName">${s.name}</div><div class="studentCode">${s.code} — ${s.answer} — ${s.result}</div>`;
-     list.appendChild(d);
-   });
-   return;
- }
+  list.innerHTML="";
 
- const vals=Object.values(attendanceStudents);
- document.getElementById("attendanceCount").textContent=vals.length;
- document.getElementById("absentCount").textContent=Math.max(0,total-vals.length);
- document.getElementById("totalCount").textContent=total;
- document.getElementById("stat1Label").textContent="حاضر";
- document.getElementById("stat2Label").textContent="غائب";
- document.getElementById("stat3Label").textContent="الإجمالي";
- document.getElementById("summaryTitle").innerHTML=section?`<b>الشعبة ${section} — ${total} طالب</b><br>${document.getElementById("attendanceDate").value}`:"اختر الشعبة";
- vals.sort((a,b)=>a.id-b.id).forEach(s=>{
-   const d=document.createElement("div");d.className="resultCard";
-   d.innerHTML=`<div class="studentName">${s.name}</div><div class="studentCode">${s.code} — حاضر ✅</div>`;
-   list.appendChild(d);
- });
+  if(currentMode==="participation"){
+    const vals=Object.values(participationStudents);
+
+    const correct=vals.filter(x=>x.result==="صحيح").length;
+    const wrong=vals.filter(x=>x.result==="خطأ").length;
+
+    document.getElementById("attendanceCount").textContent=correct;
+    document.getElementById("absentCount").textContent=wrong;
+    document.getElementById("totalCount").textContent=vals.length;
+
+    document.getElementById("stat1Label").textContent="صحيح";
+    document.getElementById("stat2Label").textContent="خطأ";
+    document.getElementById("stat3Label").textContent="تمت القراءة";
+
+    document.getElementById("summaryTitle").innerHTML=
+      section
+      ? `<b>الشعبة ${section} — المشاركة ${document.getElementById("participationNumber").value}</b>`
+      : "اختر الشعبة";
+
+    vals.sort((a,b)=>a.id-b.id).forEach(s=>{
+      const d=document.createElement("div");
+
+      d.className=
+        "resultCard "+
+        (s.result==="خطأ"?"wrongCard":"");
+
+      d.innerHTML=
+        `<div class="studentName">${s.name}</div><div class="studentCode">${s.code} — ${s.answer} — ${s.result}</div>`;
+
+      list.appendChild(d);
+    });
+
+    return;
+  }
+
+  const vals=Object.values(attendanceStudents);
+
+  document.getElementById("attendanceCount").textContent=vals.length;
+  document.getElementById("absentCount").textContent=Math.max(0,total-vals.length);
+  document.getElementById("totalCount").textContent=total;
+
+  document.getElementById("stat1Label").textContent="حاضر";
+  document.getElementById("stat2Label").textContent="غائب";
+  document.getElementById("stat3Label").textContent="الإجمالي";
+
+  document.getElementById("summaryTitle").innerHTML=
+    section
+    ? `<b>الشعبة ${section} — ${total} طالب</b><br>${document.getElementById("attendanceDate").value}`
+    : "اختر الشعبة";
+
+  vals.sort((a,b)=>a.id-b.id).forEach(s=>{
+    const d=document.createElement("div");
+
+    d.className="resultCard";
+
+    d.innerHTML=
+      `<div class="studentName">${s.name}</div><div class="studentCode">${s.code} — حاضر ✅</div>`;
+
+    list.appendChild(d);
+  });
 }
 
 async function saveAttendanceToSheets(){
- if(saving)return;
- const section=document.getElementById("classSelect").value,date=document.getElementById("attendanceDate").value;
- if(!section||!date){alert("اختر الشعبة والتاريخ");return;}
- const students=Object.values(attendanceStudents).map(s=>({id:s.id,code:s.code,name:s.name,status:"حاضر"}));
- if(!students.length){alert("لم يتم تسجيل أي طالب حاضر حتى الآن");return;}
+  if(saving) return;
 
- const total=getClassStudentCount();
- if(!confirm(`اعتماد حضور الشعبة ${section}؟\n\nالموجود في الشاشة: ${students.length}\nإجمالي الشعبة: ${total}\n\nالحضور المسجل سابقاً لن يُمسح.`))return;
+  const section=document.getElementById("classSelect").value;
+  const date=document.getElementById("attendanceDate").value;
 
- saving=true; const btn=document.getElementById("saveAttendanceBtn");btn.disabled=true;btn.textContent="⏳ جاري الحفظ...";
- try{
-   await sendToServer({type:"attendance",section,date,students});
-   document.getElementById("status").textContent="✅ تم إرسال اعتماد الحضور";
-   alert("تم إرسال الاعتماد إلى Google Sheets.\nيمكنك فتح الكاميرا لاحقاً لاستكمال الطلاب الذين لم تُقرأ بطاقاتهم.");
- }catch(e){console.error(e);alert("تعذر إرسال الحضور");}
- finally{saving=false;btn.disabled=false;btn.textContent="💾 اعتماد وحفظ الحضور";}
+  if(!section||!date){
+    alert("اختر الشعبة والتاريخ");
+    return;
+  }
+
+  const students=Object.values(attendanceStudents).map(s=>({
+    id:s.id,
+    code:s.code,
+    name:s.name,
+    status:"حاضر"
+  }));
+
+  if(!students.length){
+    alert("لم يتم تسجيل أي طالب حاضر حتى الآن");
+    return;
+  }
+
+  const total=getClassStudentCount();
+
+  if(!confirm(
+    `اعتماد حضور الشعبة ${section}؟\n\nالموجود في الشاشة: ${students.length}\nإجمالي الشعبة: ${total}\n\nالحضور المسجل سابقاً لن يُمسح.`
+  )){
+    return;
+  }
+
+  saving=true;
+
+  const btn=document.getElementById("saveAttendanceBtn");
+
+  btn.disabled=true;
+  btn.textContent="⏳ جاري الحفظ...";
+
+  try{
+    await sendToServer({
+      type:"attendance",
+      section,
+      date,
+      students
+    });
+
+    document.getElementById("status").textContent=
+      "✅ تم إرسال اعتماد الحضور";
+
+    alert(
+      "تم إرسال الاعتماد إلى Google Sheets.\nيمكنك فتح الكاميرا لاحقاً لاستكمال الطلاب الذين لم تُقرأ بطاقاتهم."
+    );
+
+  }catch(e){
+    console.error(e);
+    alert("تعذر إرسال الحضور");
+
+  }finally{
+    saving=false;
+    btn.disabled=false;
+    btn.textContent="💾 اعتماد وحفظ الحضور";
+  }
 }
 
 function resetAttendance(){
- if(confirm("هذا يمسح قائمة الشاشة فقط، ولا يحذف الحضور المحفوظ في Google Sheets.\n\nمتابعة؟")){
-   attendanceStudents={};createAttendanceHits();updateSummary();
-   document.getElementById("status").textContent="تم مسح الشاشة فقط. الحضور المحفوظ لم يُحذف.";
- }
+  if(confirm(
+    "هذا يمسح قائمة الشاشة فقط، ولا يحذف الحضور المحفوظ في Google Sheets.\n\nمتابعة؟"
+  )){
+    attendanceStudents={};
+    createAttendanceHits();
+    updateSummary();
+
+    document.getElementById("status").textContent=
+      "تم مسح الشاشة فقط. الحضور المحفوظ لم يُحذف.";
+  }
 }
 
 function finishParticipationQuestion(){
- if(!Object.keys(participationStudents).length){alert("لم تتم قراءة أي طالب في هذا السؤال");return;}
- const n=Number(document.getElementById("participationNumber").value);
- if(!confirm(`إنهاء المشاركة رقم ${n} والانتقال للسؤال التالي؟`))return;
- participationStudents={};createParticipationHits();correctAnswer="";
- document.querySelectorAll(".answerBtn").forEach(b=>b.classList.remove("selected"));
- document.getElementById("participationNumber").value=n+1;
- updateSummary();
- document.getElementById("status").textContent=`جاهز للمشاركة رقم ${n+1} — اختر الإجابة الصحيحة`;
+  if(!Object.keys(participationStudents).length){
+    alert("لم تتم قراءة أي طالب في هذا السؤال");
+    return;
+  }
+
+  const n=Number(document.getElementById("participationNumber").value);
+
+  if(!confirm(
+    `إنهاء المشاركة رقم ${n} والانتقال للسؤال التالي؟`
+  )){
+    return;
+  }
+
+  participationStudents={};
+  createParticipationHits();
+
+  correctAnswer="";
+
+  document.querySelectorAll(".answerBtn").forEach(
+    b=>b.classList.remove("selected")
+  );
+
+  document.getElementById("participationNumber").value=n+1;
+
+  updateSummary();
+
+  document.getElementById("status").textContent=
+    `جاهز للمشاركة رقم ${n+1} — اختر الإجابة الصحيحة`;
 }
 
 function collectIndividual(marker){
- const id=Number(marker.id),s=getStudent(id);if(!s)return;
- const now=Date.now(),answer=getAnswer(marker.corners);
- individualReadings.push({id,answer,time:now});
- individualReadings=individualReadings.filter(r=>now-r.time<=READING_WINDOW);
- const same=individualReadings.filter(r=>r.id===id);
- if(same.length<REQUIRED_READINGS){document.getElementById("status").textContent=`🔍 جاري تثبيت ${s.name}...`;return;}
- const counts={A:0,B:0,C:0,D:0};same.forEach(r=>{if(counts[r.answer]!==undefined)counts[r.answer]++});
- let best="A",max=-1;Object.keys(counts).forEach(a=>{if(counts[a]>max){max=counts[a];best=a}});
- showIndividualResult(id,best);
+  const id=Number(marker.id);
+  const s=getStudent(id);
+
+  if(!s) return;
+
+  const now=Date.now();
+  const answer=getAnswer(marker.corners);
+
+  individualReadings.push({
+    id,
+    answer,
+    time:now
+  });
+
+  individualReadings=individualReadings
+    .filter(r=>now-r.time<=READING_WINDOW);
+
+  const same=individualReadings.filter(r=>r.id===id);
+
+  if(same.length<REQUIRED_READINGS){
+    document.getElementById("status").textContent=
+      `🔍 جاري تثبيت ${s.name}...`;
+    return;
+  }
+
+  const counts={A:0,B:0,C:0,D:0};
+
+  same.forEach(r=>{
+    if(counts[r.answer]!==undefined){
+      counts[r.answer]++;
+    }
+  });
+
+  let best="A";
+  let max=-1;
+
+  Object.keys(counts).forEach(a=>{
+    if(counts[a]>max){
+      max=counts[a];
+      best=a;
+    }
+  });
+
+  showIndividualResult(id,best);
 }
 
 async function showIndividualResult(id,answer){
- individualLocked=true;
- const s=getStudent(id);if(!s){individualLocked=false;return;}
- const section=document.getElementById("classSelect").value;
- const number=document.getElementById("activityNumber").value;
- const box=document.getElementById("individualResult");box.style.display="block";
- const title=currentMode==="homework"?`📝 الواجب رقم ${number}`:`📋 المهمة الأدائية رقم ${number}`;
- box.innerHTML=`<div class="studentName">${s.name}</div><div class="studentCode">${s.code}</div><div class="small">الشعبة: ${section}</div><div style="margin-top:6px;font-weight:bold">${title}</div><div class="answer">التقييم: ${answer}</div><div class="small" id="saveState">⏳ جاري الحفظ...</div>`;
- try{
-   await sendToServer({type:currentMode,section,number,answer,student:{id:s.id,code:s.code,name:s.name}});
-   document.getElementById("saveState").textContent="✅ تم إرسال التقييم للحفظ";
-   document.getElementById("status").textContent=`✅ ${s.name} — ${answer}`;
- }catch(e){document.getElementById("saveState").textContent="❌ تعذر الإرسال";}
- document.getElementById("nextBtn").style.display="block";
+  individualLocked=true;
+
+  const s=getStudent(id);
+
+  if(!s){
+    individualLocked=false;
+    return;
+  }
+
+  const section=document.getElementById("classSelect").value;
+  const number=document.getElementById("activityNumber").value;
+  const box=document.getElementById("individualResult");
+
+  box.style.display="block";
+
+  const title=`📋 المهمة الأدائية رقم ${number}`;
+
+  box.innerHTML=
+    `<div class="studentName">${s.name}</div>
+     <div class="studentCode">${s.code}</div>
+     <div class="small">الشعبة: ${section}</div>
+     <div style="margin-top:6px;font-weight:bold">${title}</div>
+     <div class="answer">التقييم: ${answer}</div>
+     <div class="small" id="saveState">⏳ جاري الحفظ...</div>`;
+
+  try{
+    await sendToServer({
+      type:"task",
+      section,
+      number,
+      answer,
+      student:{
+        id:s.id,
+        code:s.code,
+        name:s.name
+      }
+    });
+
+    document.getElementById("saveState").textContent=
+      "✅ تم إرسال التقييم للحفظ";
+
+    document.getElementById("status").textContent=
+      `✅ ${s.name} — ${answer}`;
+
+  }catch(e){
+    document.getElementById("saveState").textContent=
+      "❌ تعذر الإرسال";
+  }
+
+  document.getElementById("nextBtn").style.display="block";
 }
 
 function nextStudent(){
- individualLocked=false;individualReadings=[];
- const box=document.getElementById("individualResult");box.style.display="none";box.innerHTML="";
- document.getElementById("nextBtn").style.display="none";
- if(currentMode==="homework"||currentMode==="task")document.getElementById("status").textContent="جاهز لمسح طالب";
+  individualLocked=false;
+  individualReadings=[];
+  currentHomeworkStudent=null;
+  homeworkReadings=[];
+
+  document.getElementById("homeworkEvaluation").style.display="none";
+
+  const box=document.getElementById("individualResult");
+
+  box.style.display="none";
+  box.innerHTML="";
+
+  document.getElementById("nextBtn").style.display="none";
+
+  if(currentMode==="homework"){
+    document.getElementById("status").textContent=
+      "جاهز لمسح بطاقة طالب للواجب";
+
+  }else if(currentMode==="task"){
+    document.getElementById("status").textContent=
+      "جاهز لمسح طالب";
+  }
 }
 
 function getAnswer(corners){
- if(!corners||corners.length<2)return "?";
- const p0=corners[0],p1=corners[1],dx=p1.x-p0.x,dy=p1.y-p0.y;
- let angle=Math.atan2(dy,dx)*180/Math.PI;if(angle<0)angle+=360;
- if(angle>=315||angle<45)return "A";
- if(angle>=45&&angle<135)return "D";
- if(angle>=135&&angle<225)return "C";
- return "B";
+  if(!corners||corners.length<2){
+    return "?";
+  }
+
+  const p0=corners[0];
+  const p1=corners[1];
+
+  const dx=p1.x-p0.x;
+  const dy=p1.y-p0.y;
+
+  let angle=Math.atan2(dy,dx)*180/Math.PI;
+
+  if(angle<0){
+    angle+=360;
+  }
+
+  if(angle>=315||angle<45){
+    return "A";
+  }
+
+  if(angle>=45&&angle<135){
+    return "D";
+  }
+
+  if(angle>=135&&angle<225){
+    return "C";
+  }
+
+  return "B";
 }
 
 window.addEventListener("load",()=>{
- const status=document.getElementById("status");
- if(typeof AR==="undefined"){status.textContent="❌ لم يتم تحميل قارئ البطاقات";return;}
- if(!detector){status.textContent="❌ تعذر تشغيل قارئ البطاقات";return;}
- updateSummary();status.textContent="اختر الشعبة ثم افتح الكاميرا";
+  const status=document.getElementById("status");
+
+  if(typeof AR==="undefined"){
+    status.textContent="❌ لم يتم تحميل قارئ البطاقات";
+    return;
+  }
+
+  if(!detector){
+    status.textContent="❌ تعذر تشغيل قارئ البطاقات";
+    return;
+  }
+
+  updateSummary();
+
+  status.textContent=
+    "اختر الشعبة ثم افتح الكاميرا";
 });
 </script>
+
 </body>
 </html>
