@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<title>نظام الحضور والتقييم</title>
+<title>نظام الحضور والتقييم V5</title>
 
 <script src="https://cdn.jsdelivr.net/gh/damianofalcioni/js-aruco2@master/src/cv.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/damianofalcioni/js-aruco2@master/src/aruco.js"></script>
@@ -177,25 +177,25 @@ canvas{display:none}
 
 <div class="hwRow">
 <div class="name">عدد أسئلة الكتاب</div>
-<input id="bookPart" type="number" min="0" step="0.01" placeholder="الجزء" oninput="calculateHomework()">
+<input id="bookPart" type="number" min="0" step="0.01" placeholder="المنجز" oninput="calculateHomework()">
 <div class="hwSlash">من</div>
-<input id="bookTotal" type="number" min="0.01" step="0.01" placeholder="الكل" oninput="calculateHomework()">
+<input id="bookTotal" type="number" min="0.01" step="0.01" placeholder="العدد الكلي" oninput="calculateHomework()">
 <div class="hwScore" id="bookScore">0 / 10</div>
 </div>
 
 <div class="hwRow">
 <div class="name">أداء المهام داخل الصف</div>
-<input id="classPart" type="number" min="0" step="0.01" placeholder="الجزء" oninput="calculateHomework()">
+<input id="classPart" type="number" min="0" step="0.01" placeholder="المنجز" oninput="calculateHomework()">
 <div class="hwSlash">من</div>
-<input id="classTotal" type="number" min="0.01" step="0.01" placeholder="الكل" oninput="calculateHomework()">
+<input id="classTotal" type="number" min="0.01" step="0.01" placeholder="العدد الكلي" oninput="calculateHomework()">
 <div class="hwScore" id="classScore">0 / 10</div>
 </div>
 
 <div class="hwRow">
 <div class="name">أداء المهام في المنزل</div>
-<input id="homePart" type="number" min="0" step="0.01" placeholder="الجزء" oninput="calculateHomework()">
+<input id="homePart" type="number" min="0" step="0.01" placeholder="المنجز" oninput="calculateHomework()">
 <div class="hwSlash">من</div>
-<input id="homeTotal" type="number" min="0.01" step="0.01" placeholder="الكل" oninput="calculateHomework()">
+<input id="homeTotal" type="number" min="0.01" step="0.01" placeholder="العدد الكلي" oninput="calculateHomework()">
 <div class="hwScore" id="homeScore">0 / 10</div>
 </div>
 
@@ -498,7 +498,7 @@ function updateGuide(){
       ? `الحضور: بطاقات S01 إلى ${last}`
       : "الحضور: وجّه الكاميرا إلى البطاقات";
   }else if(currentMode==="homework"){
-    g.textContent="الواجب: امسح بطاقة الطالب ثم أدخل الجزء من الكل لكل بند";
+    g.textContent="الواجب: امسح بطاقة الطالب ثم أدخل المنجز من العدد الكلي لكل بند";
   }else if(currentMode==="task"){
     g.textContent="المهمة: امسح بطاقة طالب واحد";
   }else{
@@ -794,7 +794,7 @@ function openHomeworkEvaluation(student){
   document.getElementById("homeworkEvaluation").style.display="block";
 
   document.getElementById("status").textContent=
-    "✅ تم التعرف على الطالب — أدخل الجزء من الكل لكل بند";
+    "✅ تم التعرف على الطالب — أدخل المنجز من العدد الكلي لكل بند";
 
   document.getElementById("bookPart").focus();
 }
@@ -859,17 +859,17 @@ function getHomeworkValues(){
 
   for(const [part,total,label] of items){
     if(!Number.isFinite(part)||!Number.isFinite(total)){
-      alert("أدخل الجزء والكل في "+label);
+      alert("أدخل المنجز والعدد الكلي في "+label);
       return null;
     }
 
     if(total<=0){
-      alert("الكل يجب أن يكون أكبر من صفر في "+label);
+      alert("العدد الكلي يجب أن يكون أكبر من صفر في "+label);
       return null;
     }
 
     if(part<0||part>total){
-      alert("الجزء يجب أن يكون من 0 إلى "+total+" في "+label);
+      alert("المنجز يجب أن يكون من 0 إلى "+total+" في "+label);
       return null;
     }
   }
