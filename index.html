@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<title>نظام الحضور والتقييم V6</title>
+<title>نظام الحضور والتقييم V7</title>
 
 <script src="https://cdn.jsdelivr.net/gh/damianofalcioni/js-aruco2@master/src/cv.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/damianofalcioni/js-aruco2@master/src/aruco.js"></script>
@@ -238,6 +238,7 @@ canvas{display:none}
     <select id="yearWorkStudentSelect" onchange="manualYearWorkStudentChanged()">
       <option value="">اختر بطاقة الطالب / الاسم</option>
     </select>
+    <div class="small" style="text-align:center;margin-top:6px">بعد اختيار الطالب ستظهر خانات الدرجات مباشرة أسفل القائمة</div>
   </div>
 
   <div id="ywStudentInfo">
@@ -1075,16 +1076,42 @@ function setYearWorkInputMode(mode){
 }
 
 async function manualYearWorkStudentChanged(){
-  const id=Number(document.getElementById("yearWorkStudentSelect").value);
+  const raw=document.getElementById("yearWorkStudentSelect").value;
 
-  if(!Number.isInteger(id)){
+  if(raw===""){
     currentYearWorkStudent=null;
     document.getElementById("ywStudentInfo").style.display="none";
     return;
   }
 
+  const id=Number(raw);
   const student=getStudent(id);
-  if(student) await openYearWorkStudent(student);
+
+  if(!student){
+    currentYearWorkStudent=null;
+    document.getElementById("ywStudentInfo").style.display="none";
+    document.getElementById("status").textContent="❌ لم يتم العثور على الطالب";
+    return;
+  }
+
+  // إظهار اللوحة فوراً حتى لا تبدو القائمة وكأنها لم تستجب.
+  currentYearWorkStudent=student;
+  document.getElementById("ywStudentName").textContent=
+    `${student.code} — ${student.name}`;
+  document.getElementById("ywStudentInfo").style.display="block";
+  document.getElementById("ywPerformance30").value="";
+  document.getElementById("ywParticipation10").value="";
+  document.getElementById("ywProjects5").value="";
+  document.getElementById("ywQuizzes15").value="";
+  document.getElementById("ywTotal60").textContent="0.00";
+
+  await openYearWorkStudent(student);
+
+  // تمرير الصفحة تلقائياً إلى خانات الدرجات على الجوال.
+  document.getElementById("ywStudentInfo").scrollIntoView({
+    behavior:"smooth",
+    block:"start"
+  });
 }
 
 function collectYearWorkStudent(marker){
@@ -1109,6 +1136,10 @@ function collectYearWorkStudent(marker){
 async function openYearWorkStudent(student){
   currentYearWorkStudent=student;
   yearWorkReadings=[];
+
+  document.getElementById("ywStudentInfo").style.display="block";
+  document.getElementById("ywStudentName").textContent=
+    `${student.code} — ${student.name}`;
 
   document.getElementById("status").textContent=
     "⏳ جاري تحميل أعمال السنة...";
@@ -1150,10 +1181,9 @@ async function openYearWorkStudent(student){
 
   }catch(e){
     console.error(e);
-    currentYearWorkStudent=null;
-    document.getElementById("ywStudentInfo").style.display="none";
+    document.getElementById("ywStudentInfo").style.display="block";
     document.getElementById("status").textContent=
-      "❌ تعذر تحميل أعمال السنة للطالب";
+      "❌ تعذر تحميل الدرجة السابقة /30 — تحقق من نشر V7";
   }
 }
 
