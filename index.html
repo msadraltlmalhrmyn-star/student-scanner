@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<title>نظام الحضور والتقييم V5</title>
+<title>نظام الحضور والتقييم V6</title>
 
 <script src="https://cdn.jsdelivr.net/gh/damianofalcioni/js-aruco2@master/src/cv.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/damianofalcioni/js-aruco2@master/src/aruco.js"></script>
@@ -18,7 +18,7 @@ h1{color:#14558e;margin:6px 0 2px;font-size:24px}
 .full{grid-column:1/-1}
 label{display:block;text-align:right;font-weight:bold;margin:3px 2px;font-size:13px}
 select,input{width:100%;padding:9px;border:1px solid #d0d5dd;border-radius:9px;font-size:16px;background:#fff}
-.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;max-width:700px;margin:0 auto 7px}
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;max-width:700px;margin:0 auto 7px}
 .tab{border:0;padding:10px 2px;border-radius:11px;background:#fff;color:#1671d9;font-size:14px;font-weight:bold}
 .tab.active{background:#19558e;color:#fff}
 #status{max-width:700px;margin:0 auto 6px;background:#fff;border-radius:10px;padding:8px;font-size:15px;font-weight:bold}
@@ -51,7 +51,7 @@ canvas{display:none}
 .answer{font-size:24px;font-weight:bold;color:#159447;margin-top:7px}
 .small{color:#667085;font-size:14px;margin-top:4px}
 #individualResult{display:none;max-width:700px;margin:7px auto;background:#e4f7eb;border:2px solid #159447;border-radius:14px;padding:12px}
-.answerButtons{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.answerButtons{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
 .answerBtn{padding:10px;border:1px solid #d0d5dd;background:#fff;border-radius:9px;font-weight:bold;font-size:17px}
 .answerBtn.selected{background:#19558e;color:#fff;border-color:#19558e}
 
@@ -76,6 +76,22 @@ canvas{display:none}
 .hwTotalBox{background:#f4f6f9;border-radius:10px;padding:10px;text-align:center;font-weight:bold}
 #saveHomeworkBtn{margin-top:10px;background:#7C3AED}
 #cancelHomeworkBtn{margin-top:10px;background:#667085}
+
+
+#yearWorkPanel{display:none;max-width:700px;margin:7px auto;background:#fff;border:2px solid #0F766E;border-radius:14px;padding:12px;text-align:right}
+.ywTitle{text-align:center;font-size:20px;font-weight:bold;color:#0F766E;margin-bottom:8px}
+.ywMode{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+.ywMode button{padding:10px;border:0;border-radius:10px;font-weight:bold;font-size:14px}
+#ywScanModeBtn{background:#19558e;color:#fff}
+#ywManualModeBtn{background:#e5e7eb;color:#111827}
+#ywManualArea{display:none;margin-bottom:8px}
+#ywStudentInfo{display:none;background:#f0fdfa;border-radius:12px;padding:10px;margin-top:8px}
+.ywStudentName{text-align:center;font-size:18px;font-weight:bold;color:#174d82;margin-bottom:8px}
+.ywGrid{display:grid;grid-template-columns:1.5fr .8fr;gap:7px;align-items:center}
+.ywGrid .lbl{font-weight:bold}
+.ywReadOnly{background:#f3f4f6;font-weight:bold;text-align:center}
+.ywTotal{margin-top:10px;background:#dcfce7;border-radius:10px;padding:11px;text-align:center;font-size:18px;font-weight:bold}
+#saveYearWorkBtn{margin-top:10px;background:#0F766E}
 
 @media(max-width:700px){
  body{padding:5px}
@@ -148,6 +164,7 @@ canvas{display:none}
 <button class="tab" onclick="selectMode('homework',this)">📝 الواجب</button>
 <button class="tab" onclick="selectMode('task',this)">📋 مهمة</button>
 <button class="tab" onclick="selectMode('participation',this)">⭐ مشاركة</button>
+<button class="tab" onclick="selectMode('yearwork',this)">📊 أعمال السنة</button>
 </div>
 
 <div id="status">اختر الشعبة ثم افتح الكاميرا</div>
@@ -208,6 +225,47 @@ canvas{display:none}
 <button id="cancelHomeworkBtn" class="main" onclick="cancelHomeworkEvaluation()">إلغاء</button>
 </div>
 
+
+<div id="yearWorkPanel">
+  <div class="ywTitle">📊 أعمال السنة</div>
+
+  <div class="ywMode">
+    <button id="ywScanModeBtn" type="button" onclick="setYearWorkInputMode('scan')">📷 بالباركود</button>
+    <button id="ywManualModeBtn" type="button" onclick="setYearWorkInputMode('manual')">📋 اختيار يدوي</button>
+  </div>
+
+  <div id="ywManualArea">
+    <select id="yearWorkStudentSelect" onchange="manualYearWorkStudentChanged()">
+      <option value="">اختر بطاقة الطالب / الاسم</option>
+    </select>
+  </div>
+
+  <div id="ywStudentInfo">
+    <div class="ywStudentName" id="ywStudentName"></div>
+
+    <div class="ywGrid">
+      <div class="lbl">المهام الأدائية من 30</div>
+      <input id="ywPerformance30" class="ywReadOnly" type="number" readonly>
+
+      <div class="lbl">المشاركة من 10</div>
+      <input id="ywParticipation10" type="number" min="0" max="10" step="0.25" oninput="calculateYearWorkTotal()">
+
+      <div class="lbl">البحث والمشاريع والتجارب من 5</div>
+      <input id="ywProjects5" type="number" min="0" max="5" step="0.25" oninput="calculateYearWorkTotal()">
+
+      <div class="lbl">الاختبارات القصيرة من 15</div>
+      <input id="ywQuizzes15" type="number" min="0" max="15" step="0.25" oninput="calculateYearWorkTotal()">
+    </div>
+
+    <div class="ywTotal">
+      المجموع الكلي لأعمال السنة:
+      <span id="ywTotal60">0.00</span> / 60
+    </div>
+
+    <button id="saveYearWorkBtn" class="main" onclick="saveYearWorkEvaluation()">💾 حفظ أعمال السنة</button>
+  </div>
+</div>
+
 <div id="summary">
 <div id="summaryTitle">اختر الشعبة</div>
 
@@ -261,14 +319,19 @@ let individualLocked=false;
 
 let currentHomeworkStudent=null;
 let homeworkReadings=[];
+let yearWorkInputMode="scan";
+let currentYearWorkStudent=null;
+let yearWorkReadings=[];
 
 const ATTENDANCE_REQUIRED_HITS=5;
 const PARTICIPATION_REQUIRED_HITS=5;
 const HOMEWORK_REQUIRED_HITS=5;
+const YEARWORK_REQUIRED_HITS=5;
 
 const ATTENDANCE_HIT_WINDOW=2000;
 const PARTICIPATION_HIT_WINDOW=1800;
 const HOMEWORK_HIT_WINDOW=1500;
+const YEARWORK_HIT_WINDOW=1500;
 
 const REQUIRED_READINGS=5;
 const READING_WINDOW=1500;
@@ -368,9 +431,15 @@ async function classChanged(){
   individualLocked=false;
   currentHomeworkStudent=null;
   homeworkReadings=[];
+  currentYearWorkStudent=null;
+  yearWorkReadings=[];
+  currentYearWorkStudent=null;
+  yearWorkReadings=[];
 
   document.getElementById("individualResult").style.display="none";
   document.getElementById("homeworkEvaluation").style.display="none";
+  document.getElementById("yearWorkPanel").style.display=currentMode==="yearwork"?"block":"none";
+  document.getElementById("ywStudentInfo").style.display="none";
   document.getElementById("nextBtn").style.display="none";
 
   const section=document.getElementById("classSelect").value;
@@ -385,6 +454,7 @@ async function classChanged(){
 
   if(currentMode==="attendance") await loadExistingAttendance();
   if(currentMode==="participation") await loadNextParticipationNumber();
+  if(currentMode==="yearwork") populateYearWorkStudentSelect();
 
   updateGuide();
   updateSummary();
@@ -457,12 +527,14 @@ function selectMode(mode,button){
   const reset=document.getElementById("resetAttendanceBtn");
   const save=document.getElementById("saveAttendanceBtn");
   const finish=document.getElementById("finishParticipationBtn");
+  const yearPanel=document.getElementById("yearWorkPanel");
 
   dateArea.style.display=(mode==="attendance"||mode==="participation")?"block":"none";
   numberArea.style.display=(mode==="homework"||mode==="task")?"block":"none";
   pNum.style.display=mode==="participation"?"block":"none";
   correct.style.display=mode==="participation"?"block":"none";
   summary.style.display=(mode==="attendance"||mode==="participation")?"block":"none";
+  yearPanel.style.display=mode==="yearwork"?"block":"none";
 
   reset.style.display=(mode==="attendance"&&stream)?"block":"none";
   save.style.display=(mode==="attendance"&&stream)?"block":"none";
@@ -480,10 +552,17 @@ function selectMode(mode,button){
   createParticipationHits();
 
   cancelHomeworkEvaluation();
+  currentYearWorkStudent=null;
+  yearWorkReadings=[];
+  document.getElementById("ywStudentInfo").style.display="none";
   nextStudent();
 
   if(mode==="attendance") loadExistingAttendance();
   if(mode==="participation") loadNextParticipationNumber();
+  if(mode==="yearwork"){
+    populateYearWorkStudentSelect();
+    setYearWorkInputMode("scan");
+  }
 
   updateGuide();
   updateSummary();
@@ -501,6 +580,10 @@ function updateGuide(){
     g.textContent="الواجب: امسح بطاقة الطالب ثم أدخل المنجز من العدد الكلي لكل بند";
   }else if(currentMode==="task"){
     g.textContent="المهمة: امسح بطاقة طالب واحد";
+  }else if(currentMode==="yearwork"){
+    g.textContent=yearWorkInputMode==="scan"
+      ? "أعمال السنة: امسح بطاقة الطالب أو اختره من القائمة اليدوية"
+      : "أعمال السنة: اختر الطالب من القائمة اليدوية";
   }else{
     g.textContent="المشاركة: اختر الإجابة الصحيحة ثم وجّه الكاميرا إلى بطاقات الطلاب";
   }
@@ -674,6 +757,11 @@ function scanFrame(){
       }else if(currentMode==="homework"){
         if(markers.length&&!currentHomeworkStudent){
           collectHomeworkStudent(markers[0]);
+        }
+
+      }else if(currentMode==="yearwork"){
+        if(yearWorkInputMode==="scan" && markers.length && !currentYearWorkStudent){
+          collectYearWorkStudent(markers[0]);
         }
 
       }else if(markers.length&&!individualLocked){
@@ -945,6 +1033,209 @@ function cancelHomeworkEvaluation(){
     box.style.display="none";
   }
 }
+
+
+function populateYearWorkStudentSelect(){
+  const select=document.getElementById("yearWorkStudentSelect");
+  select.innerHTML='<option value="">اختر بطاقة الطالب / الاسم</option>';
+
+  getStudents().forEach(s=>{
+    const opt=document.createElement("option");
+    opt.value=String(s.id);
+    opt.textContent=`${s.code} — ${s.name}`;
+    select.appendChild(opt);
+  });
+}
+
+function setYearWorkInputMode(mode){
+  yearWorkInputMode=mode;
+
+  const manual=document.getElementById("ywManualArea");
+  const scanBtn=document.getElementById("ywScanModeBtn");
+  const manualBtn=document.getElementById("ywManualModeBtn");
+
+  if(mode==="manual"){
+    manual.style.display="block";
+    manualBtn.style.background="#0F766E";
+    manualBtn.style.color="#fff";
+    scanBtn.style.background="#e5e7eb";
+    scanBtn.style.color="#111827";
+  }else{
+    manual.style.display="none";
+    scanBtn.style.background="#19558e";
+    scanBtn.style.color="#fff";
+    manualBtn.style.background="#e5e7eb";
+    manualBtn.style.color="#111827";
+  }
+
+  currentYearWorkStudent=null;
+  yearWorkReadings=[];
+  document.getElementById("ywStudentInfo").style.display="none";
+  updateGuide();
+}
+
+async function manualYearWorkStudentChanged(){
+  const id=Number(document.getElementById("yearWorkStudentSelect").value);
+
+  if(!Number.isInteger(id)){
+    currentYearWorkStudent=null;
+    document.getElementById("ywStudentInfo").style.display="none";
+    return;
+  }
+
+  const student=getStudent(id);
+  if(student) await openYearWorkStudent(student);
+}
+
+function collectYearWorkStudent(marker){
+  const id=Number(marker.id);
+  const student=getStudent(id);
+  if(!student) return;
+
+  const now=Date.now();
+  yearWorkReadings.push({id,time:now});
+  yearWorkReadings=yearWorkReadings.filter(r=>now-r.time<=YEARWORK_HIT_WINDOW);
+
+  const same=yearWorkReadings.filter(r=>r.id===id);
+
+  document.getElementById("status").textContent=
+    `🔍 جاري تثبيت ${student.name} — ${Math.min(same.length,YEARWORK_REQUIRED_HITS)}/${YEARWORK_REQUIRED_HITS}`;
+
+  if(same.length>=YEARWORK_REQUIRED_HITS){
+    openYearWorkStudent(student);
+  }
+}
+
+async function openYearWorkStudent(student){
+  currentYearWorkStudent=student;
+  yearWorkReadings=[];
+
+  document.getElementById("status").textContent=
+    "⏳ جاري تحميل أعمال السنة...";
+
+  try{
+    const section=document.getElementById("classSelect").value;
+    const data=await apiGet({
+      action:"yearWorkStudent",
+      section,
+      id:student.id
+    });
+
+    if(!data.success||!data.record){
+      throw new Error(data.message||"تعذر تحميل بيانات الطالب");
+    }
+
+    const r=data.record;
+
+    document.getElementById("ywStudentName").textContent=
+      `${r.code} — ${r.name}`;
+
+    document.getElementById("ywPerformance30").value=
+      Number(r.performance30||0).toFixed(2);
+
+    document.getElementById("ywParticipation10").value=
+      r.participation10===""?"":r.participation10;
+
+    document.getElementById("ywProjects5").value=
+      r.projects5===""?"":r.projects5;
+
+    document.getElementById("ywQuizzes15").value=
+      r.quizzes15===""?"":r.quizzes15;
+
+    calculateYearWorkTotal();
+
+    document.getElementById("ywStudentInfo").style.display="block";
+    document.getElementById("status").textContent=
+      `✅ ${r.name} — أكمل الدرجات المتبقية`;
+
+  }catch(e){
+    console.error(e);
+    currentYearWorkStudent=null;
+    document.getElementById("ywStudentInfo").style.display="none";
+    document.getElementById("status").textContent=
+      "❌ تعذر تحميل أعمال السنة للطالب";
+  }
+}
+
+function calculateYearWorkTotal(){
+  const a=Number(document.getElementById("ywPerformance30").value)||0;
+  const b=Number(document.getElementById("ywParticipation10").value)||0;
+  const c=Number(document.getElementById("ywProjects5").value)||0;
+  const d=Number(document.getElementById("ywQuizzes15").value)||0;
+
+  document.getElementById("ywTotal60").textContent=(a+b+c+d).toFixed(2);
+}
+
+function validateYearWorkScore(id,max,label){
+  const value=document.getElementById(id).value;
+
+  if(value===""){
+    alert("أدخل درجة "+label);
+    return null;
+  }
+
+  const n=Number(value);
+
+  if(!Number.isFinite(n)||n<0||n>max){
+    alert(`درجة ${label} يجب أن تكون من 0 إلى ${max}`);
+    return null;
+  }
+
+  return n;
+}
+
+async function saveYearWorkEvaluation(){
+  if(!currentYearWorkStudent){
+    alert("اختر الطالب أو امسح بطاقته أولاً");
+    return;
+  }
+
+  const participation10=validateYearWorkScore("ywParticipation10",10,"المشاركة");
+  if(participation10===null) return;
+
+  const projects5=validateYearWorkScore("ywProjects5",5,"البحث والمشاريع والتجارب");
+  if(projects5===null) return;
+
+  const quizzes15=validateYearWorkScore("ywQuizzes15",15,"الاختبارات القصيرة");
+  if(quizzes15===null) return;
+
+  const section=document.getElementById("classSelect").value;
+  const btn=document.getElementById("saveYearWorkBtn");
+
+  btn.disabled=true;
+  btn.textContent="⏳ جاري الحفظ...";
+
+  try{
+    await sendToServer({
+      type:"yearWork",
+      section,
+      student:{
+        id:currentYearWorkStudent.id,
+        code:currentYearWorkStudent.code,
+        name:currentYearWorkStudent.name
+      },
+      participation10,
+      projects5,
+      quizzes15
+    });
+
+    document.getElementById("status").textContent=
+      `✅ تم إرسال أعمال السنة للطالب ${currentYearWorkStudent.name}`;
+
+    currentYearWorkStudent=null;
+    yearWorkReadings=[];
+    document.getElementById("ywStudentInfo").style.display="none";
+    document.getElementById("yearWorkStudentSelect").value="";
+
+  }catch(e){
+    console.error(e);
+    document.getElementById("status").textContent="❌ تعذر إرسال أعمال السنة";
+  }finally{
+    btn.disabled=false;
+    btn.textContent="💾 حفظ أعمال السنة";
+  }
+}
+
 
 function collectParticipationHit(marker){
   const id=Number(marker.id);
@@ -1345,6 +1636,9 @@ function nextStudent(){
   }else if(currentMode==="task"){
     document.getElementById("status").textContent=
       "جاهز لمسح طالب";
+  }else if(currentMode==="yearwork"){
+    document.getElementById("status").textContent=
+      "جاهز لمسح بطاقة الطالب أو اختياره من القائمة";
   }
 }
 
