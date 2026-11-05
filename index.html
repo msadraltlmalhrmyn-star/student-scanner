@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<title>نظام الحضور والتقييم V9</title>
+<title>نظام الحضور والتقييم V10</title>
 
 <script src="https://cdn.jsdelivr.net/gh/damianofalcioni/js-aruco2@master/src/cv.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/damianofalcioni/js-aruco2@master/src/aruco.js"></script>
@@ -228,6 +228,7 @@ canvas{display:none}
 
 <div id="yearWorkPanel">
   <div class="ywTitle">📊 أعمال السنة</div>
+  <div id="ywSyncState" class="small" style="text-align:center;margin-bottom:6px">الحفظ المؤكد في Google Sheets</div>
 
   <div class="ywMode">
     <button id="ywScanModeBtn" type="button" onclick="setYearWorkInputMode('scan')">📷 بالباركود</button>
@@ -1057,12 +1058,21 @@ function loadYearWorkQueueFromStorage(){
   }catch(e){
     yearWorkSaveQueue=[];
   }
+
+  setTimeout(persistYearWorkQueue,0);
 }
 
 function persistYearWorkQueue(){
   try{
     localStorage.setItem(YEARWORK_QUEUE_KEY,JSON.stringify(yearWorkSaveQueue));
   }catch(e){}
+
+  const el=document.getElementById("ywSyncState");
+  if(el){
+    el.textContent=yearWorkSaveQueue.length
+      ? `⏳ بانتظار الحفظ المؤكد: ${yearWorkSaveQueue.length}`
+      : "✅ جميع الدرجات محفوظة في Google Sheets";
+  }
 }
 
 function enqueueYearWorkSave(item){
@@ -1113,40 +1123,52 @@ async function processYearWorkQueue(){
     const item=yearWorkSaveQueue[0];
 
     try{
-      await sendToServer({
-        type:"yearWork",
+      // حفظ مؤكد: الخادم يعيد JSON success بعد كتابة Google Sheets فعلياً.
+      const data=await apiGet({
+        action:"saveYearWork",
         section:item.section,
-        student:item.student,
+        id:item.student.id,
         participation10:item.participation10,
         projects5:item.projects5,
-        quizzes15:item.quizzes15
+        quizzes15:item.quizzes15,
+        _t:Date.now()
       });
 
-      // التحقق في الخلفية لا يوقف انتقال المعلم بين الطلاب.
-      await new Promise(r=>setTimeout(r,250));
-
-      let ok=await verifyYearWorkItem(item);
-
-      if(!ok){
-        await new Promise(r=>setTimeout(r,500));
-        ok=await verifyYearWorkItem(item);
+      if(!data.success){
+        throw new Error(data.message||"فشل الحفظ");
       }
 
-      if(ok){
-        yearWorkSaveQueue.shift();
-        persistYearWorkQueue();
-
-        try{
-          localStorage.removeItem(
-            "yearWorkBackup_"+item.section+"_"+item.student.id
-          );
-        }catch(e){}
-      }else{
-        // نتركه في الطابور للمحاولة لاحقاً ولا نفقد البيانات.
-        break;
+      // تحديث الذاكرة بالقيم التي أكدها الخادم.
+      if(data.result){
+        yearWorkCache[Number(item.student.id)]={
+          id:item.student.id,
+          name:item.student.name,
+          performance30:Number(data.result.performance30)||0,
+          participation10:Number(data.result.participation10)||0,
+          projects5:Number(data.result.projects5)||0,
+          quizzes15:Number(data.result.quizzes15)||0,
+          total60:Number(data.result.total60)||0
+        };
       }
+
+      yearWorkSaveQueue.shift();
+      persistYearWorkQueue();
+
+      try{
+        localStorage.removeItem(
+          "yearWorkBackup_"+item.section+"_"+item.student.id
+        );
+      }catch(e){}
+
+      document.getElementById("status").textContent=
+        `✅ تم الحفظ المؤكد في الكشف: ${item.student.name}`;
 
     }catch(e){
+      console.error(e);
+
+      document.getElementById("status").textContent=
+        "⚠️ لم يصل الحفظ إلى الكشف بعد — البيانات محفوظة محلياً وستعاد المحاولة";
+
       break;
     }
   }
@@ -1443,7 +1465,7 @@ function saveYearWorkEvaluation(){
   enqueueYearWorkSave(queueItem);
 
   document.getElementById("status").textContent=
-    `✅ تم تسجيل ${student.name} محلياً — الحفظ في الخلفية`;
+    `⏳ تم تسجيل ${student.name} محلياً — جاري الحفظ المؤكد في الكشف`;
 
   // الانتقال للطالب التالي فوراً بلا انتظار.
   currentYearWorkStudent=null;
