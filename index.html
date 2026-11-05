@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<title>نظام الحضور والتقييم V7</title>
+<title>نظام الحضور والتقييم V8</title>
 
 <script src="https://cdn.jsdelivr.net/gh/damianofalcioni/js-aruco2@master/src/cv.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/damianofalcioni/js-aruco2@master/src/aruco.js"></script>
@@ -323,6 +323,9 @@ let homeworkReadings=[];
 let yearWorkInputMode="scan";
 let currentYearWorkStudent=null;
 let yearWorkReadings=[];
+let yearWorkCache={};
+let yearWorkCacheSection="";
+let yearWorkLoading=false;
 
 const ATTENDANCE_REQUIRED_HITS=5;
 const PARTICIPATION_REQUIRED_HITS=5;
@@ -455,7 +458,10 @@ async function classChanged(){
 
   if(currentMode==="attendance") await loadExistingAttendance();
   if(currentMode==="participation") await loadNextParticipationNumber();
-  if(currentMode==="yearwork") populateYearWorkStudentSelect();
+  if(currentMode==="yearwork"){
+    populateYearWorkStudentSelect();
+    await loadYearWorkSectionCache(true);
+  }
 
   updateGuide();
   updateSummary();
@@ -563,6 +569,7 @@ function selectMode(mode,button){
   if(mode==="yearwork"){
     populateYearWorkStudentSelect();
     setYearWorkInputMode("scan");
+    loadYearWorkSectionCache(false);
   }
 
   updateGuide();
@@ -1036,6 +1043,107 @@ function cancelHomeworkEvaluation(){
 }
 
 
+
+async function loadYearWorkSectionCache(force=false){
+  const section=document.getElementById("classSelect").value;
+
+  if(!section) return false;
+
+  if(!force && yearWorkCacheSection===section && Object.keys(yearWorkCache).length){
+    return true;
+  }
+
+  if(yearWorkLoading) return false;
+
+  yearWorkLoading=true;
+
+  try{
+    document.getElementById("status").textContent=
+      "⏳ تحميل أعمال السنة للشعبة مرة واحدة...";
+
+    const data=await apiGet({
+      action:"yearWorkSection",
+      section
+    });
+
+    if(!data.success){
+      throw new Error(data.message||"تعذر تحميل أعمال السنة");
+    }
+
+    yearWorkCache={};
+
+    (data.records||[]).forEach(r=>{
+      yearWorkCache[Number(r.id)]=r;
+    });
+
+    yearWorkCacheSection=section;
+
+    document.getElementById("status").textContent=
+      `✅ أعمال السنة جاهزة — ${Object.keys(yearWorkCache).length} طالب`;
+
+    return true;
+
+  }catch(e){
+    console.error(e);
+    document.getElementById("status").textContent=
+      "❌ تعذر تحميل أعمال السنة للشعبة";
+    return false;
+
+  }finally{
+    yearWorkLoading=false;
+  }
+}
+
+function getYearWorkCachedRecord(student){
+  const r=yearWorkCache[Number(student.id)];
+
+  if(r){
+    return {
+      ...r,
+      name:student.name,
+      code:student.code,
+      section:student.section
+    };
+  }
+
+  return {
+    name:student.name,
+    code:student.code,
+    id:student.id,
+    section:student.section,
+    performance30:0,
+    participation10:"",
+    projects5:"",
+    quizzes15:"",
+    total60:0
+  };
+}
+
+function showYearWorkRecord(student,r){
+  currentYearWorkStudent=student;
+
+  document.getElementById("ywStudentName").textContent=
+    `${student.code} — ${student.name}`;
+
+  document.getElementById("ywPerformance30").value=
+    Number(r.performance30||0).toFixed(2);
+
+  document.getElementById("ywParticipation10").value=
+    r.participation10===""?"":r.participation10;
+
+  document.getElementById("ywProjects5").value=
+    r.projects5===""?"":r.projects5;
+
+  document.getElementById("ywQuizzes15").value=
+    r.quizzes15===""?"":r.quizzes15;
+
+  calculateYearWorkTotal();
+
+  document.getElementById("ywStudentInfo").style.display="block";
+  document.getElementById("status").textContent=
+    `✅ ${student.name} — جاهز للإدخال`;
+}
+
 function populateYearWorkStudentSelect(){
   const select=document.getElementById("yearWorkStudentSelect");
   select.innerHTML='<option value="">اختر بطاقة الطالب / الاسم</option>';
@@ -1088,26 +1196,18 @@ async function manualYearWorkStudentChanged(){
   const student=getStudent(id);
 
   if(!student){
-    currentYearWorkStudent=null;
-    document.getElementById("ywStudentInfo").style.display="none";
     document.getElementById("status").textContent="❌ لم يتم العثور على الطالب";
     return;
   }
 
-  // إظهار اللوحة فوراً حتى لا تبدو القائمة وكأنها لم تستجب.
-  currentYearWorkStudent=student;
-  document.getElementById("ywStudentName").textContent=
-    `${student.code} — ${student.name}`;
-  document.getElementById("ywStudentInfo").style.display="block";
-  document.getElementById("ywPerformance30").value="";
-  document.getElementById("ywParticipation10").value="";
-  document.getElementById("ywProjects5").value="";
-  document.getElementById("ywQuizzes15").value="";
-  document.getElementById("ywTotal60").textContent="0.00";
+  if(yearWorkCacheSection!==document.getElementById("classSelect").value ||
+     !Object.keys(yearWorkCache).length){
+    await loadYearWorkSectionCache(false);
+  }
 
-  await openYearWorkStudent(student);
+  const record=getYearWorkCachedRecord(student);
+  showYearWorkRecord(student,record);
 
-  // تمرير الصفحة تلقائياً إلى خانات الدرجات على الجوال.
   document.getElementById("ywStudentInfo").scrollIntoView({
     behavior:"smooth",
     block:"start"
@@ -1137,54 +1237,13 @@ async function openYearWorkStudent(student){
   currentYearWorkStudent=student;
   yearWorkReadings=[];
 
-  document.getElementById("ywStudentInfo").style.display="block";
-  document.getElementById("ywStudentName").textContent=
-    `${student.code} — ${student.name}`;
-
-  document.getElementById("status").textContent=
-    "⏳ جاري تحميل أعمال السنة...";
-
-  try{
-    const section=document.getElementById("classSelect").value;
-    const data=await apiGet({
-      action:"yearWorkStudent",
-      section,
-      id:student.id
-    });
-
-    if(!data.success||!data.record){
-      throw new Error(data.message||"تعذر تحميل بيانات الطالب");
-    }
-
-    const r=data.record;
-
-    document.getElementById("ywStudentName").textContent=
-      `${r.code} — ${r.name}`;
-
-    document.getElementById("ywPerformance30").value=
-      Number(r.performance30||0).toFixed(2);
-
-    document.getElementById("ywParticipation10").value=
-      r.participation10===""?"":r.participation10;
-
-    document.getElementById("ywProjects5").value=
-      r.projects5===""?"":r.projects5;
-
-    document.getElementById("ywQuizzes15").value=
-      r.quizzes15===""?"":r.quizzes15;
-
-    calculateYearWorkTotal();
-
-    document.getElementById("ywStudentInfo").style.display="block";
-    document.getElementById("status").textContent=
-      `✅ ${r.name} — أكمل الدرجات المتبقية`;
-
-  }catch(e){
-    console.error(e);
-    document.getElementById("ywStudentInfo").style.display="block";
-    document.getElementById("status").textContent=
-      "❌ تعذر تحميل الدرجة السابقة /30 — تحقق من نشر V7";
+  if(yearWorkCacheSection!==document.getElementById("classSelect").value ||
+     !Object.keys(yearWorkCache).length){
+    await loadYearWorkSectionCache(false);
   }
+
+  const record=getYearWorkCachedRecord(student);
+  showYearWorkRecord(student,record);
 }
 
 function calculateYearWorkTotal(){
@@ -1230,36 +1289,80 @@ async function saveYearWorkEvaluation(){
   if(quizzes15===null) return;
 
   const section=document.getElementById("classSelect").value;
-  const btn=document.getElementById("saveYearWorkBtn");
+  const student={...currentYearWorkStudent};
+  const performance30=Number(document.getElementById("ywPerformance30").value)||0;
+  const total60=Number((performance30+participation10+projects5+quizzes15).toFixed(2));
 
+  const payload={
+    type:"yearWork",
+    section,
+    student:{
+      id:student.id,
+      code:student.code,
+      name:student.name
+    },
+    participation10,
+    projects5,
+    quizzes15
+  };
+
+  const btn=document.getElementById("saveYearWorkBtn");
   btn.disabled=true;
-  btn.textContent="⏳ جاري الحفظ...";
+  btn.textContent="⏳ حفظ...";
+
+  // نسخة احتياطية محلية فورية قبل الإرسال.
+  try{
+    localStorage.setItem(
+      "yearWorkBackup_"+section+"_"+student.id,
+      JSON.stringify({
+        ...payload,
+        performance30,
+        total60,
+        savedAt:new Date().toISOString()
+      })
+    );
+  }catch(e){}
+
+  // تحديث الذاكرة المحلية فوراً.
+  yearWorkCache[Number(student.id)]={
+    id:student.id,
+    name:student.name,
+    performance30,
+    participation10,
+    projects5,
+    quizzes15,
+    total60
+  };
 
   try{
-    await sendToServer({
-      type:"yearWork",
-      section,
-      student:{
-        id:currentYearWorkStudent.id,
-        code:currentYearWorkStudent.code,
-        name:currentYearWorkStudent.name
-      },
-      participation10,
-      projects5,
-      quizzes15
-    });
+    await sendToServer(payload);
 
     document.getElementById("status").textContent=
-      `✅ تم إرسال أعمال السنة للطالب ${currentYearWorkStudent.name}`;
+      `✅ تم إرسال أعمال السنة للطالب ${student.name}`;
 
     currentYearWorkStudent=null;
     yearWorkReadings=[];
     document.getElementById("ywStudentInfo").style.display="none";
-    document.getElementById("yearWorkStudentSelect").value="";
+
+    const select=document.getElementById("yearWorkStudentSelect");
+    const currentIndex=select.selectedIndex;
+
+    // عند الإدخال اليدوي ينتقل مباشرة للطالب التالي.
+    if(yearWorkInputMode==="manual" &&
+       currentIndex>0 &&
+       currentIndex<select.options.length-1){
+      select.selectedIndex=currentIndex+1;
+      await manualYearWorkStudentChanged();
+    }else{
+      select.value="";
+    }
 
   }catch(e){
     console.error(e);
-    document.getElementById("status").textContent="❌ تعذر إرسال أعمال السنة";
+
+    document.getElementById("status").textContent=
+      "⚠️ تعذر الإرسال الآن — بقيت نسخة احتياطية محلية على الجهاز";
+
   }finally{
     btn.disabled=false;
     btn.textContent="💾 حفظ أعمال السنة";
