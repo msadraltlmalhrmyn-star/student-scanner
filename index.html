@@ -334,7 +334,7 @@ canvas{display:none}
     </div>
   </div>
 
-  <div class="analysisNote">يقرأ التحليل درجات أعمال السنة مباشرة من السجل للشعبة والفترة المختارة، ويعتمد فقط الطلاب الذين لديهم مجموع محفوظ فعليًا.</div>
+  <div class="analysisNote">يقرأ التحليل مجموع أعمال السنة المحفوظ مباشرة من السجل للشعبة والفترة المختارة.</div>
 
   <div id="analysisPrintArea">
     <div id="analysisReportEmpty">اختر الشعبة والفترة ثم اضغط «إنشاء التحليل والتقرير».</div>
@@ -2257,11 +2257,14 @@ async function buildYearWorkAnalysis(){
 
     const records=(data.records||[]).filter(r=>{
       const total=Number(r.total60);
-      const hasManual =
-        r.participation10!=="" &&
-        r.projects5!=="" &&
-        r.quizzes15!=="";
-      return hasManual && Number.isFinite(total);
+      const hasAnySavedScore =
+        Number(r.performance30)!==0 ||
+        r.participation10!=="" ||
+        r.projects5!=="" ||
+        r.quizzes15!=="" ||
+        total!==0;
+
+      return Number.isFinite(total) && hasAnySavedScore;
     });
 
     if(!records.length){
