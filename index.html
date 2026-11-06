@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<title>نظام الحضور والتقييم V11</title>
+<title>نظام الحضور والتقييم V12</title>
 
 <script src="https://cdn.jsdelivr.net/gh/damianofalcioni/js-aruco2@master/src/cv.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/damianofalcioni/js-aruco2@master/src/aruco.js"></script>
@@ -18,7 +18,7 @@ h1{color:#14558e;margin:6px 0 2px;font-size:24px}
 .full{grid-column:1/-1}
 label{display:block;text-align:right;font-weight:bold;margin:3px 2px;font-size:13px}
 select,input{width:100%;padding:9px;border:1px solid #d0d5dd;border-radius:9px;font-size:16px;background:#fff}
-.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;max-width:700px;margin:0 auto 7px}
+.tabs{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;max-width:700px;margin:0 auto 7px}
 .tab{border:0;padding:10px 2px;border-radius:11px;background:#fff;color:#1671d9;font-size:14px;font-weight:bold}
 .tab.active{background:#19558e;color:#fff}
 #status{max-width:700px;margin:0 auto 6px;background:#fff;border-radius:10px;padding:8px;font-size:15px;font-weight:bold}
@@ -93,6 +93,42 @@ canvas{display:none}
 .ywTotal{margin-top:10px;background:#dcfce7;border-radius:10px;padding:11px;text-align:center;font-size:18px;font-weight:bold}
 #saveYearWorkBtn{margin-top:10px;background:#0F766E}
 
+
+/* تحليل أعمال السنة والتقرير */
+#analysisPanel{display:none;max-width:900px;margin:8px auto;background:#fff;border:2px solid #1D4ED8;border-radius:14px;padding:12px;text-align:right}
+.analysisTitle{text-align:center;font-size:21px;font-weight:bold;color:#1D4ED8;margin-bottom:8px}
+.analysisControls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:10px}
+.analysisCard{background:#f8fafc;border:1px solid #dbe3ee;border-radius:12px;padding:10px;margin:10px 0}
+.reportHeader{text-align:center;font-weight:bold;line-height:1.7}
+.reportMainTitle{background:#24577f;color:#fff;padding:10px;border-radius:4px;font-size:21px;margin:10px 0 0;text-align:center}
+.reportSubTitle{background:#d9e2f3;padding:8px;border:1px solid #777;border-top:0;font-weight:bold;text-align:center}
+.reportSectionTitle{background:#24577f;color:#fff;padding:8px;margin:16px 0 8px;font-size:18px;font-weight:bold;text-align:center}
+.reportTable{width:100%;border-collapse:collapse;background:#fff;margin:7px 0;font-size:14px}
+.reportTable th,.reportTable td{border:1px solid #555;padding:7px;text-align:center;vertical-align:middle}
+.reportTable th{background:#315ca8;color:#fff}
+.reportMeta td{font-weight:bold}
+.reportText{line-height:1.9;font-size:15px;text-align:right}
+.reportText ul{margin:4px 18px 4px 0;padding:0}
+.chartWrap{margin:12px 0;padding:10px;border:1px solid #d0d5dd;border-radius:12px;background:#fff}
+.chartTitle{text-align:center;font-weight:bold;font-size:17px;margin-bottom:10px;color:#173b63}
+.barRow{display:grid;grid-template-columns:120px 1fr 62px;align-items:center;gap:8px;margin:8px 0}
+.barLabel{font-weight:bold;font-size:13px}
+.barTrack{height:26px;background:#e5e7eb;border-radius:7px;overflow:hidden;direction:ltr}
+.barFill{height:100%;background:#24577f;border-radius:7px;min-width:0}
+.barValue{text-align:center;font-weight:bold;font-size:13px}
+.signatureGrid{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:25px;text-align:center;line-height:2}
+.analysisNote{background:#fff7ed;border:1px solid #fed7aa;border-radius:9px;padding:8px;font-size:13px;margin:8px 0}
+#analysisReportEmpty{text-align:center;color:#667085;padding:16px}
+@media print{
+  body *{visibility:hidden!important}
+  #analysisPrintArea,#analysisPrintArea *{visibility:visible!important}
+  #analysisPrintArea{position:absolute;right:0;top:0;width:100%;padding:8mm;background:#fff;color:#000}
+  #analysisPrintArea .noPrint{display:none!important}
+  .reportTable{font-size:11px}
+  .reportSectionTitle{break-after:avoid}
+  .chartWrap,.reportTable{break-inside:avoid}
+}
+
 @media(max-width:700px){
  body{padding:5px}
  h1{font-size:19px;margin:2px 0}
@@ -165,6 +201,7 @@ canvas{display:none}
 <button class="tab" onclick="selectMode('task',this)">📋 مهمة</button>
 <button class="tab" onclick="selectMode('participation',this)">⭐ مشاركة</button>
 <button class="tab" onclick="selectMode('yearwork',this)">📊 أعمال السنة</button>
+<button class="tab" onclick="selectMode('analysis',this)">📈 التحليل</button>
 </div>
 
 <div id="status">اختر الشعبة ثم افتح الكاميرا</div>
@@ -274,6 +311,34 @@ canvas{display:none}
     </div>
 
     <button id="saveYearWorkBtn" class="main" onclick="saveYearWorkEvaluation()">💾 حفظ أعمال السنة</button>
+  </div>
+</div>
+
+<div id="analysisPanel">
+  <div class="analysisTitle">📈 تحليل بيانات أعمال السنة والتقرير المهني</div>
+
+  <div class="analysisControls">
+    <div>
+      <label>الفترة</label>
+      <select id="analysisPeriodSelect">
+        <option value="الفترة الأولى" selected>الفترة الأولى</option>
+        <option value="الفترة الثانية">الفترة الثانية</option>
+      </select>
+    </div>
+    <div>
+      <label>المادة</label>
+      <input id="analysisSubject" value="الفيزياء">
+    </div>
+    <div style="display:flex;align-items:end">
+      <button class="main" style="background:#1D4ED8" onclick="buildYearWorkAnalysis()">📊 إنشاء التحليل والتقرير</button>
+    </div>
+  </div>
+
+  <div class="analysisNote">يُحلل التقرير الطلاب الذين اكتملت لهم درجات بنود أعمال السنة اليدوية، حتى لا تُحتسب الخانات غير المدخلة على أنها صفر.</div>
+
+  <div id="analysisPrintArea">
+    <div id="analysisReportEmpty">اختر الشعبة والفترة ثم اضغط «إنشاء التحليل والتقرير».</div>
+    <div id="analysisReportContent" style="display:none"></div>
   </div>
 </div>
 
@@ -458,6 +523,7 @@ async function classChanged(){
   document.getElementById("individualResult").style.display="none";
   document.getElementById("homeworkEvaluation").style.display="none";
   document.getElementById("yearWorkPanel").style.display=currentMode==="yearwork"?"block":"none";
+  document.getElementById("analysisPanel").style.display=currentMode==="analysis"?"block":"none";
   document.getElementById("ywStudentInfo").style.display="none";
   document.getElementById("nextBtn").style.display="none";
 
@@ -476,6 +542,10 @@ async function classChanged(){
   if(currentMode==="yearwork"){
     populateYearWorkStudentSelect();
     await loadYearWorkSectionCache(true);
+  }
+
+  if(currentMode==="analysis"){
+    document.getElementById("status").textContent=`الشعبة ${section} — جاهز لتحليل أعمال السنة`;
   }
 
   updateGuide();
@@ -550,6 +620,9 @@ function selectMode(mode,button){
   const save=document.getElementById("saveAttendanceBtn");
   const finish=document.getElementById("finishParticipationBtn");
   const yearPanel=document.getElementById("yearWorkPanel");
+  const analysisPanel=document.getElementById("analysisPanel");
+  const cameraBox=document.querySelector(".cameraBox");
+  const cameraButtons=document.querySelector(".buttons");
 
   dateArea.style.display=(mode==="attendance"||mode==="participation")?"block":"none";
   numberArea.style.display=(mode==="homework"||mode==="task")?"block":"none";
@@ -557,6 +630,9 @@ function selectMode(mode,button){
   correct.style.display=mode==="participation"?"block":"none";
   summary.style.display=(mode==="attendance"||mode==="participation")?"block":"none";
   yearPanel.style.display=mode==="yearwork"?"block":"none";
+  analysisPanel.style.display=mode==="analysis"?"block":"none";
+  cameraBox.style.display=mode==="analysis"?"none":"block";
+  cameraButtons.style.display=mode==="analysis"?"none":"grid";
 
   reset.style.display=(mode==="attendance"&&stream)?"block":"none";
   save.style.display=(mode==="attendance"&&stream)?"block":"none";
@@ -577,7 +653,7 @@ function selectMode(mode,button){
   currentYearWorkStudent=null;
   yearWorkReadings=[];
   document.getElementById("ywStudentInfo").style.display="none";
-  nextStudent();
+  if(mode!=="analysis") nextStudent();
 
   if(mode==="attendance") loadExistingAttendance();
   if(mode==="participation") loadNextParticipationNumber();
@@ -585,6 +661,9 @@ function selectMode(mode,button){
     populateYearWorkStudentSelect();
     setYearWorkInputMode("scan");
     loadYearWorkSectionCache(false);
+  }
+  if(mode==="analysis"){
+    document.getElementById("status").textContent="اختر الشعبة ثم أنشئ تحليل أعمال السنة";
   }
 
   updateGuide();
@@ -608,6 +687,8 @@ function updateGuide(){
     g.textContent=yearWorkInputMode==="scan"
       ? `أعمال السنة — ${p}: امسح بطاقة الطالب أو اختره من القائمة اليدوية`
       : `أعمال السنة — ${p}: اختر الطالب من القائمة اليدوية`;
+  }else if(currentMode==="analysis"){
+    g.textContent="تحليل أعمال السنة";
   }else{
     g.textContent="المشاركة: اختر الإجابة الصحيحة ثم وجّه الكاميرا إلى بطاقات الطلاب";
   }
