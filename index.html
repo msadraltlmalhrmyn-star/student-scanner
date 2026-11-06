@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
-<title>نظام الحضور والتقييم V10</title>
+<title>نظام الحضور والتقييم V11</title>
 
 <script src="https://cdn.jsdelivr.net/gh/damianofalcioni/js-aruco2@master/src/cv.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/damianofalcioni/js-aruco2@master/src/aruco.js"></script>
@@ -228,7 +228,16 @@ canvas{display:none}
 
 <div id="yearWorkPanel">
   <div class="ywTitle">📊 أعمال السنة</div>
+
+  <div style="margin-bottom:8px">
+    <select id="yearWorkPeriodSelect" onchange="yearWorkPeriodChanged()">
+      <option value="الفترة الأولى" selected>الفترة الأولى</option>
+      <option value="الفترة الثانية">الفترة الثانية</option>
+    </select>
+  </div>
+
   <div id="ywSyncState" class="small" style="text-align:center;margin-bottom:6px">الحفظ المؤكد في Google Sheets</div>
+  <button type="button" class="main" style="background:#B45309;margin-bottom:7px" onclick="syncLegacyLocalYearWork()">🔄 مزامنة الدرجات السابقة المحفوظة على الجوال للفترة الأولى</button>
 
   <div class="ywMode">
     <button id="ywScanModeBtn" type="button" onclick="setYearWorkInputMode('scan')">📷 بالباركود</button>
@@ -326,6 +335,7 @@ let currentYearWorkStudent=null;
 let yearWorkReadings=[];
 let yearWorkCache={};
 let yearWorkCacheSection="";
+let yearWorkCachePeriod="الفترة الأولى";
 let yearWorkLoading=false;
 
 let yearWorkSaveQueue=[];
@@ -594,9 +604,10 @@ function updateGuide(){
   }else if(currentMode==="task"){
     g.textContent="المهمة: امسح بطاقة طالب واحد";
   }else if(currentMode==="yearwork"){
+    const p=getYearWorkPeriod();
     g.textContent=yearWorkInputMode==="scan"
-      ? "أعمال السنة: امسح بطاقة الطالب أو اختره من القائمة اليدوية"
-      : "أعمال السنة: اختر الطالب من القائمة اليدوية";
+      ? `أعمال السنة — ${p}: امسح بطاقة الطالب أو اختره من القائمة اليدوية`
+      : `أعمال السنة — ${p}: اختر الطالب من القائمة اليدوية`;
   }else{
     g.textContent="المشاركة: اختر الإجابة الصحيحة ثم وجّه الكاميرا إلى بطاقات الطلاب";
   }
@@ -1050,11 +1061,89 @@ function cancelHomeworkEvaluation(){
 
 
 
+
+function getYearWorkPeriod(){
+  const el=document.getElementById("yearWorkPeriodSelect");
+  return el ? el.value : "الفترة الأولى";
+}
+
+async function yearWorkPeriodChanged(){
+  yearWorkCache={};
+  yearWorkCacheSection="";
+  yearWorkCachePeriod=getYearWorkPeriod();
+  currentYearWorkStudent=null;
+  yearWorkReadings=[];
+  document.getElementById("ywStudentInfo").style.display="none";
+  await loadYearWorkSectionCache(true);
+  updateGuide();
+}
+
+function syncLegacyLocalYearWork(){
+  const section=document.getElementById("classSelect").value;
+
+  if(!section){
+    alert("اختر الشعبة أولاً");
+    return;
+  }
+
+  let found=0;
+
+  try{
+    const keys=[];
+    for(let i=0;i<localStorage.length;i++) keys.push(localStorage.key(i));
+
+    keys.forEach(key=>{
+      if(!key || !key.startsWith("yearWorkBackup_")) return;
+
+      const raw=localStorage.getItem(key);
+      if(!raw) return;
+
+      let item;
+      try{ item=JSON.parse(raw); }catch(e){ return; }
+
+      if(String(item.section)!==String(section)) return;
+      if(!item.student) return;
+
+      const normalized={
+        section:String(item.section),
+        period:"الفترة الأولى",
+        student:{
+          id:Number(item.student.id),
+          code:item.student.code||"",
+          name:item.student.name||""
+        },
+        performance30:Number(item.performance30)||0,
+        participation10:Number(item.participation10)||0,
+        projects5:Number(item.projects5)||0,
+        quizzes15:Number(item.quizzes15)||0,
+        total60:Number(item.total60)||0,
+        createdAt:item.createdAt||Date.now()
+      };
+
+      enqueueYearWorkSave(normalized);
+      found++;
+    });
+  }catch(e){
+    console.error(e);
+  }
+
+  if(found){
+    document.getElementById("status").textContent=
+      `🔄 تم العثور على ${found} سجل سابق — جاري مزامنته للفترة الأولى`;
+  }else{
+    alert("لم أجد درجات محلية قديمة لهذه الشعبة على هذا الجهاز.");
+  }
+}
+
 function loadYearWorkQueueFromStorage(){
   try{
     const raw=localStorage.getItem(YEARWORK_QUEUE_KEY);
     yearWorkSaveQueue=raw?JSON.parse(raw):[];
     if(!Array.isArray(yearWorkSaveQueue)) yearWorkSaveQueue=[];
+    yearWorkSaveQueue=yearWorkSaveQueue.map(x=>({
+      ...x,
+      period:x.period||"الفترة الأولى"
+    }));
   }catch(e){
     yearWorkSaveQueue=[];
   }
@@ -1078,7 +1167,11 @@ function persistYearWorkQueue(){
 function enqueueYearWorkSave(item){
   // أحدث إدخال لنفس الطالب يستبدل القديم غير المؤكد.
   yearWorkSaveQueue=yearWorkSaveQueue.filter(x=>
-    !(String(x.section)===String(item.section) && Number(x.student.id)===Number(item.student.id))
+    !(
+      String(x.section)===String(item.section) &&
+      String(x.period||"الفترة الأولى")===String(item.period||"الفترة الأولى") &&
+      Number(x.student.id)===Number(item.student.id)
+    )
   );
 
   yearWorkSaveQueue.push(item);
@@ -1127,6 +1220,7 @@ async function processYearWorkQueue(){
       const data=await apiGet({
         action:"saveYearWork",
         section:item.section,
+        period:item.period||"الفترة الأولى",
         id:item.student.id,
         participation10:item.participation10,
         projects5:item.projects5,
@@ -1178,10 +1272,16 @@ async function processYearWorkQueue(){
 
 async function loadYearWorkSectionCache(force=false){
   const section=document.getElementById("classSelect").value;
+  const period=getYearWorkPeriod();
 
   if(!section) return false;
 
-  if(!force && yearWorkCacheSection===section && Object.keys(yearWorkCache).length){
+  if(
+    !force &&
+    yearWorkCacheSection===section &&
+    yearWorkCachePeriod===period &&
+    Object.keys(yearWorkCache).length
+  ){
     return true;
   }
 
@@ -1195,7 +1295,8 @@ async function loadYearWorkSectionCache(force=false){
 
     const data=await apiGet({
       action:"yearWorkSection",
-      section
+      section,
+      period
     });
 
     if(!data.success){
@@ -1210,7 +1311,10 @@ async function loadYearWorkSectionCache(force=false){
 
     // أي حفظ لم يتأكد بعد يظل ظاهرًا من النسخة المحلية.
     yearWorkSaveQueue
-      .filter(x=>String(x.section)===String(section))
+      .filter(x=>
+        String(x.section)===String(section) &&
+        String(x.period||"الفترة الأولى")===String(period)
+      )
       .forEach(x=>{
         yearWorkCache[Number(x.student.id)]={
           id:x.student.id,
@@ -1224,6 +1328,7 @@ async function loadYearWorkSectionCache(force=false){
       });
 
     yearWorkCacheSection=section;
+    yearWorkCachePeriod=period;
 
     document.getElementById("status").textContent=
       `✅ أعمال السنة جاهزة — ${Object.keys(yearWorkCache).length} طالب`;
@@ -1423,12 +1528,14 @@ function saveYearWorkEvaluation(){
   if(quizzes15===null) return;
 
   const section=document.getElementById("classSelect").value;
+  const period=getYearWorkPeriod();
   const student={...currentYearWorkStudent};
   const performance30=Number(document.getElementById("ywPerformance30").value)||0;
   const total60=Number((performance30+participation10+projects5+quizzes15).toFixed(2));
 
   const queueItem={
     section,
+    period,
     student:{
       id:student.id,
       code:student.code,
@@ -1445,7 +1552,7 @@ function saveYearWorkEvaluation(){
   // نسخة احتياطية قبل أي شيء.
   try{
     localStorage.setItem(
-      "yearWorkBackup_"+section+"_"+student.id,
+      "yearWorkBackup_"+period+"_"+section+"_"+student.id,
       JSON.stringify(queueItem)
     );
   }catch(e){}
