@@ -334,7 +334,7 @@ canvas{display:none}
     </div>
   </div>
 
-  <div class="analysisNote">يُحلل التقرير الطلاب الذين اكتملت لهم درجات بنود أعمال السنة اليدوية، حتى لا تُحتسب الخانات غير المدخلة على أنها صفر.</div>
+  <div class="analysisNote">يقرأ التحليل درجات أعمال السنة مباشرة من السجل للشعبة والفترة المختارة، ويعتمد فقط الطلاب الذين لديهم مجموع محفوظ فعليًا.</div>
 
   <div id="analysisPrintArea">
     <div id="analysisReportEmpty">اختر الشعبة والفترة ثم اضغط «إنشاء التحليل والتقرير».</div>
@@ -2111,6 +2111,307 @@ function getAnswer(corners){
   }
 
   return "B";
+}
+
+
+function analysisGradeBand(score){
+  if(score>=54) return "ممتاز";
+  if(score>=48) return "جيد جدًا";
+  if(score>=42) return "جيد";
+  if(score>=36) return "مقبول";
+  return "بحاجة إلى دعم";
+}
+
+function analysisAverage(arr){
+  if(!arr.length) return 0;
+  return arr.reduce((a,b)=>a+b,0)/arr.length;
+}
+
+function analysisMedian(arr){
+  if(!arr.length) return 0;
+  const a=[...arr].sort((x,y)=>x-y);
+  const m=Math.floor(a.length/2);
+  return a.length%2?a[m]:(a[m-1]+a[m])/2;
+}
+
+function drawBarChart(canvasId, labels, values, maxValue, title){
+  const canvas=document.getElementById(canvasId);
+  if(!canvas) return;
+
+  const dpr=window.devicePixelRatio||1;
+  const cssWidth=Math.max(320, Math.min(900, canvas.parentElement?.clientWidth||700));
+  const cssHeight=Math.max(280, labels.length*24+120);
+
+  canvas.style.width=cssWidth+"px";
+  canvas.style.height=cssHeight+"px";
+  canvas.width=Math.floor(cssWidth*dpr);
+  canvas.height=Math.floor(cssHeight*dpr);
+
+  const ctx=canvas.getContext("2d");
+  ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,cssWidth,cssHeight);
+
+  const left=80, right=30, top=55, bottom=45;
+  const w=cssWidth-left-right;
+  const h=cssHeight-top-bottom;
+
+  ctx.font="bold 16px Arial";
+  ctx.textAlign="center";
+  ctx.fillText(title, cssWidth/2, 25);
+
+  ctx.strokeStyle="#888";
+  ctx.beginPath();
+  ctx.moveTo(left,top);
+  ctx.lineTo(left,top+h);
+  ctx.lineTo(left+w,top+h);
+  ctx.stroke();
+
+  const n=values.length||1;
+  const gap=8;
+  const barW=Math.max(8,(w-gap*(n+1))/n);
+
+  values.forEach((v,i)=>{
+    const x=left+gap+i*(barW+gap);
+    const bh=Math.max(0,Math.min(h,(Number(v)/maxValue)*h));
+    const y=top+h-bh;
+
+    ctx.fillStyle="#2563EB";
+    ctx.fillRect(x,y,barW,bh);
+
+    ctx.fillStyle="#111";
+    ctx.font="11px Arial";
+    ctx.textAlign="center";
+    ctx.fillText(Number(v).toFixed(1),x+barW/2,y-5);
+
+    ctx.save();
+    ctx.translate(x+barW/2,top+h+8);
+    ctx.rotate(-Math.PI/4);
+    ctx.textAlign="right";
+    ctx.fillText(labels[i],0,0);
+    ctx.restore();
+  });
+
+  ctx.font="11px Arial";
+  ctx.textAlign="right";
+  for(let t=0;t<=maxValue;t+=maxValue/4){
+    const y=top+h-(t/maxValue)*h;
+    ctx.fillStyle="#555";
+    ctx.fillText(String(Math.round(t)),left-8,y+4);
+    ctx.strokeStyle="#eee";
+    ctx.beginPath();
+    ctx.moveTo(left,y);
+    ctx.lineTo(left+w,y);
+    ctx.stroke();
+  }
+}
+
+function renderAnalysisTable(rows){
+  return `
+  <table style="width:100%;border-collapse:collapse;margin-top:8px;font-size:13px">
+    <thead>
+      <tr style="background:#1D4ED8;color:#fff">
+        <th style="border:1px solid #999;padding:6px">التقدير</th>
+        <th style="border:1px solid #999;padding:6px">نطاق الدرجة</th>
+        <th style="border:1px solid #999;padding:6px">عدد الطلاب</th>
+        <th style="border:1px solid #999;padding:6px">النسبة</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rows.map(r=>`
+        <tr>
+          <td style="border:1px solid #bbb;padding:6px">${r.label}</td>
+          <td style="border:1px solid #bbb;padding:6px">${r.range}</td>
+          <td style="border:1px solid #bbb;padding:6px">${r.count}</td>
+          <td style="border:1px solid #bbb;padding:6px">${r.pct.toFixed(1)}%</td>
+        </tr>`).join("")}
+    </tbody>
+  </table>`;
+}
+
+async function buildYearWorkAnalysis(){
+  const section=document.getElementById("classSelect").value;
+  const period=document.getElementById("analysisPeriodSelect").value;
+  const subject=(document.getElementById("analysisSubject").value||"الفيزياء").trim();
+
+  if(!section){
+    alert("اختر الشعبة أولاً");
+    return;
+  }
+
+  const out=document.getElementById("analysisReportContent");
+  const empty=document.getElementById("analysisReportEmpty");
+  empty.style.display="none";
+  out.style.display="block";
+  out.innerHTML='<div style="text-align:center;padding:20px">⏳ جاري قراءة درجات أعمال السنة وتحليلها...</div>';
+
+  try{
+    const data=await apiGet({
+      action:"yearWorkSection",
+      section,
+      period
+    });
+
+    if(!data.success){
+      throw new Error(data.message||"تعذر قراءة درجات أعمال السنة");
+    }
+
+    const records=(data.records||[]).filter(r=>{
+      const total=Number(r.total60);
+      const hasManual =
+        r.participation10!=="" &&
+        r.projects5!=="" &&
+        r.quizzes15!=="";
+      return hasManual && Number.isFinite(total);
+    });
+
+    if(!records.length){
+      out.innerHTML=`
+        <div class="analysisCard" style="text-align:center">
+          لا توجد درجات مكتملة محفوظة في أعمال السنة للشعبة ${section} — ${period}.
+        </div>`;
+      return;
+    }
+
+    const totals=records.map(r=>Number(r.total60)||0);
+    const avg=analysisAverage(totals);
+    const median=analysisMedian(totals);
+    const max=Math.max(...totals);
+    const min=Math.min(...totals);
+
+    const bands=[
+      {label:"ممتاز",range:"54 - 60",min:54,max:60},
+      {label:"جيد جدًا",range:"48 - أقل من 54",min:48,max:53.999},
+      {label:"جيد",range:"42 - أقل من 48",min:42,max:47.999},
+      {label:"مقبول",range:"36 - أقل من 42",min:36,max:41.999},
+      {label:"بحاجة إلى دعم",range:"أقل من 36",min:-999,max:35.999}
+    ].map(b=>{
+      const count=totals.filter(x=>x>=b.min&&x<=b.max).length;
+      return {...b,count,pct:(count/records.length)*100};
+    });
+
+    const excellent=bands[0].count;
+    const support=bands[4].count;
+
+    const perfAvg=analysisAverage(records.map(r=>Number(r.performance30)||0));
+    const partAvg=analysisAverage(records.map(r=>Number(r.participation10)||0));
+    const projAvg=analysisAverage(records.map(r=>Number(r.projects5)||0));
+    const quizAvg=analysisAverage(records.map(r=>Number(r.quizzes15)||0));
+
+    const components=[
+      {name:"المهام الأدائية",pct:(perfAvg/30)*100},
+      {name:"المشاركة",pct:(partAvg/10)*100},
+      {name:"البحث والمشاريع والتجارب",pct:(projAvg/5)*100},
+      {name:"الاختبارات القصيرة",pct:(quizAvg/15)*100}
+    ].sort((a,b)=>b.pct-a.pct);
+
+    const strongest=components[0];
+    const weakest=components[components.length-1];
+
+    const labels=records.map(r=>String(r.name||("طالب "+r.id)).split(" ")[0]);
+    const values=records.map(r=>Number(r.total60)||0);
+
+    const today=new Date().toLocaleDateString("ar-SA");
+
+    out.innerHTML=`
+      <div class="analysisCard">
+        <div style="text-align:center;font-weight:bold;font-size:18px">المملكة العربية السعودية - وزارة التعليم</div>
+        <div style="text-align:center;font-weight:bold">مدرسة الحرمين الثانوية</div>
+        <div style="text-align:center;font-size:19px;font-weight:bold;margin:8px 0">تقرير تحليل نتائج أعمال السنة والخطة العلاجية</div>
+        <div style="text-align:center">المادة: ${subject} | الشعبة: ${section} | ${period} | التاريخ: ${today}</div>
+        <div style="text-align:center;margin-top:4px">المعلم: عقيل الدخيل | الدرجة العظمى: 60 | عدد الطلاب المحللين: ${records.length}</div>
+      </div>
+
+      <div class="analysisCard">
+        <h3 style="text-align:center">أولًا: الرسم البياني لدرجات الطلاب</h3>
+        <div style="overflow-x:auto"><canvas id="analysisBarChart"></canvas></div>
+      </div>
+
+      <div class="analysisCard">
+        <h3 style="text-align:center">ثانيًا: رصد النتائج المجمعة</h3>
+        ${renderAnalysisTable(bands)}
+      </div>
+
+      <div class="analysisCard">
+        <h3 style="text-align:center">ثالثًا: مؤشرات الأداء العامة</h3>
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <tr><td style="border:1px solid #bbb;padding:6px">المتوسط الحسابي</td><td style="border:1px solid #bbb;padding:6px">${avg.toFixed(2)} / 60</td></tr>
+          <tr><td style="border:1px solid #bbb;padding:6px">الوسيط</td><td style="border:1px solid #bbb;padding:6px">${median.toFixed(2)}</td></tr>
+          <tr><td style="border:1px solid #bbb;padding:6px">أعلى درجة</td><td style="border:1px solid #bbb;padding:6px">${max.toFixed(2)}</td></tr>
+          <tr><td style="border:1px solid #bbb;padding:6px">أقل درجة</td><td style="border:1px solid #bbb;padding:6px">${min.toFixed(2)}</td></tr>
+          <tr><td style="border:1px solid #bbb;padding:6px">نسبة الممتاز</td><td style="border:1px solid #bbb;padding:6px">${((excellent/records.length)*100).toFixed(1)}%</td></tr>
+          <tr><td style="border:1px solid #bbb;padding:6px">نسبة المحتاجين للدعم</td><td style="border:1px solid #bbb;padding:6px">${((support/records.length)*100).toFixed(1)}%</td></tr>
+        </table>
+      </div>
+
+      <div class="analysisCard">
+        <h3 style="text-align:center">رابعًا: التحليل التربوي للنتائج</h3>
+        <p>أظهرت نتائج أعمال السنة للشعبة (${section}) في ${period} أن المتوسط الحسابي بلغ <b>${avg.toFixed(2)} من 60</b>. وبلغت نسبة الطلاب الحاصلين على تقدير ممتاز <b>${((excellent/records.length)*100).toFixed(1)}%</b>، بينما بلغت نسبة الطلاب الذين يحتاجون إلى دعم <b>${((support/records.length)*100).toFixed(1)}%</b>.</p>
+        <p>تشير مقارنة مكونات أعمال السنة إلى أن أقوى مكوّن هو <b>${strongest.name}</b> بنسبة أداء تقديرية <b>${strongest.pct.toFixed(1)}%</b>، في حين أن المكوّن الأقل أداءً هو <b>${weakest.name}</b> بنسبة <b>${weakest.pct.toFixed(1)}%</b>. ويوصى بالتركيز على هذا الجانب في خطة التحسين.</p>
+      </div>
+
+      <div class="analysisCard">
+        <h3 style="text-align:center">خامسًا: الخطة العلاجية والإثرائية</h3>
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <tr style="background:#1D4ED8;color:#fff"><th style="border:1px solid #999;padding:6px">م</th><th style="border:1px solid #999;padding:6px">الإجراء</th><th style="border:1px solid #999;padding:6px">التفاصيل وآلية التنفيذ</th></tr>
+          <tr><td style="border:1px solid #bbb;padding:6px">1</td><td style="border:1px solid #bbb;padding:6px">تشخيص نقاط الضعف</td><td style="border:1px solid #bbb;padding:6px">تحديد الطلاب الأقل من 36 درجة وتحليل جوانب القصور في بنود أعمال السنة.</td></tr>
+          <tr><td style="border:1px solid #bbb;padding:6px">2</td><td style="border:1px solid #bbb;padding:6px">حصص علاجية مركزة</td><td style="border:1px solid #bbb;padding:6px">مراجعة المهارات الأساسية مع تركيز خاص على ${weakest.name}.</td></tr>
+          <tr><td style="border:1px solid #bbb;padding:6px">3</td><td style="border:1px solid #bbb;padding:6px">تعلم بالأقران</td><td style="border:1px solid #bbb;padding:6px">توظيف الطلاب مرتفعي الأداء لمساندة زملائهم في مجموعات صغيرة.</td></tr>
+          <tr><td style="border:1px solid #bbb;padding:6px">4</td><td style="border:1px solid #bbb;padding:6px">متابعة دورية</td><td style="border:1px solid #bbb;padding:6px">تنفيذ تقويمات قصيرة أسبوعية وتسجيل مستوى التقدم في سجل المتابعة.</td></tr>
+          <tr><td style="border:1px solid #bbb;padding:6px">5</td><td style="border:1px solid #bbb;padding:6px">إثراء المتفوقين</td><td style="border:1px solid #bbb;padding:6px">تكليفات تطبيقية وتجارب ومهام أعمق للطلاب ذوي الأداء المرتفع.</td></tr>
+          <tr><td style="border:1px solid #bbb;padding:6px">6</td><td style="border:1px solid #bbb;padding:6px">التواصل مع ولي الأمر</td><td style="border:1px solid #bbb;padding:6px">إشعار أولياء أمور الطلاب المحتاجين للدعم ومتابعة التحسن بصورة دورية.</td></tr>
+        </table>
+      </div>
+
+      <div class="analysisCard">
+        <h3 style="text-align:center">سادسًا: الجدول الزمني لتنفيذ الخطة</h3>
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <tr style="background:#1D4ED8;color:#fff"><th style="border:1px solid #999;padding:6px">الأسبوع</th><th style="border:1px solid #999;padding:6px">الإجراء المخطط</th><th style="border:1px solid #999;padding:6px">الفئة المستهدفة</th><th style="border:1px solid #999;padding:6px">مؤشر النجاح</th></tr>
+          <tr><td style="border:1px solid #bbb;padding:6px">الأول</td><td style="border:1px solid #bbb;padding:6px">تشخيص الضعف وتحديد المجموعات العلاجية</td><td style="border:1px solid #bbb;padding:6px">المحتاجون للدعم</td><td style="border:1px solid #bbb;padding:6px">اكتمال التشخيص</td></tr>
+          <tr><td style="border:1px solid #bbb;padding:6px">الثاني</td><td style="border:1px solid #bbb;padding:6px">تدريب مركز على الجانب الأقل أداءً</td><td style="border:1px solid #bbb;padding:6px">المحتاجون للدعم</td><td style="border:1px solid #bbb;padding:6px">تحسن ملحوظ في التقويم القصير</td></tr>
+          <tr><td style="border:1px solid #bbb;padding:6px">الثالث</td><td style="border:1px solid #bbb;padding:6px">تطبيقات وتجارب وأنشطة تعلم نشط</td><td style="border:1px solid #bbb;padding:6px">جميع الطلاب</td><td style="border:1px solid #bbb;padding:6px">نسبة إنجاز ≥ 80%</td></tr>
+          <tr><td style="border:1px solid #bbb;padding:6px">الرابع</td><td style="border:1px solid #bbb;padding:6px">تقويم متابعة ومراجعة الخطة</td><td style="border:1px solid #bbb;padding:6px">جميع الطلاب</td><td style="border:1px solid #bbb;padding:6px">ارتفاع المتوسط العام</td></tr>
+        </table>
+      </div>
+
+      <div class="analysisCard">
+        <h3 style="text-align:center">سابعًا: التوصيات</h3>
+        <p>• الاستمرار في تحليل أعمال السنة دوريًا لكل شعبة وفترة.</p>
+        <p>• توظيف نتائج التحليل لتحديد الطلاب الذين يحتاجون إلى تدخل علاجي مبكر.</p>
+        <p>• تكثيف استراتيجيات التعلم النشط والتقويم المستمر في المكوّن الأقل أداءً.</p>
+        <p>• دعم الطلاب المتفوقين بمهام إثرائية تحافظ على مستوى تقدمهم.</p>
+        <p>• توثيق نتائج التحليل والخطة العلاجية ضمن شواهد الأداء الوظيفي للمعلم.</p>
+      </div>
+
+      <div class="analysisCard">
+        <h3 style="text-align:center">اعتماد التقرير</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;text-align:center">
+          <div>معلم المادة<br><b>عقيل الدخيل</b><br>التوقيع: ....................</div>
+          <div>مدير المدرسة<br><b>ضيف الله عبدالرزاق المالكي</b><br>التوقيع: ....................</div>
+        </div>
+      </div>
+
+      <div class="noPrint" style="text-align:center;margin:12px">
+        <button class="main" style="background:#0F766E" onclick="window.print()">🖨️ طباعة / حفظ PDF</button>
+      </div>
+    `;
+
+    setTimeout(()=>{
+      drawBarChart(
+        "analysisBarChart",
+        labels,
+        values,
+        60,
+        `درجات أعمال السنة - الشعبة ${section} - ${period}`
+      );
+    },50);
+
+  }catch(e){
+    console.error(e);
+    out.innerHTML=`
+      <div class="analysisCard" style="text-align:center;color:#b91c1c">
+        ❌ تعذر إنشاء التحليل. تأكد من تحديث Apps Script إلى النسخة الأخيرة ثم أعد المحاولة.
+      </div>`;
+  }
 }
 
 window.addEventListener("load",()=>{
